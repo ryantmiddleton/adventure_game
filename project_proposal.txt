@@ -1,0 +1,27 @@
+We are going to create a metroidvania inspired 2D action platfomer
+
+Our goal is to have at least four screens, a spawn, two basic enemy rooms, and a boss room.
+
+
+The player character will be able to move left, right, jump, and attack and have a health bar
+*stretch goal: experience bar allowing level upper
+*stretch goal: items (health, weapon upgrade)
+
+rooms will have platforms player can jump to
+
+Enemies will have health
+*stretch goal: more than one enemy type
+
+Boss will have health and multiple attacks.
+
+all sprites will have sound cues tied to their events
+
+level will have background music
+*stretch goal: boss will have different music
+
+
+Group Members:
+Ben Cossum - Game Developer
+Michael Erickson -  Game Developer
+Kirsten Dobson - Game Developer
+Ryan Middleton - Game Developer
