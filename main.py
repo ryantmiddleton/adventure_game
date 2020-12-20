@@ -35,6 +35,20 @@ class Game:
     p1 = Platform(0, HEIGHT -40, WIDTH, 40)
     self.all_sprites.add(p1)
     self.platforms.add(p1)
+    # continued ground
+    p_1 = Platform(-100, HEIGHT -40, WIDTH, 40)
+    self.all_sprites.add(p_1)
+    self.platforms.add(p_1)
+    # seperated ground
+    p_2 = Platform(-350, HEIGHT * 3/4, 100, 40)
+    self.all_sprites.add(p_2)
+    self.platforms.add(p_2)
+    p_3 = Platform(-650, HEIGHT -40, 200, 40)
+    self.all_sprites.add(p_3)
+    self.platforms.add(p_3)
+    p_4 = Platform(-1150, HEIGHT -40, 200, 40)
+    self.all_sprites.add(p_4)
+    self.platforms.add(p_4)
     # raised platform
     p2 = Platform(WIDTH/2 - 50, HEIGHT * 3/4, 100, 40)
     self.all_sprites.add(p2)
@@ -79,6 +93,15 @@ class Game:
             self.player.pos.x += abs(self.player.vel.x)
             for plat in self.platforms:
                 plat.rect.x += abs(self.player.vel.x)
+                # if plat.rect.right >= WIDTH:
+                  # plat.kill()
+            while len(self.platforms) < 6:
+              width = random.randrange(50, 100)
+              p = Platform(random.randrange(0, WIDTH-width),
+                          random.randrange(-75, -30),
+                          width, 20)
+              self.platforms.add(p)
+              self.all_sprites.add(p)
 
   def events(self):
     # Game Loop - events
