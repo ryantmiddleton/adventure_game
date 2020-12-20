@@ -1,6 +1,7 @@
 # Sprite classes for Metroidvania game
 import pygame as pg
 from settings import *
+import random
 vec = pg.math.Vector2
 
 from pygame.locals import (
@@ -20,8 +21,10 @@ class Player(pg.sprite.Sprite):
     pg.sprite.Sprite.__init__(self)
     self.game = game
     # Player Image
-    self.image = pg.Surface((30, 40))
-    self.image.fill(YELLOW)
+    
+    
+    self.image = pg.image.load("imgs/samus_front.png").convert()
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.pos = vec(WIDTH/2, HEIGHT/2)
@@ -40,9 +43,13 @@ class Player(pg.sprite.Sprite):
     keys = pg.key.get_pressed()
     # move left
     if keys[pg.K_LEFT]:
+      self.image = pg.image.load("imgs/samus_left.png").convert()
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = -PLAYER_ACC
     #move right
     if keys[pg.K_RIGHT]:
+      self.image = pg.image.load("imgs/samus_right.png").convert()
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
 
 
@@ -67,3 +74,4 @@ class Platform(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y  
+

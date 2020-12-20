@@ -1,6 +1,6 @@
 # game options
 TITLE = "Metoidvania"
-WIDTH = 1080
+WIDTH = 1500
 HEIGHT = 720
 FPS = 60
 

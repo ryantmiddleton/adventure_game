@@ -3,6 +3,7 @@ import random
 from settings import *
 from sprites import *
 
+
 from pygame.locals import (
   RLEACCEL,
   K_UP,
@@ -19,11 +20,11 @@ class Game:
     # Initialize Game
     pg.mixer.init()
     pg.init()
-    self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     pg.display.set_caption(TITLE)
+    self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     self.clock = pg.time.Clock()
-    self.running = True
 
+  
   def new(self):
     # start a new game
     self.all_sprites = pg.sprite.Group()
@@ -70,6 +71,14 @@ class Game:
       if hits:
         self.player.pos.y = hits[0].rect.top
         self.player.vel.y = 0
+    # if self.player.rect.left >= HEIGHT - 200:
+    #         self.player.pos.x -= abs(self.player.vel.x)
+    #         for plat in self.platforms:
+    #             plat.rect.x -= abs(self.player.vel.x)
+    if self.player.rect.right <= WIDTH / 2:
+            self.player.pos.x += abs(self.player.vel.x)
+            for plat in self.platforms:
+                plat.rect.x += abs(self.player.vel.x)
 
   def events(self):
     # Game Loop - events
@@ -78,7 +87,7 @@ class Game:
         if event.type == pg.QUIT:
           if self.playing:
             self.playing = False
-          self.running = False
+            self.run = False
         
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
@@ -101,7 +110,7 @@ class Game:
 
 g = Game()
 g.show_start_screen()
-while g.running:
+while g.run:
   g.new()
   g.show_go_screen()
 
