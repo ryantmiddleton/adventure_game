@@ -32,9 +32,9 @@ class Player(pg.sprite.Sprite):
     self.acc = vec(0, 0)
 
   def jump(self):
-    self.rect.x += 1
+    self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-    self.rect.x -= 1
+    self.rect.y -= 1
     if hits:  
       self.vel.y = -15
 

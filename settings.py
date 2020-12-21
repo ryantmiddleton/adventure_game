@@ -1,8 +1,9 @@
 # game options
 TITLE = "Metoidvania"
-WIDTH = 1500
+WIDTH = 1400
 HEIGHT = 720
 FPS = 60
+FONT_NAME = 'arial'
 
 # Player properties
 PLAYER_ACC = 0.5

@@ -12,6 +12,7 @@ from pygame.locals import (
   K_RIGHT,
   K_ESCAPE,
   KEYDOWN,
+  KEYUP,
   QUIT,
 )
 
@@ -23,10 +24,12 @@ class Game:
     pg.display.set_caption(TITLE)
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     self.clock = pg.time.Clock()
+    self.font_name = pg.font.match_font(FONT_NAME)
 
   
   def new(self):
     # start a new game
+    self.score = 0
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.player = Player(self)
@@ -49,21 +52,17 @@ class Game:
     p_4 = Platform(-1150, HEIGHT -40, 200, 40)
     self.all_sprites.add(p_4)
     self.platforms.add(p_4)
+    p_5 = Platform(-1550, HEIGHT -40, 200, 40)
+    self.all_sprites.add(p_5)
+    self.platforms.add(p_5)
     # raised platform
     p2 = Platform(WIDTH/2 - 50, HEIGHT * 3/4, 100, 40)
     self.all_sprites.add(p2)
     self.platforms.add(p2)
     # 2nd raised platform
-    p3 = Platform(WIDTH/4 - 50, HEIGHT * 3/4, 100, 40)
+    p3 = Platform(WIDTH/4 - 100, HEIGHT * 3/4, 100, 40)
     self.all_sprites.add(p3)
     self.platforms.add(p3)
-    # 3rd raised platform
-    p4 = Platform(WIDTH - 100, HEIGHT * 3/4, 100, 20)
-    self.all_sprites.add(p4)
-    self.platforms.add(p4)
-    p5 = Platform(WIDTH - 100, HEIGHT * 3/4, 100, 40)
-    self.all_sprites.add(p5)
-    self.platforms.add(p5)
     self.run()
     
 
@@ -95,13 +94,23 @@ class Game:
                 plat.rect.x += abs(self.player.vel.x)
                 # if plat.rect.right >= WIDTH:
                   # plat.kill()
-            while len(self.platforms) < 6:
-              width = random.randrange(50, 100)
-              p = Platform(random.randrange(0, WIDTH-width),
-                          random.randrange(-75, -30),
-                          width, 20)
-              self.platforms.add(p)
-              self.all_sprites.add(p)
+                self.score += 1
+
+    if self.player.rect.bottom > HEIGHT:
+      for sprite in self.all_sprites:
+        sprite.rect.y -= max(self.player.vel.y, 10)
+        if sprite.rect.bottom <0:
+          sprite.kill()
+        if len(self.platforms) ==0:
+          self.playing= False
+
+    while len(self.platforms) < 6:
+      width = random.randrange(50, 100)
+      p = Platform(random.randrange(0, WIDTH-width),
+                random.randrange(-75, -30),
+                width, 20)
+      self.platforms.add(p)
+      self.all_sprites.add(p)
 
   def events(self):
     # Game Loop - events
@@ -111,7 +120,6 @@ class Game:
           if self.playing:
             self.playing = False
             self.run = False
-        
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
             self.player.jump()
@@ -120,16 +128,41 @@ class Game:
     #Game Loop - draw 
     self.screen.fill(BLACK)
     self.all_sprites.draw(self.screen)
+    self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
     pg.display.flip()
 
 
   def show_start_screen(self):
     # game splash/start screen
-    pass
+    self.screen.fill(BLACK)
+    self.draw_text(TITLE, 48, WHITE, WIDTH /2, HEIGHT / 4)
+    self.draw_text("Right and Left Arrow to move, Up Arrow to jump", 22, WHITE, WIDTH / 2, HEIGHT /2)
+    self.draw_text("Press a key to play", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
+    pg.display.flip()
+    self.wait_for_key()
 
   def show_go_screen(self):
     #game over/continue
     pass
+
+  def wait_for_key(self):
+    waiting = True
+    while waiting:
+      self.clock.tick(FPS)
+      for event in pg.event.get():
+        if event.type == pg.QUIT:
+          waiting = False
+          self.running = False
+        if event.type == pg.KEYUP:
+          waiting = False
+
+
+  def draw_text(self, text, size, color, x, y):
+    font = pg.font.Font(self.font_name, size)
+    text_surface = font.render(text, True, color)
+    text_rect= text_surface.get_rect()
+    text_rect.midtop = (x,y)
+    self.screen.blit(text_surface, text_rect)
 
 g = Game()
 g.show_start_screen()
