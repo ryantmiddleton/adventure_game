@@ -60,7 +60,7 @@ class Game:
     self.all_sprites.add(p2)
     self.platforms.add(p2)
     # 2nd raised platform
-    p3 = Platform(WIDTH/4 - 100, HEIGHT * 3/4, 100, 40)
+    p3 = Platform(WIDTH/4 - 100, HEIGHT * 3/4, 100, 100)
     self.all_sprites.add(p3)
     self.platforms.add(p3)
     self.run()
@@ -135,15 +135,24 @@ class Game:
   def show_start_screen(self):
     # game splash/start screen
     self.screen.fill(BLACK)
-    self.draw_text(TITLE, 48, WHITE, WIDTH /2, HEIGHT / 4)
-    self.draw_text("Right and Left Arrow to move, Up Arrow to jump", 22, WHITE, WIDTH / 2, HEIGHT /2)
-    self.draw_text("Press a key to play", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
+    self.draw_text("Welcome to Metroidvania... Enter if you dare!", 48, BLUE, WIDTH /2, HEIGHT / 4)
+    self.draw_text("Controls: Right and Left Arrow to move, Up Arrow to jump", 22, WHITE, WIDTH / 2, HEIGHT /2)
+    self.draw_text("You ready? Press a key to play", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
     pg.display.flip()
     self.wait_for_key()
 
   def show_go_screen(self):
     #game over/continue
-    pass
+    self.screen.fill(BLACK)
+    if self.score < 4000:
+      self.draw_text("You are pretty bad at this! GAME OVER!!!", 48, RED, WIDTH /2, HEIGHT / 4)
+    else:
+      self.draw_text("I've seen better! GAME OVER!", 48, RED, WIDTH /2, HEIGHT / 4)
+    self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
+    self.draw_text("Press key to play again", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
+    pg.display.flip()
+    self.wait_for_key()
+
 
   def wait_for_key(self):
     waiting = True

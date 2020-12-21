@@ -23,7 +23,7 @@ class Player(pg.sprite.Sprite):
     # Player Image
     
     
-    self.image = pg.image.load("imgs/samus_front.png").convert()
+    self.image = pg.image.load("imgs/idle outline.gif").convert()
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
@@ -43,12 +43,12 @@ class Player(pg.sprite.Sprite):
     keys = pg.key.get_pressed()
     # move left
     if keys[pg.K_LEFT]:
-      self.image = pg.image.load("imgs/samus_left.png").convert()
+      self.image = pg.image.load("imgs/left_run.gif").convert()
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = -PLAYER_ACC
     #move right
     if keys[pg.K_RIGHT]:
-      self.image = pg.image.load("imgs/samus_right.png").convert()
+      self.image = pg.image.load("imgs/run outline.gif").convert()
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
 
