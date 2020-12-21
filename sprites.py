@@ -1,6 +1,7 @@
 # Sprite classes for Metroidvania game
 import pygame as pg
 from settings import *
+import random
 vec = pg.math.Vector2
 
 from pygame.locals import (
@@ -10,6 +11,7 @@ from pygame.locals import (
   K_LEFT,
   K_RIGHT,
   K_ESCAPE,
+  K_SPACE,
   KEYDOWN,
   QUIT,
 )
@@ -20,18 +22,20 @@ class Player(pg.sprite.Sprite):
     pg.sprite.Sprite.__init__(self)
     self.game = game
     # Player Image
-    self.image = pg.Surface((30, 40))
-    self.image.fill(YELLOW)
+    self.image = pg.image.load("img/idle outline.gif").convert()
+    self.image.set_colorkey((WHITE), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
-    self.pos = vec(WIDTH/2, HEIGHT/2)
+    self.pos = vec(0, HEIGHT-40)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
+    self.right = True
+    self.left = False
 
   def jump(self):
-    self.rect.x += 1
+    self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-    self.rect.x -= 1
+    self.rect.y -= 1
     if hits:  
       self.vel.y = -15
 
@@ -40,10 +44,18 @@ class Player(pg.sprite.Sprite):
     keys = pg.key.get_pressed()
     # move left
     if keys[pg.K_LEFT]:
+      self.image = pg.image.load("img/left_run.gif").convert()
+      self.image.set_colorkey((WHITE), RLEACCEL)
       self.acc.x = -PLAYER_ACC
+      self.right = False
+      self.left = True
     #move right
     if keys[pg.K_RIGHT]:
+      self.image = pg.image.load("img/run outline.gif").convert()
+      self.image.set_colorkey((WHITE), RLEACCEL)
       self.acc.x = PLAYER_ACC
+      self.right = True
+      self.left = False
 
 
     # apply friction
@@ -59,6 +71,34 @@ class Player(pg.sprite.Sprite):
 
     self.rect.midbottom = self.pos
 
+class Bullet(pg.sprite.Sprite):
+  def __init__(self, x, y, facing):
+    pg.sprite.Sprite.__init__(self)
+    self.facing = facing
+    if facing == -1:
+      self.image = pg.image.load("img/bullet-left.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x-40
+      self.rect.y = y-20
+    else:
+      self.image = pg.image.load("img/bullet.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-20
+    self.image.set_colorkey((WHITE), RLEACCEL)
+    self.vel = vec(0.5, 0)
+    self.acc = vec(0, 0)
+
+  def update(self):
+    self.rect.x += (8*self.facing)
+    if self.rect.left > WIDTH: 
+      self.kill()
+    elif self.rect.right < 0:
+      self.kill()
+
+
+
+
 class Platform(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -66,4 +106,4 @@ class Platform(pg.sprite.Sprite):
     self.image.fill(GREEN)
     self.rect = self.image.get_rect()
     self.rect.x = x
-    self.rect.y = y  
+    self.rect.y = y      

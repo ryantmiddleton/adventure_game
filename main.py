@@ -10,6 +10,7 @@ from pygame.locals import (
   K_LEFT,
   K_RIGHT,
   K_ESCAPE,
+  K_SPACE,
   KEYDOWN,
   QUIT,
 )
@@ -28,16 +29,13 @@ class Game:
     # start a new game
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
+    self.bullets = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
-    # ground platform
-    p1 = Platform(0, HEIGHT-40, WIDTH, 40)
-    self.all_sprites.add(p1)
-    self.platforms.add(p1)
-    # raised platform
-    p2 = Platform(WIDTH/2 - 50, HEIGHT * 3/4, 100, 20)
-    self.all_sprites.add(p2)
-    self.platforms.add(p2)
+    for plat in PLATFORM_LIST:
+      p = Platform(*plat)
+      self.all_sprites.add(p)
+      self.platforms.add(p)
     self.run()
     
 
@@ -70,8 +68,19 @@ class Game:
           self.running = False
         
         if event.type == pg.KEYDOWN:
-          if event.key == pg.K_SPACE:
+          if event.key == pg.K_UP:
             self.player.jump()
+
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_SPACE:
+            if self.player.left:
+              facing = -1
+            else:
+              facing = 1
+            b = Bullet(self.player.pos.x, self.player.pos.y, facing)
+            self.all_sprites.add(b)
+            self.bullets.add(b)
+
 
   def draw(self):
     #Game Loop - draw 
