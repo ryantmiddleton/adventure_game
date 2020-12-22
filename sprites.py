@@ -34,13 +34,15 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
+    self.health = PLAYER_HEALTH
+    self.max_health = PLAYER_HEALTH
 
   def jump(self):
     self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
     self.rect.y -= 1
     if hits:  
-      self.vel.y = -15
+      self.vel.y = -PLAYER_JUMP
 
   def update(self):
     self.acc = vec(0, PLAYER_GRAV)
@@ -129,7 +131,7 @@ class Platform(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((w, h))
-    self.image.fill(GREEN)
+    self.image.fill(BLUE)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y      

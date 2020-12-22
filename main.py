@@ -71,6 +71,8 @@ class Game:
         if self.playing:
           self.playing = False
         self.running = False
+      if self.player.health == 0:
+        self.playing = False
       
       if event.type == pg.KEYDOWN:
         if event.key == pg.K_UP:
@@ -101,6 +103,9 @@ class Game:
     #Game Loop - draw 
     self.screen.fill(BLACK)
     self.all_sprites.draw(self.screen)
+    pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
+    pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
+
     pg.display.flip()
 
 
@@ -111,6 +116,8 @@ class Game:
   def show_go_screen(self):
     #game over/continue
     pass
+
+    
 
 g = Game()
 g.show_start_screen()
