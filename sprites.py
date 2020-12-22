@@ -14,6 +14,10 @@ from pygame.locals import (
   K_SPACE,
   KEYDOWN,
   QUIT,
+  K_w,
+  K_a,
+  K_s,
+  K_d,
 )
 
 
@@ -29,7 +33,6 @@ class Player(pg.sprite.Sprite):
     self.pos = vec(0, HEIGHT-40)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
-    self.right = True
     self.left = False
 
   def jump(self):
@@ -47,14 +50,12 @@ class Player(pg.sprite.Sprite):
       self.image = pg.image.load("img/left_run.gif").convert()
       self.image.set_colorkey((WHITE), RLEACCEL)
       self.acc.x = -PLAYER_ACC
-      self.right = False
       self.left = True
     #move right
     if keys[pg.K_RIGHT]:
       self.image = pg.image.load("img/run outline.gif").convert()
       self.image.set_colorkey((WHITE), RLEACCEL)
       self.acc.x = PLAYER_ACC
-      self.right = True
       self.left = False
 
 
@@ -75,22 +76,47 @@ class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
     self.facing = facing
-    if facing == -1:
+    if facing == 2:
+      self.image = pg.image.load("img/bullet-up.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-80
+    elif facing == -1:
       self.image = pg.image.load("img/bullet-left.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-40
       self.rect.y = y-20
+    elif facing == 3:
+      self.image = pg.image.load("img/bullet-diag-right.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-50
+    elif facing == -3:
+      self.image = pg.image.load("img/bullet-diag-left.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x-20
+      self.rect.y = y-50
     else:
       self.image = pg.image.load("img/bullet.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-20
     self.image.set_colorkey((WHITE), RLEACCEL)
-    self.vel = vec(0.5, 0)
-    self.acc = vec(0, 0)
+    
 
   def update(self):
-    self.rect.x += (8*self.facing)
+    if self.facing == 3:
+      self.rect.y += -8
+      self.rect.x += 8
+    elif self.facing == -3:
+      self.rect.y += -8
+      self.rect.x += -8
+    elif self.facing == 2:
+      self.rect.y += -8
+
+    else:
+      self.rect.x += (8*self.facing)
+
     if self.rect.left > WIDTH: 
       self.kill()
     elif self.rect.right < 0:

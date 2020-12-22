@@ -13,6 +13,10 @@ from pygame.locals import (
   K_SPACE,
   KEYDOWN,
   QUIT,
+  K_w,
+  K_a,
+  K_s,
+  K_d,
 )
 
 class Game:
@@ -32,7 +36,7 @@ class Game:
     self.bullets = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
-    for plat in PLATFORM_LIST:
+    for plat in MAP1_PLATFORM_LIST:
       p = Platform(*plat)
       self.all_sprites.add(p)
       self.platforms.add(p)
@@ -60,26 +64,37 @@ class Game:
 
   def events(self):
     # Game Loop - events
-      for event in pg.event.get():
-        # check for closing window
-        if event.type == pg.QUIT:
-          if self.playing:
-            self.playing = False
-          self.running = False
-        
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.jump()
+    keys = pg.key.get_pressed()
+    for event in pg.event.get():
+      # check for closing window
+      if event.type == pg.QUIT:
+        if self.playing:
+          self.playing = False
+        self.running = False
+      
+      if event.type == pg.KEYDOWN:
+        if event.key == pg.K_UP:
+          self.player.jump()
 
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_SPACE:
-            if self.player.left:
-              facing = -1
-            else:
-              facing = 1
-            b = Bullet(self.player.pos.x, self.player.pos.y, facing)
-            self.all_sprites.add(b)
-            self.bullets.add(b)
+        if event.key == pg.K_SPACE:
+          if keys[pg.K_d] and keys[pg.K_w]:
+            facing = 3
+          elif keys[pg.K_a] and keys[pg.K_w]:
+            facing = -3
+          elif keys[pg.K_w]:
+            facing = 2
+          elif keys[pg.K_d]:
+            facing = 1
+          elif self.player.left or keys[pg.K_a]:
+            facing = -1        
+          else:
+            facing = 1
+          b = Bullet(self.player.pos.x, self.player.pos.y, facing)
+          self.all_sprites.add(b)
+          self.bullets.add(b)
+
+        
+
 
 
   def draw(self):
