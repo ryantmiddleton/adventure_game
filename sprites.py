@@ -13,6 +13,10 @@ from pygame.locals import (
   K_ESCAPE,
   KEYDOWN,
   QUIT,
+  K_w,
+  K_a,
+  K_s,
+  K_d,
 )
 
 
@@ -46,11 +50,13 @@ class Player(pg.sprite.Sprite):
       self.image = pg.image.load("imgs/left_run.gif").convert()
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = -PLAYER_ACC
+      self.left = True
     #move right
     if keys[pg.K_RIGHT]:
       self.image = pg.image.load("imgs/run outline.gif").convert()
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
+      self.left = False
 
 
     # apply friction
@@ -65,6 +71,55 @@ class Player(pg.sprite.Sprite):
       self.pos.x = 0 + self.rect.width/2
 
     self.rect.midbottom = self.pos
+
+class Bullet(pg.sprite.Sprite):
+  def __init__(self, x, y, facing):
+    pg.sprite.Sprite.__init__(self)
+    self.facing = facing
+    if facing == 2:
+      self.image = pg.image.load("imgs/bullet-up.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-80
+    elif facing == -1:
+      self.image = pg.image.load("imgs/bullet-left.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x-40
+      self.rect.y = y-20
+    elif facing == 3:
+      self.image = pg.image.load("imgs/bullet-diag-right.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-50
+    elif facing == -3:
+      self.image = pg.image.load("imgs/bullet-diag-left.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x-20
+      self.rect.y = y-50
+    else:
+      self.image = pg.image.load("imgs/bullet.png").convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-20
+    self.image.set_colorkey((WHITE), RLEACCEL)
+
+  def update(self):
+    if self.facing == 3:
+      self.rect.y += -8
+      self.rect.x += 8
+    elif self.facing == -3:
+      self.rect.y += -8
+      self.rect.x += -8
+    elif self.facing == 2:
+      self.rect.y += -8
+
+    else:
+      self.rect.x += (8*self.facing)
+
+    if self.rect.left > WIDTH: 
+      self.kill()
+    elif self.rect.right < 0:
+      self.kill()
 
 class Platform(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):

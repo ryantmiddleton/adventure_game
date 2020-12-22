@@ -14,6 +14,10 @@ from pygame.locals import (
   KEYDOWN,
   KEYUP,
   QUIT,
+  K_w,
+  K_a,
+  K_s,
+  K_d,
 )
 
 class Game:
@@ -25,13 +29,14 @@ class Game:
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     self.clock = pg.time.Clock()
     self.font_name = pg.font.match_font(FONT_NAME)
-
+    self.running = True
   
   def new(self):
     # start a new game
     self.score = 0
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
+    self.bullets = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
     # ground platform
@@ -114,15 +119,34 @@ class Game:
 
   def events(self):
     # Game Loop - events
+      keys = pg.key.get_pressed()
       for event in pg.event.get():
-        # check for closing window
+      # check for closing window
         if event.type == pg.QUIT:
           if self.playing:
             self.playing = False
-            self.run = False
+          self.running = False
+        
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
             self.player.jump()
+
+          if event.key == pg.K_SPACE:
+            if keys[pg.K_d] and keys[pg.K_w]:
+              facing = 3
+            elif keys[pg.K_a] and keys[pg.K_w]:
+              facing = -3
+            elif keys[pg.K_w]:
+              facing = 2
+            elif keys[pg.K_d]:
+              facing = 1
+            elif self.player.left or keys[pg.K_a]:
+              facing = -1        
+            else:
+              facing = 1
+            b = Bullet(self.player.pos.x, self.player.pos.y, facing)
+            self.all_sprites.add(b)
+            self.bullets.add(b)
 
   def draw(self):
     #Game Loop - draw 
