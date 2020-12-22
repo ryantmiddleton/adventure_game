@@ -10,6 +10,7 @@ from pygame.locals import (
   K_LEFT,
   K_RIGHT,
   K_SPACE,
+  K_LALT,
   K_ESCAPE,
   KEYDOWN,
   QUIT,
@@ -30,13 +31,22 @@ class Game:
     # start a new game
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
+    self.bullets = pg.sprite.Group()
+    self.enemies = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
-    for platform in PLATFORM_LIST:
+
+    for platform in MAP3_PLATFORM_LIST:
       # create a new platform - could also use p=Platform(*platform)
-      p = Platform(platform[0], platform[1], platform[2], platform[3])
+      p = Platform(*platform)
+      # spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
+      # self.all_sprites.add(spider)
       self.all_sprites.add(p)
+      # self.enemies.add(spider)
       self.platforms.add(p)
+    spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
+    self.all_sprites.add(spider)
+    self.enemies.add(spider)
     self.run()
     
 
@@ -61,19 +71,25 @@ class Game:
             self.player.pos.y = hits[0].rect.top
             # stop the player by seting velocity to 0
             self.player.vel.y = 0;
-    # If player reaches the top 25% 
-    # scroll all platforms down (increase y coord)
-    if self.player.rect.top <= HEIGHT/4:
-        self.player.pos.y += abs(self.player.vel.y)
-        for platform in self.platforms:
-            platform.rect.y += abs(self.player.vel.y)
-    # If player reaches the bottom 25% 
-    # scroll all platforms up (decrease y coord)
-    if self.player.rect.bottom >= HEIGHT * 0.75:
-        self.player.pos.y -= abs(self.player.vel.y)
-        for platform in self.platforms:
-            platform.rect.y -= abs(self.player.vel.y)
 
+    # If player reaches the top 25% of the screen
+    # scroll all platforms down (increase y coord)
+    if abs(self.player.rect.top) <= HEIGHT/4:
+        if not(isStanding(self.player)):
+          for platform in self.platforms:
+              platform.rect.y += abs(self.player.vel.y)
+          for enemy in self.enemies:
+              enemy.rect.y += abs(self.player.vel.y)
+          self.player.pos.y += abs(self.player.vel.y)
+    # If player reaches the bottom 25% of the screen
+    # scroll all platforms up (decrease y coord)
+    if abs(self.player.rect.top) >= HEIGHT * 0.75:
+        if not(isStanding(self.player)):
+          for platform in self.platforms:
+              platform.rect.y -= abs(self.player.vel.y)
+          for enemy in self.enemies:
+              enemy.rect.y -= abs(self.player.vel.y)
+          self.player.pos.y -= abs(self.player.vel.y)
 
   def events(self):
     # Game Loop - events
@@ -83,9 +99,18 @@ class Game:
           if self.playing:
             self.playing = False
           self.running = False
+
         if event.type == KEYDOWN:
           if event.key == K_SPACE:
             self.player.jump()
+          if event.key == K_LALT:
+            if self.player.left:
+              facing = -1
+            else:
+              facing = 1
+            b = Bullet(self.player.pos.x, self.player.pos.y, facing)
+            self.all_sprites.add(b)
+            self.bullets.add(b)
 
   def draw(self):
     #Game Loop - draw 
@@ -101,21 +126,6 @@ class Game:
   def show_go_screen(self):
     #game over/continue
     pass
-
-  def draw_map3(self):
-    map3 = pg.Surface((1080, 2160))
-    # self.scroll_val += 1;
-    platform_width = 175
-    platform_height = 25
-    # top of map
-    pg.draw.rect(map3, SILVER, (0,0,20, 2160))
-    # right side of map
-    pg.draw.rect(map3, SILVER, (WIDTH - 20,0,20, 2160))
-    pg.draw.rect(map3, SILVER, (0,0,WIDTH, 20))
-    pg.draw.rect(map3,SILVER,(WIDTH/2 - platform_width/2, 360 + self.player.image.get_height()/2,platform_width,platform_height))
-    pg.draw.rect(map3,GOLD,(120,120,175,25))
-    self.screen.blit(map3, (0, 0))
-
 
 g = Game()
 g.show_start_screen()

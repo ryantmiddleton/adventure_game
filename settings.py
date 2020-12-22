@@ -7,9 +7,14 @@ FPS = 60
 # Player properties
 PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.12
-PLAYER_GRAVITY = 0.5
+PLAYER_GRAV = 0.5
 
-#Starting PLatforsms
+LEFT = 0
+UP = 1
+RIGHT = 2
+DOWN = 4
+
+#Starting Platforsms
 PLATFORM_HEIGHT = 20
 PLATFORM_WIDTH = 100
 
