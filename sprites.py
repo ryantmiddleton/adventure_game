@@ -35,7 +35,7 @@ class Player(pg.sprite.Sprite):
     self.game = game
     # Player Image
     
-    
+    self.jumping = False
     self.image = pg.image.load("imgs/idle outline.png").convert()
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
@@ -44,12 +44,20 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
 
+  def jump_cut(self):
+    if self.jumping:
+      if self.vel.y < -3:
+        self.vel.y = -3
+
+
   def jump(self):
     self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
     self.rect.y -= 1
-    if hits:  
+    if hits and not self.jumping:  
+      self.jumping = True
       self.vel.y = -15
+      self.game.jump_sound.play()
 
   def update(self):
     self.acc = vec(0, PLAYER_GRAV)
@@ -93,26 +101,36 @@ class Bullet(pg.sprite.Sprite):
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-80
+      
+
     elif facing == -1:
       self.image = pg.image.load("imgs/bullet-left.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-40
       self.rect.y = y-20
+      
+
     elif facing == 3:
       self.image = pg.image.load("imgs/bullet-diag-right.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-50
+      
+
     elif facing == -3:
       self.image = pg.image.load("imgs/bullet-diag-left.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-20
       self.rect.y = y-50
+      
+
     else:
       self.image = pg.image.load("imgs/bullet.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-20
+      
+    
     self.image.set_colorkey((WHITE), RLEACCEL)
 
   def update(self):
