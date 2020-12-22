@@ -1,7 +1,7 @@
 # Sprite classes for Metroidvania game
 import pygame as pg
 from settings import *
-import random
+from random import choice
 vec = pg.math.Vector2
 
 from pygame.locals import (
@@ -19,6 +19,15 @@ from pygame.locals import (
   K_d,
 )
 
+class Spirtesheet:
+  def __init__(self, filename):
+    self.spritesheet = pg.image.load(filename).convert()
+
+  def get_image(self, x, y, width, height):
+    image = pg.Surface((width, height))
+    image.blit(self.spritesheet, (0,0), (x, y, width, height))
+    image = pg.transform.scale(image, (width //2, height// 2))
+    return image
 
 class Player(pg.sprite.Sprite):
   def __init__(self, game):
@@ -27,7 +36,7 @@ class Player(pg.sprite.Sprite):
     # Player Image
     
     
-    self.image = pg.image.load("imgs/idle outline.gif").convert()
+    self.image = pg.image.load("imgs/idle outline.png").convert()
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
@@ -47,16 +56,19 @@ class Player(pg.sprite.Sprite):
     keys = pg.key.get_pressed()
     # move left
     if keys[pg.K_LEFT]:
-      self.image = pg.image.load("imgs/left_run.gif").convert()
+      self.image = pg.image.load("imgs/left_run.png").convert()
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = -PLAYER_ACC
       self.left = True
     #move right
     if keys[pg.K_RIGHT]:
-      self.image = pg.image.load("imgs/run outline.gif").convert()
+      self.image = pg.image.load("imgs/run_right.png").convert()
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
       self.left = False
+    if keys[pg.K_UP]:
+      self.image = pg.image.load("imgs/jump outline.png").convert()
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
 
     # apply friction
@@ -122,11 +134,35 @@ class Bullet(pg.sprite.Sprite):
       self.kill()
 
 class Platform(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
+  def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(GREEN)
+    self.game = game
+    images = [self.game.spritesheet.get_image(0, 288, 380, 94),
+              # self.game.spritesheet.get_image(213, 1662, 201, 100)
+    ]
+    self.image = choice(images)
+    self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y  
 
+# class Door(pg.sprite.Sprite):
+#   def __init__(self, game, x, y):
+#     pg.sprite.Sprite.__init__(self)
+#     self.game = game
+#     self.image = pg.image.load('door_closedMid.png')
+#     self.image.set_colorkey(BLACK)
+#     self.rect = self.image.get_rect()
+#     self.rect.x = x
+#     self.rect.y = y  
+    
+
+# class Key(pg.sprite.Sprite):
+#   def __init__(self, game, x, y):
+#     pg.sprite.Sprite.__init__(self)
+#     self.game = game
+#     self.image = pg.image.load('keyYellow.png')
+#     self.image.set_colorkey(BLACK)
+#     self.rect = self.image.get_rect()
+#     self.rect.x = x
+#     self.rect.y = y  
