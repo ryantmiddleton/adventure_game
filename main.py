@@ -34,13 +34,18 @@ class Game:
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
+    self.acid = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
     for plat in MAP1_PLATFORM_LIST:
       p = Platform(*plat)
       self.all_sprites.add(p)
       self.platforms.add(p)
+    acid = Acid(500, HEIGHT - 40, 100, 30)
+    self.all_sprites.add(acid)
+    self.acid.add(acid)  
     self.run()
+    
     
 
   def run(self):
@@ -61,6 +66,13 @@ class Game:
       if hits:
         self.player.pos.y = hits[0].rect.top
         self.player.vel.y = 0
+    acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
+    if acid_hit:
+      self.player.health -= 1
+    if self.player.health < self.player.max_health:
+      self.player.health += .01
+    if self.player.health <= 0:
+        self.playing = False
 
   def events(self):
     # Game Loop - events
@@ -71,8 +83,6 @@ class Game:
         if self.playing:
           self.playing = False
         self.running = False
-      if self.player.health == 0:
-        self.playing = False
       
       if event.type == pg.KEYDOWN:
         if event.key == pg.K_UP:
@@ -105,7 +115,6 @@ class Game:
     self.all_sprites.draw(self.screen)
     pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
     pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
-
     pg.display.flip()
 
 
