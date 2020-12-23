@@ -43,6 +43,9 @@ class Player(pg.sprite.Sprite):
     self.pos = vec(WIDTH/2, HEIGHT/2)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
+    self.left = False
+    self.health = PLAYER_HEALTH
+    self.max_health = PLAYER_HEALTH
 
   def jump_cut(self):
     if self.jumping:
@@ -163,6 +166,15 @@ class Platform(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y  
+
+  # def isStanding(self):
+  #   self.rect.y += 1
+  #   hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+  #   self.rect.y -= 1
+  #   if hits:
+  #     return True
+  #   else:  
+  #     return False
 
 # class Door(pg.sprite.Sprite):
 #   def __init__(self, game, x, y):

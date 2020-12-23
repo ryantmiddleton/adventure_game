@@ -6,6 +6,7 @@ FPS = 60
 FONT_NAME = 'bloddy.ttf'
 HS_FILE = 'highscore.txt'
 SPRITESHEET = "spritesheet_jumper.png"
+PLAYER_HEALTH = 8
 
 # Player properties
 PLAYER_ACC = 0.5

@@ -44,6 +44,7 @@ class Game:
         self.highscore = 0
     self.spritesheet = Spirtesheet(path.join(img_dir, SPRITESHEET))
     self.snd_dir = path.join(self.dir, 'snd')
+    self.bg_dir = path.join(self.dir, 'bg')
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
 
@@ -110,14 +111,12 @@ class Game:
     if self.player.rect.right <= WIDTH / 2:
             self.player.pos.x += abs(self.player.vel.x)
             for plat in self.platforms:
-                plat.rect.x += abs(self.player.vel.x)
-                self.score += 1
-    elif self.player.rect.left >= WIDTH * 1/2:
+                  plat.rect.x += abs(self.player.vel.x)
+                  self.score += 1
+    elif self.player.rect.left >= WIDTH * .75:
             self.player.pos.x -= abs(self.player.vel.x)
             for plat in self.platforms:
                 plat.rect.x -= abs(self.player.vel.x)
-                # if plat.rect.right >= WIDTH:
-                  # plat.kill()
                 # self.score += 1
 
     if self.player.rect.bottom > HEIGHT:
@@ -179,9 +178,17 @@ class Game:
 
   def draw(self):
     #Game Loop - draw 
+    self.back_image = pg.image.load('bg/plx-4.png')
+    self.back_rect = self.back_image.get_rect()
     self.screen.fill(BLACK)
+    self.screen.blit(self.back_image, self.back_rect.move(self.back_rect.width, self.back_rect.height))
     self.all_sprites.draw(self.screen)
+    pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
+    pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
     self.screen.blit(self.player.image, self.player.rect)
+    self.back_rect.move_ip(-2, 0)
+    if self.back_rect.right == 0:
+      self.back_rect.x =0
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
     pg.display.flip()
 
