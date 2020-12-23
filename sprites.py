@@ -109,23 +109,23 @@ class Bullet(pg.sprite.Sprite):
     self.image.set_colorkey((WHITE), RLEACCEL)
   
 
-def update(self):
-  if self.facing == 3:
-    self.rect.y += -8
-    self.rect.x += 8
-  elif self.facing == -3:
-    self.rect.y += -8
-    self.rect.x += -8
-  elif self.facing == 2:
-    self.rect.y += -8
+  def update(self):
+    if self.facing == 3:
+      self.rect.y += -8
+      self.rect.x += 8
+    elif self.facing == -3:
+      self.rect.y += -8
+      self.rect.x += -8
+    elif self.facing == 2:
+      self.rect.y += -8
 
-  else:
-    self.rect.x += (8*self.facing)
+    else:
+      self.rect.x += (8*self.facing)
 
-  if self.rect.left > WIDTH: 
-    self.kill()
-  elif self.rect.right < 0:
-    self.kill()
+    if self.rect.left > WIDTH: 
+      self.kill()
+    elif self.rect.right < 0:
+      self.kill()
 
 
 class Spider(pg.sprite.Sprite):
@@ -134,7 +134,7 @@ class Spider(pg.sprite.Sprite):
     self.game = game
     self.spider_sheet = pg.image.load("img/spiders.png").convert_alpha()
     self.size = self.spider_sheet.get_size()
-    self.frames = strip_from_sheet(self.spider_sheet,(0,6),(2,6),(self.size[0]/12,self.size[1]/8))
+    self.frames = strip_from_sheet(self.spider_sheet,(6,6),(8,6),(self.size[0]/12,self.size[1]/8))
     for i in range(len(self.frames)):
       self.frames[i] = crop(self.frames[i],(10,20),(65,45))
       # self.frames[i] = pg.transform.flip(self.frames[i], True, False)
