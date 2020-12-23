@@ -3,13 +3,10 @@ TITLE = "Metoidvania"
 WIDTH = 1400
 HEIGHT = 720
 FPS = 60
-
 FONT_NAME = 'bloddy.ttf'
 HS_FILE = 'highscore.txt'
 SPRITESHEET = "spritesheet_jumper.png"
 PLAYER_HEALTH = 8
-
-
 
 
 # Player properties
@@ -29,7 +26,7 @@ MAP1_PLATFORM_LIST = [
   (175, 100, 50, 20)
 ]
 
-MAP1_PLATFORM_LIST = [
+MAP4_PLATFORM_LIST = [
   (1200, HEIGHT - 40),
   (1050, HEIGHT - 40),
   (900, HEIGHT - 40),
@@ -49,13 +46,13 @@ MAP1_PLATFORM_LIST = [
   (0, HEIGHT - 700),
 ]
 
-MAP2_PLATFORM_LIST = [
-  (0, HEIGHT - 40),
-  (WIDTH/2 - 50, HEIGHT * 3/4),
-  (125, HEIGHT - 350),
-  (350, 200),
-  (175, 100)
-]
+# MAP2_PLATFORM_LIST = [
+#   (0, HEIGHT - 40),
+#   (WIDTH/2 - 50, HEIGHT * 3/4),
+#   (125, HEIGHT - 350),
+#   (350, 200),
+#   (175, 100)
+# ]
 
 # MAP3_PLATFORM_LIST = [
 #   (0, HEIGHT - 40, WIDTH, 40),
