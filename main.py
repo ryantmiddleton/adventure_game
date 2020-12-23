@@ -5,6 +5,7 @@ from sprites import *
 from os import path
 
 
+
 from pygame.locals import (
   RLEACCEL,
   K_UP,
@@ -30,6 +31,7 @@ class Game:
     pg.display.set_caption(TITLE)
     self.screen = pg.display.set_mode((WIDTH, HEIGHT))
     self.clock = pg.time.Clock()
+    self.font_name = pg.font.match_font(FONT_NAME)
     self.running = True
     self.font_name = pg.font.match_font(FONT_NAME)
     self.load_data()
@@ -62,11 +64,7 @@ class Game:
     self.key1 = pg.sprite.Group()
     self.key2 = pg.sprite.Group()
     self.key3 = pg.sprite.Group()
-    self.player = Player(self)
-    self.all_sprites.add(self.player)
     
-
-
     self.acid = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
@@ -114,12 +112,12 @@ class Game:
     # Door detection for Door 1
     door_hit = pg.sprite.spritecollide(self.player, self.door1, False)
     if door_hit:
-        while self.player.level < 50:
-          self.player.level += 1
-        print('success')
-        print(self.player.level)
+      while self.player.level < 50:
+        self.player.level += 1
+      print('success')
+      print(self.player.level)
 
-        self.load_level()
+      self.load_level()
 
     # Add wall blocking Level 1
     if self.player.level == 50:
@@ -131,19 +129,19 @@ class Game:
     # Door detection for Door 2
     door_hit2 = pg.sprite.spritecollide(self.player, self.door2, False)
     if door_hit2:
-        while self.player.level < 100:
-          self.player.level += 1
-        print('success')
-        print(self.player.level)
-        self.load_level()
+      while self.player.level < 100:
+        self.player.level += 1
+      print('success')
+      print(self.player.level)
+      self.load_level()
     # Door detection for Door 3
     door_hit3 = pg.sprite.spritecollide(self.player, self.door3, False)
     if door_hit3:
-        while self.player.level < 150:
-          self.player.level += 1
-        print('success')
-        print(self.player.level)
-        self.load_level()    
+      while self.player.level < 150:
+        self.player.level += 1
+      print('success')
+      print(self.player.level)
+      self.load_level()    
 
     # Side scrolling
     if self.player.rect.right <= WIDTH / 3:
@@ -166,21 +164,21 @@ class Game:
             # plat.kill()
       self.score += 1
 
-        if self.player.pos.y < hits[0].rect.bottom:
-          self.player.pos.y = hits[0].rect.top
-          self.player.vel.y = 0
-          self.player.jumping = False
+    if self.player.pos.y < hits[0].rect.bottom:
+      self.player.pos.y = hits[0].rect.top
+      self.player.vel.y = 0
+      self.player.jumping = False
     if self.player.rect.right <= WIDTH / 2:
-            self.player.pos.x += abs(self.player.vel.x)
-            # self.acid.pos.x += abs(self.player.vel.x)
-            for plat in self.platforms:
-                  plat.rect.x += abs(self.player.vel.x)
-                  self.score += 1
+      self.player.pos.x += abs(self.player.vel.x)
+      # self.acid.pos.x += abs(self.player.vel.x)
+      for plat in self.platforms:
+        plat.rect.x += abs(self.player.vel.x)
+        self.score += 1
     elif self.player.rect.left >= WIDTH * .75:
-            self.player.pos.x -= abs(self.player.vel.x)
-            for plat in self.platforms:
-                plat.rect.x -= abs(self.player.vel.x)
-                # self.score += 1
+      self.player.pos.x -= abs(self.player.vel.x)
+      for plat in self.platforms:
+        plat.rect.x -= abs(self.player.vel.x)
+        # self.score += 1
 
     if self.player.rect.bottom > HEIGHT:
       for sprite in self.all_sprites:
@@ -196,10 +194,9 @@ class Game:
       for event in pg.event.get():
       # check for closing window
         if event.type == pg.QUIT:
-          self.running = False
           if self.playing:
             self.playing = False
-          
+          self.running = False
         
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
@@ -209,28 +206,28 @@ class Game:
           if event.key == pg.K_UP:
             self.player.jump_cut()
 
-          if event.key == pg.K_SPACE:
-            if keys[pg.K_d] and keys[pg.K_w]:
-              facing = 3
-              self.shoot_sound.play()
-            elif keys[pg.K_a] and keys[pg.K_w]:
-              facing = -3
-              self.shoot_sound.play()
-            elif keys[pg.K_w]:
-              facing = 2
-              self.shoot_sound.play()
-            elif keys[pg.K_d]:
-              facing = 1
-              self.shoot_sound.play()
-            elif self.player.left or keys[pg.K_a]:
-              facing = -1    
-              self.shoot_sound.play()    
-            else:
-              facing = 1
-              self.shoot_sound.play()
-            b = Bullet(self.player.pos.x, self.player.pos.y, facing)
-            self.all_sprites.add(b)
-            self.bullets.add(b)
+        if event.key == pg.K_SPACE:
+          if keys[pg.K_d] and keys[pg.K_w]:
+            facing = 3
+            self.shoot_sound.play()
+          elif keys[pg.K_a] and keys[pg.K_w]:
+            facing = -3
+            self.shoot_sound.play()
+          elif keys[pg.K_w]:
+            facing = 2
+            self.shoot_sound.play()
+          elif keys[pg.K_d]:
+            facing = 1
+            self.shoot_sound.play()
+          elif self.player.left or keys[pg.K_a]:
+            facing = -1    
+            self.shoot_sound.play()    
+          else:
+            facing = 1
+            self.shoot_sound.play()
+          b = Bullet(self.player.pos.x, self.player.pos.y, facing)
+          self.all_sprites.add(b)
+          self.bullets.add(b)
 
     acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
     if acid_hit:
@@ -238,19 +235,7 @@ class Game:
     if self.player.health < self.player.max_health:
       self.player.health += .01
     if self.player.health <= 0:
-        self.playing = False
-
-  def events(self):
-    # Game Loop - events
-    keys = pg.key.get_pressed()
-    for event in pg.event.get():
-      # check for closing window
-      if event.type == pg.QUIT:
-        if self.playing:
-          self.playing = False
-        self.running = False
-      
-
+      self.playing = False
 
 
   def draw(self):
@@ -262,6 +247,7 @@ class Game:
 
     self.screen.blit(self.back_image, self.back_rect.move(0,0))
     self.all_sprites.draw(self.screen)
+    self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
     pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
     pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
 
