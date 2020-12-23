@@ -57,6 +57,7 @@ class Game:
     self.bullets = pg.sprite.Group()
     self.door = pg.sprite.Group()
     self.key = pg.sprite.Group()
+    self.acid = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
     # k = self.screen.blit(self.door, 395, 130)
@@ -83,6 +84,9 @@ class Game:
     #     if key_found == True:
     #         plat = MAP2_PLATFORM_LIST
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
+    
+    # self.all_sprites.add(acid)
+    # self.acid.add(acid)  
     self.run()
     
 
@@ -110,6 +114,7 @@ class Game:
           self.player.jumping = False
     if self.player.rect.right <= WIDTH / 2:
             self.player.pos.x += abs(self.player.vel.x)
+            # self.acid.pos.x += abs(self.player.vel.x)
             for plat in self.platforms:
                   plat.rect.x += abs(self.player.vel.x)
                   self.score += 1
@@ -133,6 +138,14 @@ class Game:
                 random.randrange(-75, -30))
       self.platforms.add(p)
       self.all_sprites.add(p)
+
+    # acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
+    # if acid_hit:
+    #   self.player.health -= 1
+    # if self.player.health < self.player.max_health:
+    #   self.player.health += .01
+    # if self.player.health <= 0:
+    #     self.playing = False
 
   def events(self):
     # Game Loop - events
@@ -179,9 +192,10 @@ class Game:
   def draw(self):
     #Game Loop - draw 
     self.back_image = pg.image.load('bg/plx-4.png')
+    self.back_image = pg.transform.scale(self.back_image, (1400, 720))
     self.back_rect = self.back_image.get_rect()
     self.screen.fill(BLACK)
-    self.screen.blit(self.back_image, self.back_rect.move(self.back_rect.width, self.back_rect.height))
+    self.screen.blit(self.back_image, self.back_rect.move(0,0))
     self.all_sprites.draw(self.screen)
     pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
     pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
@@ -197,7 +211,7 @@ class Game:
     # game splash/start screen
     self.screen.fill(BLACK)
     self.draw_text("Welcome to Metroidvania... Enter if you dare!", 48, BLUE, WIDTH /2, HEIGHT / 4)
-    self.draw_text("Controls: Right and Left Arrow to move, Up Arrow to jump", 22, WHITE, WIDTH / 2, HEIGHT /2)
+    self.draw_text("Controls: Right and Left Arrow to move, Up Arrow to jump, Space Bar to shoot, AWSD for directional shooting", 22, WHITE, WIDTH / 2, HEIGHT /2)
     self.draw_text("You ready? Press a key to play", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
     self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, 15)
     pg.display.flip()
