@@ -34,21 +34,25 @@ class Spirtesheet:
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game):
-      pg.sprite.Sprite.__init__(self)
-      self.game = game
-      # Player Image
-      self.jumping = False
-      self.image = pg.image.load("imgs/idle outline.png").convert()
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-      self.rect = self.image.get_rect()
-      self.rect.center = (WIDTH/2, HEIGHT/2)
-      self.pos = vec(0, HEIGHT-40)
-      self.vel = vec(0, 0)
-      self.acc = vec(0, 0)
-      self.left = False
-      self.health = PLAYER_HEALTH
-      self.max_health = PLAYER_HEALTH
+      def __init__(self, game):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    # Player Image
+
+    
+    self.jumping = False
+    self.image = pg.image.load("imgs/idle outline.png").convert()
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.pos = vec(0, HEIGHT-40)
+    self.vel = vec(0, 0)
+    self.acc = vec(0, 0)
+    self.level = 1
+    self.left = False
+    self.health = PLAYER_HEALTH
+    self.max_health = PLAYER_HEALTH
 
     def jump_cut(self):
       if self.jumping:
@@ -310,3 +314,57 @@ def crop(image, start_pos, new_size):
   cropped_image = pg.Surface(new_size)
   cropped_image.blit(image, (0,0), (start_pos[0], start_pos[1], old_size[0], old_size[1]))
   return cropped_image
+  
+class Door1(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Door2(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Door3(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Key1(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+  
+class Key2(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Key3(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
