@@ -94,22 +94,16 @@ class Game:
     self.acid = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
-    for plat in MAP1_PLATFORM_LIST:
+    for plat in MAP4_PLATFORM_LIST:
       p = Platform(*plat)
       self.all_sprites.add(p)
       self.platforms.add(p)
     acid = Acid(500, HEIGHT - 40, 100, 30)
     self.all_sprites.add(acid)
     self.acid.add(acid)  
-
-    pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
-    
-    # self.all_sprites.add(acid)
-    # self.acid.add(acid)  
+    pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg')) 
     self.run()
     
-    
-
   def run(self):
     # Game loop
     pg.mixer.music.play(loops=-1)
@@ -234,10 +228,13 @@ class Game:
             # plat.kill()
       self.score += 1
 
+
+
     if self.player.pos.y < hits[0].rect.bottom:
       self.player.pos.y = hits[0].rect.top
       self.player.vel.y = 0
       self.player.jumping = False
+
     if self.player.rect.right <= WIDTH / 2:
       self.player.pos.x += abs(self.player.vel.x)
       # self.acid.pos.x += abs(self.player.vel.x)
@@ -260,8 +257,8 @@ class Game:
 
   def events(self):
     # Game Loop - events
-      keys = pg.key.get_pressed()
-      for event in pg.event.get():
+    keys = pg.key.get_pressed()
+    for event in pg.event.get():
       # check for closing window
         if event.type == pg.QUIT:
             if self.playing:
@@ -269,6 +266,7 @@ class Game:
             self.running = False
         if self.player.health == 0:
               self.playing = False
+
           
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
@@ -278,29 +276,29 @@ class Game:
           if event.key == pg.K_UP:
             self.player.jump_cut()
 
-        if event.key == pg.K_SPACE:
-          if keys[pg.K_d] and keys[pg.K_w]:
-            facing = 3
-            self.shoot_sound.play()
-          elif keys[pg.K_a] and keys[pg.K_w]:
-            facing = -3
-            self.shoot_sound.play()
-          elif keys[pg.K_w]:
-            facing = 2
-            self.shoot_sound.play()
-          elif keys[pg.K_d]:
-            facing = 1
-            self.shoot_sound.play()
-          elif self.player.left or keys[pg.K_a]:
-            facing = -1    
-            self.shoot_sound.play()    
-          else:
-            facing = 1
-            self.shoot_sound.play()
-          b = Bullet(self.player.pos.x, self.player.pos.y, facing)
-          self.all_sprites.add(b)
-          self.bullets.add(b)
 
+          if event.key == pg.K_SPACE:
+            if keys[pg.K_d] and keys[pg.K_w]:
+              facing = 3
+              self.shoot_sound.play()
+            elif keys[pg.K_a] and keys[pg.K_w]:
+              facing = -3
+              self.shoot_sound.play()
+            elif keys[pg.K_w]:
+              facing = 2
+              self.shoot_sound.play()
+            elif keys[pg.K_d]:
+              facing = 1
+              self.shoot_sound.play()
+            elif self.player.left or keys[pg.K_a]:
+              facing = -1    
+              self.shoot_sound.play()    
+            else:
+              facing = 1
+              self.shoot_sound.play()
+            b = Bullet(self.player.pos.x, self.player.pos.y, facing)
+            self.all_sprites.add(b)
+            self.bullets.add(b)
       acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
       if acid_hit:
         self.player.health -= 1
@@ -317,10 +315,6 @@ class Game:
       if event.type == pg.QUIT:
         if self.playing:
           self.playing = False
-        self.running = False
-      
-
-
 
   def draw(self):
     #Game Loop - draw 
@@ -339,7 +333,6 @@ class Game:
     if self.back_rect.right == 0:
       self.back_rect.x =0
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
-
     pg.display.flip()
 
   def load_level(self):

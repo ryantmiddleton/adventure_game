@@ -3,13 +3,10 @@ TITLE = "Metoidvania"
 WIDTH = 1400
 HEIGHT = 720
 FPS = 60
-
 FONT_NAME = 'bloddy.ttf'
 HS_FILE = 'highscore.txt'
 SPRITESHEET = "spritesheet_jumper.png"
 PLAYER_HEALTH = 8
-
-
 
 
 # Player properties
