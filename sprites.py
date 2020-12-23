@@ -155,8 +155,6 @@ class Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y  
 
-
-
 class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
     pg.sprite.Sprite.__init__(self)

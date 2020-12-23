@@ -5,7 +5,6 @@ from sprites import *
 from os import path
 
 
-
 from pygame.locals import (
   RLEACCEL,
   K_UP,
