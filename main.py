@@ -166,10 +166,10 @@ class Game:
             # plat.kill()
       self.score += 1
 
-        if self.player.pos.y < hits[0].rect.bottom:
-          self.player.pos.y = hits[0].rect.top
-          self.player.vel.y = 0
-          self.player.jumping = False
+      if self.player.pos.y < hits[0].rect.bottom:
+        self.player.pos.y = hits[0].rect.top
+        self.player.vel.y = 0
+        self.player.jumping = False
     if self.player.rect.right <= WIDTH / 2:
             self.player.pos.x += abs(self.player.vel.x)
             # self.acid.pos.x += abs(self.player.vel.x)
@@ -238,7 +238,7 @@ class Game:
     if self.player.health < self.player.max_health:
       self.player.health += .01
     if self.player.health <= 0:
-        self.playing = False
+      self.playing = False
 
   def events(self):
     # Game Loop - events
