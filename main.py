@@ -12,6 +12,7 @@ from pygame.locals import (
   K_LEFT,
   K_RIGHT,
   K_ESCAPE,
+  K_SPACE,
   KEYDOWN,
   KEYUP,
   QUIT,
@@ -55,39 +56,25 @@ class Game:
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
-    self.door = pg.sprite.Group()
-    self.key = pg.sprite.Group()
+
+
     self.acid = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
-    # k = self.screen.blit(self.door, 395, 130)
-    # d = self.screen.blit(self.key, 695, 430)
     for plat in MAP1_PLATFORM_LIST:
-      p = Platform(self, *plat)
+      p = Platform(*plat)
       self.all_sprites.add(p)
       self.platforms.add(p)
-    #   self.key.add(k)
-    #   self.door.add(d)
-    # for plat in MAP2_PLATFORM_LIST:
-    #   p = Platform(self, *plat)
-    #   self.all_sprites.add(p)
-    #   self.platforms.add(p)
-    # if plat == MAP1_PLATFORM_LIST:
-    #     # door_rect = self.screen.blit(self.door, (395, 130))
-    #     # # if key_found == False:
-    #     # key_rect = self.screen.blit(self.key, (680, 450))
-    # if plat == MAP2_PLATFORM_LIST:
-    #     door_rect = self.screen.blit(self.door, (695, 430))
-    # if self.player.spritecollide(key_rect):
-    #     key_found = True
-    # if self.player.spritecollide(door_rect):
-    #     if key_found == True:
-    #         plat = MAP2_PLATFORM_LIST
+    acid = Acid(500, HEIGHT - 40, 100, 30)
+    self.all_sprites.add(acid)
+    self.acid.add(acid)  
+
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     
     # self.all_sprites.add(acid)
     # self.acid.add(acid)  
     self.run()
+    
     
 
   def run(self):
@@ -108,6 +95,7 @@ class Game:
     if self.player.vel.y > 0:
       hits = pg.sprite.spritecollide(self.player, self.platforms, False)
       if hits:
+
         if self.player.pos.y < hits[0].rect.bottom:
           self.player.pos.y = hits[0].rect.top
           self.player.vel.y = 0
@@ -131,21 +119,6 @@ class Game:
           sprite.kill()
         if len(self.platforms) ==0:
           self.playing= False
-
-    while len(self.platforms) < 6:
-      width = random.randrange(50, 100)
-      p = Platform(self, random.randrange(0, WIDTH-width),
-                random.randrange(-75, -30))
-      self.platforms.add(p)
-      self.all_sprites.add(p)
-
-    # acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
-    # if acid_hit:
-    #   self.player.health -= 1
-    # if self.player.health < self.player.max_health:
-    #   self.player.health += .01
-    # if self.player.health <= 0:
-    #     self.playing = False
 
   def events(self):
     # Game Loop - events
@@ -189,6 +162,27 @@ class Game:
             self.all_sprites.add(b)
             self.bullets.add(b)
 
+    acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
+    if acid_hit:
+      self.player.health -= 1
+    if self.player.health < self.player.max_health:
+      self.player.health += .01
+    if self.player.health <= 0:
+        self.playing = False
+
+  def events(self):
+    # Game Loop - events
+    keys = pg.key.get_pressed()
+    for event in pg.event.get():
+      # check for closing window
+      if event.type == pg.QUIT:
+        if self.playing:
+          self.playing = False
+        self.running = False
+      
+
+
+
   def draw(self):
     #Game Loop - draw 
     self.back_image = pg.image.load('bg/plx-4.png')
@@ -199,11 +193,13 @@ class Game:
     self.all_sprites.draw(self.screen)
     pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
     pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
+
     self.screen.blit(self.player.image, self.player.rect)
     self.back_rect.move_ip(-2, 0)
     if self.back_rect.right == 0:
       self.back_rect.x =0
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
+
     pg.display.flip()
 
 
@@ -258,6 +254,8 @@ class Game:
     text_rect= text_surface.get_rect()
     text_rect.midtop = (x,y)
     self.screen.blit(text_surface, text_rect)
+
+    
 
 g = Game()
 g.show_start_screen()
