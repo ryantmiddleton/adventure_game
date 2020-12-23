@@ -66,6 +66,10 @@ class Game:
       if hits:
         self.player.pos.y = hits[0].rect.top
         self.player.vel.y = 0
+    # Key detection for Key 1
+    key1_hit = pg.sprite.spritecollide(self.player, self.key1, True)
+    if key1_hit:
+      door_hit = True
     # Door detection for Door 1
     door_hit = pg.sprite.spritecollide(self.player, self.door1, False)
     if door_hit:
@@ -73,14 +77,15 @@ class Game:
           self.player.level += 1
         print('success')
         print(self.player.level)
+
         self.load_level()
 
-#    # Add wall blocking Level 1
-#    if self.player.level == 50:
-#      if self.player.pos.x > 340:
-#        wall_1 = Platform(500, 0, 20, 720)
-#        self.all_sprites.add(wall_1)
-#        self.platforms.add(wall_1)
+    # Add wall blocking Level 1
+    if self.player.level == 50:
+      if self.player.pos.x > 340:
+        wall_1 = Platform(500, 0, 20, 720)
+        self.all_sprites.add(wall_1)
+        self.platforms.add(wall_1)
           
     # Door detection for Door 2
     door_hit2 = pg.sprite.spritecollide(self.player, self.door2, False)
@@ -170,6 +175,7 @@ class Game:
   def draw(self):
     #Game Loop - draw 
     self.screen.fill(BLACK)
+
     self.all_sprites.draw(self.screen)
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
     pg.display.flip()
@@ -187,10 +193,9 @@ class Game:
       self.all_sprites.add(d1)
       self.door1.add(d1)
       # Level 1 Key
-      if key_found == False:
-        key_rect = Key1(350, 200, 10, 10)
-        self.all_sprites.add(key_rect)
-        self.key1.add(key_rect)
+      key_rect = Key1(350, 200, 10, 10)
+      self.all_sprites.add(key_rect)
+      self.key1.add(key_rect)
   # Load Level 2
     if self.player.level == 50:
       # Level 2 Platforms
