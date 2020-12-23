@@ -56,6 +56,17 @@ class Game:
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
+    self.door1 = pg.sprite.Group()
+    self.door2 = pg.sprite.Group()
+    self.door3 = pg.sprite.Group()
+    self.key1 = pg.sprite.Group()
+    self.key2 = pg.sprite.Group()
+    self.key3 = pg.sprite.Group()
+    self.player = Player(self)
+    self.all_sprites.add(self.player)
+    
+
+
     self.acid = pg.sprite.Group()
     self.player = Player(self)
     self.all_sprites.add(self.player)
@@ -73,6 +84,7 @@ class Game:
     # Game loop
     pg.mixer.music.play(loops=-1)
     self.playing = True
+    self.load_level()
     while self.playing:
       self.clock.tick(FPS)
       self.events()
@@ -87,8 +99,67 @@ class Game:
     if self.player.vel.y > 0:
       hits = pg.sprite.spritecollide(self.player, self.platforms, False)
       if hits:
+        self.player.pos.y = hits[0].rect.top
+        self.player.vel.y = 0
+    # Key detection for Key 1
+    key1_hit = pg.sprite.spritecollide(self.player, self.key1, True)
+    if key1_hit:
+      door_hit = True
+    # Door detection for Door 1
+    door_hit = pg.sprite.spritecollide(self.player, self.door1, False)
+    if door_hit:
+        while self.player.level < 50:
+          self.player.level += 1
+        print('success')
+        print(self.player.level)
 
-        if self.player.pos.y < hits[0].rect.bottom:
+        self.load_level()
+
+    # Add wall blocking Level 1
+    if self.player.level == 50:
+      if self.player.pos.x > 340:
+        wall_1 = Platform(500, 0, 20, 720)
+        self.all_sprites.add(wall_1)
+        self.platforms.add(wall_1)
+          
+    # Door detection for Door 2
+    door_hit2 = pg.sprite.spritecollide(self.player, self.door2, False)
+    if door_hit2:
+        while self.player.level < 100:
+          self.player.level += 1
+        print('success')
+        print(self.player.level)
+        self.load_level()
+    # Door detection for Door 3
+    door_hit3 = pg.sprite.spritecollide(self.player, self.door3, False)
+    if door_hit3:
+        while self.player.level < 150:
+          self.player.level += 1
+        print('success')
+        print(self.player.level)
+        self.load_level()    
+
+    # Side scrolling
+    if self.player.rect.right <= WIDTH / 3:
+      self.player.pos.x += abs(self.player.vel.x)
+      for plat in self.platforms:
+        plat.rect.x += abs(self.player.vel.x)
+      for door in self.door1:
+        door.rect.x += abs(self.player.vel.x)
+      for door in self.door2:
+            door.rect.x += abs(self.player.vel.x)
+      for door in self.door3:
+            door.rect.x += abs(self.player.vel.x)
+      for key in self.key1:
+        key.rect.x += abs(self.player.vel.x)
+      for key in self.key2:
+        key.rect.x += abs(self.player.vel.x)
+      for key in self.key3:
+        key.rect.x += abs(self.player.vel.x)
+          # if plat.rect.right >= WIDTH:
+            # plat.kill()
+      self.score += 1
+    if self.player.pos.y < hits[0].rect.bottom:
           self.player.pos.y = hits[0].rect.top
           self.player.vel.y = 0
           self.player.jumping = False
@@ -167,6 +238,7 @@ class Game:
     self.back_image = pg.transform.scale(self.back_image, (1400, 720))
     self.back_rect = self.back_image.get_rect()
     self.screen.fill(BLACK)
+
     self.screen.blit(self.back_image, self.back_rect.move(0,0))
     self.all_sprites.draw(self.screen)
     pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
@@ -178,6 +250,60 @@ class Game:
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
     pg.display.flip()
 
+  def load_level(self):
+  # Load Level 1
+    if self.player.level == 1:
+      # Level 1 Platforms
+      for plat in MAP1_PLATFORM_LIST:
+        p = Platform(*plat)
+        self.all_sprites.add(p)
+        self.platforms.add(p)
+      # Level 1 Door  
+      d1 = Door1(200, 250, 30, 50)
+      self.all_sprites.add(d1)
+      self.door1.add(d1)
+      # Level 1 Key
+      key_rect = Key1(350, 200, 10, 10)
+      self.all_sprites.add(key_rect)
+      self.key1.add(key_rect)
+  # Load Level 2
+    if self.player.level == 50:
+      # Level 2 Platforms
+      for plat in MAP2_PLATFORM_LIST:
+            p = Platform(*plat)
+            self.all_sprites.add(p)
+            self.platforms.add(p)
+      # Level 2 Door
+      d2 = Door2(300, 250, 30, 50)
+      self.all_sprites.add(d2)
+      self.door2.add(d2)
+      # Level 2 Key
+      k2 = Key2(350, 200, 10, 10)
+      self.all_sprites.add(k2)
+      self.key2.add(k2)
+  # Load Level 3 
+    if self.player.level == 100:
+      # Level 3 Platforms
+      for plat in MAP3_PLATFORM_LIST:
+            p = Platform(*plat)
+            self.all_sprites.add(p)
+            self.platforms.add(p)
+      # Level 3 Door
+      d3 = Door3(300, 250, 30, 50)
+      self.all_sprites.add(d3)
+      self.door3.add(d3)
+      # Level 3 Key
+      k3 = Key3(350, 200, 10, 10)
+      self.all_sprites.add(k3)
+      self.key3.add(k3)
+  # Load Level 4
+    if self.player.level == 150:
+      # Level 4 Platforms
+      for plat in MAP4_PLATFORM_LIST:
+       p = Platform(*plat)
+       self.all_sprites.add(p)
+       self.platforms.add(p)
+      
 
   def show_start_screen(self):
     # game splash/start screen
@@ -221,7 +347,6 @@ class Game:
           self.running = False
         if event.type == pg.KEYUP:
           waiting = False
-
 
   def draw_text(self, text, size, color, x, y):
     font = pg.font.Font(self.font_name, size)

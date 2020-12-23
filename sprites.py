@@ -43,6 +43,7 @@ class Player(pg.sprite.Sprite):
     self.pos = vec(0, HEIGHT-40)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
+    self.level = 1
     self.left = False
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -157,3 +158,56 @@ class Acid(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
+class Door1(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Door2(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Door3(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Key1(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+  
+class Key2(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Key3(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
