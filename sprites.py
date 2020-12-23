@@ -108,17 +108,17 @@ class Spider(pg.sprite.Sprite):
     self.frames = strip_from_sheet(self.spider_sheet,(0,6),(2,6),(self.size[0]/12,self.size[1]/8))
     for i in range(len(self.frames)):
       self.frames[i] = crop(self.frames[i],(10,20),(65,45))
-      self.frames[i] = pg.transform.rotozoom(self.frames[i], 180, 0.5)
+      # self.frames[i] = pg.transform.flip(self.frames[i], True, False)
+      self.frames[i] = pg.transform.rotozoom(self.frames[i], 0, 1)
     self.image_num = 0
     self.anima_speed = 6
     self.image = self.frames[self.image_num]
-  
     # self.rect.y = y, self.rect.x = x
     self.rect = self.image.get_rect(topleft=(x,y))
 
-    # 0-right-facing/right, 90-right-facing/down, 180-hanging/left, 270-right-facing/up
+    # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
     self.orient = 180
-    self.dir = 0
+    self.dir = LEFT
 
   def update(self):
     # Animate the spider's legs by cycling through each image
@@ -127,7 +127,8 @@ class Spider(pg.sprite.Sprite):
       if self.image_num == len(self.frames):
         self.image_num = 0
       self.anima_speed = 6
-      self.image = self.frames[self.image_num]
+      self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+      # print(self.orient)
     else:
       self.anima_speed -= 1
     
@@ -137,56 +138,54 @@ class Spider(pg.sprite.Sprite):
         self.rect.x -= 1
       elif self.dir == RIGHT:
         self.rect.x += 1
-      print("hanging")
+      # print("hanging")
 
     elif isGripping_right(self):
       if self.dir == UP:
         self.rect.y -= 1
       if self.dir == DOWN:
         self.rect.y += 1
-      print("gripping right")
+      # print("gripping right")
       
-    # elif isStanding(self):
-    #   if self.dir == LEFT:
-    #     self.rect.x -= 1
-    #   elif self.dir == RIGHT:
-    #     self.rect.x += 1
-    #   print("walking")
+    elif isStanding(self):
+      if self.dir == LEFT:
+        self.rect.x -= 1
+      elif self.dir == RIGHT:
+        self.rect.x += 1
+      # print("walking")
 
-    # elif isGripping_left(self):
-    #   if self.dir == UP:
-    #     self.rect.y -= 1
-    #   if self.dir == DOWN:
-    #     self.rect.y += 1
-    #   print("gripping left")
+    elif isGripping_left(self):
+      if self.dir == UP:
+        self.rect.y -= 1
+      if self.dir == DOWN:
+        self.rect.y += 1
+      # print("gripping left")
 
     else:
-      print("changing direction")
+      # print("changing direction")
       if self.dir == LEFT:
-        print("rotating UP to 270")
+        # print("rotating UP to 90")
         self.dir = UP
-        self.orient = 270
-        self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+        self.orient = 90
         self.rect.y -= 1
+
       elif self.dir == UP:
-        print("rotating RIGHT to 0")
+        # print("rotating RIGHT to 0")
         self.dir = RIGHT
         self.orient = 0
-        self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
         self.rect.x += 1
+
       elif self.dir == RIGHT:
-        print("rotating DOWN to 90")
+        # print("rotating DOWN to 270")
         self.dir = DOWN
-        self.orient = 90
-        self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+        self.orient = 270
         self.rect.y += 1
-      elif self.dir == RIGHT:
-        print("rotating RIGHT to 180")
-        self.dir = RIGHT
+
+      elif self.dir == DOWN:
+        # print("rotating RIGHT to 180")
+        self.dir = LEFT
         self.orient = 180
-        self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
-        self.rect.y += 1
-      
+        self.rect.x -= 1
 
 class Platform(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):

@@ -39,14 +39,14 @@ class Game:
     for platform in MAP3_PLATFORM_LIST:
       # create a new platform - could also use p=Platform(*platform)
       p = Platform(*platform)
-      # spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
-      # self.all_sprites.add(spider)
+      spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
+      self.all_sprites.add(spider)
       self.all_sprites.add(p)
-      # self.enemies.add(spider)
+      self.enemies.add(spider)
       self.platforms.add(p)
-    spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
-    self.all_sprites.add(spider)
-    self.enemies.add(spider)
+    # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
+    # self.all_sprites.add(spider)
+    # self.enemies.add(spider)
     self.run()
     
 
@@ -77,18 +77,18 @@ class Game:
     if abs(self.player.rect.top) <= HEIGHT/4:
         if not(isStanding(self.player)):
           for platform in self.platforms:
-              platform.rect.y += abs(self.player.vel.y)
+              platform.rect.y += abs(int(self.player.vel.y))
           for enemy in self.enemies:
-              enemy.rect.y += abs(self.player.vel.y)
+              enemy.rect.y += abs(int(self.player.vel.y))
           self.player.pos.y += abs(self.player.vel.y)
     # If player reaches the bottom 25% of the screen
     # scroll all platforms up (decrease y coord)
     if abs(self.player.rect.top) >= HEIGHT * 0.75:
         if not(isStanding(self.player)):
           for platform in self.platforms:
-              platform.rect.y -= abs(self.player.vel.y)
+              platform.rect.y -= abs(int(self.player.vel.y))
           for enemy in self.enemies:
-              enemy.rect.y -= abs(self.player.vel.y)
+              enemy.rect.y -= abs(int(self.player.vel.y))
           self.player.pos.y -= abs(self.player.vel.y)
 
   def events(self):
