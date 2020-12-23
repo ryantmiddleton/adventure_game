@@ -228,12 +228,11 @@ class Game:
             # plat.kill()
       self.score += 1
 
-
-
     if self.player.pos.y < hits[0].rect.bottom:
       self.player.pos.y = hits[0].rect.top
       self.player.vel.y = 0
       self.player.jumping = False
+
 
     if self.player.rect.right <= WIDTH / 2:
       self.player.pos.x += abs(self.player.vel.x)
@@ -299,13 +298,14 @@ class Game:
             b = Bullet(self.player.pos.x, self.player.pos.y, facing)
             self.all_sprites.add(b)
             self.bullets.add(b)
-      acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
-      if acid_hit:
-        self.player.health -= 1
-      if self.player.health < self.player.max_health:
-        self.player.health += .01
-      if self.player.health <= 0:
-          self.playing = False
+
+    acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
+    if acid_hit:
+      self.player.health -= 1
+    if self.player.health < self.player.max_health:
+      self.player.health += .01
+    if self.player.health <= 0:
+      self.playing = False
 
   def events(self):
     # Game Loop - events
