@@ -43,7 +43,7 @@ class Player(pg.sprite.Sprite):
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
-    self.pos = vec(WIDTH/2, HEIGHT/2)
+    self.pos = vec(WIDTH * .75, HEIGHT/2)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.level = 1
@@ -158,9 +158,9 @@ class Spider(pg.sprite.Sprite):
     self.image_num = 0
     self.anima_speed = 6
     self.image = self.frames[self.image_num]
-    # self.rect.y = y, self.rect.x = x
+    
     self.rect = self.image.get_rect(topleft=(x,y))
-
+    # self.rect.y = y, self.rect.x = x
     # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
     self.orient = 180
     self.dir = LEFT

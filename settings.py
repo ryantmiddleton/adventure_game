@@ -30,6 +30,7 @@ PLATFORM_WIDTH = 100
 MAP1_PLATFORM_LIST = [
   # Ground
   (0, HEIGHT - 40),
+  (WIDTH *.70, HEIGHT - 40),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (125, HEIGHT - 350),
   (135, 300),
@@ -41,9 +42,10 @@ MAP1_PLATFORM_LIST = [
 
 MAP2_PLATFORM_LIST = [
   (0, HEIGHT - 40),
+  (0, 250),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (125, HEIGHT - 350),
-  (350, 200),
+  (350, 300),
   (175, 100),
   (155, 350),
   (400, 400),
