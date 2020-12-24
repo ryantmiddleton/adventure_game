@@ -22,7 +22,7 @@ from pygame.locals import (
   K_d,
 )
 
-class Spirtesheet:
+class Spritesheet:
   def __init__(self, filename):
     self.spritesheet = pg.image.load(filename).convert()
 
@@ -34,7 +34,7 @@ class Spirtesheet:
 
 
 class Player(pg.sprite.Sprite):
-      def __init__(self, game):
+  def __init__(self, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
     # Player Image
@@ -43,7 +43,7 @@ class Player(pg.sprite.Sprite):
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
-    self.pos = vec(0, HEIGHT-40)
+    self.pos = vec(WIDTH/2, HEIGHT/2)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.level = 1
@@ -143,17 +143,6 @@ class Bullet(pg.sprite.Sprite):
       self.kill()
     elif self.rect.right < 0:
       self.kill()
-
-
-class Platform(pg.sprite.Sprite):
-  def __init__(self, game, x, y):
-    pg.sprite.Sprite.__init__(self)
-    self.game = game
-    self.game.spritesheet.get_image(0, 288, 380, 94)
-    self.image.set_colorkey(BLACK)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y  
 
 class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
@@ -255,12 +244,8 @@ class Acid(pg.sprite.Sprite):
 class Platform(pg.sprite.Sprite):
   def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-
     self.game = game
-    images = [self.game.spritesheet.get_image(0, 288, 380, 94),
-              # self.game.spritesheet.get_image(213, 1662, 201, 100)
-    ]
-    self.image = choice(images)
+    self.image = self.game.spritesheet.get_image(0, 288, 380, 94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
