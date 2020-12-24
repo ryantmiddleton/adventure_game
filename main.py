@@ -110,8 +110,6 @@ class Game:
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     self.run()
     
-    
-
   def run(self):
     # Game loop
     pg.mixer.music.play(loops=-1)
@@ -329,7 +327,6 @@ class Game:
     if self.back_rect.right == 0:
       self.back_rect.x =0
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
-
     pg.display.flip()
 
   def load_level(self):
