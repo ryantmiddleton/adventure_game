@@ -85,7 +85,7 @@ class Player(pg.sprite.Sprite):
     # equations of motion
     self.vel += self.acc
     self.pos += self.vel + 0.5 * self.acc
-    
+
     # collision detection
     if self.pos.x > WIDTH -self.rect.width/2:
       self.pos.x = WIDTH - self.rect.width/2
@@ -350,62 +350,8 @@ class Door(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
-  
-class Door1(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(RED)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Door2(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(RED)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Door3(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(RED)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
 
 class Key(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Key1(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-  
-class Key2(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Key3(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((w, h))

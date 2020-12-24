@@ -79,14 +79,14 @@ class Game:
     if self.player.level == 1:
       # Add Platforms
       for plat in MAP1_PLATFORM_LIST:
-        p = Platform(plat[0], plat[1], 380, 94)
+        p = Platform(*plat)
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
       d1 = Door(200, 250, 30, 50)
       # Position player right where the door is
-      self.player.rect.x = 200
-      self.player.rect.y = 250
+      self.player.pos.x = d1.rect.x
+      self.player.pos.y = d1.rect.y
       self.all_sprites.add(d1)
       self.doors.add(d1)
       # Add Level 1 Key
@@ -139,7 +139,7 @@ class Game:
       self.keys.add(k3)
 
     # LEVEL 4
-    if self.player.level == 150:
+    if self.player.level == 4:
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
        p = Platform(*plat)
@@ -180,7 +180,7 @@ class Game:
       #   self.player.vel.y = 0
       #   self.player.jumping = False
 
-    if self.player.level == 1 or self.player.level == 2:
+    if self.player.level == 1 or self.player.level == 2 or self.player.level == 4:
       # Side Scrolling Logic
       if self.player.rect.right <= WIDTH / 4:
         for plat in self.platforms:
@@ -272,9 +272,10 @@ class Game:
       self.player.hasKey = False
       # print('success')
       # print(self.player.level)
+      # Load a new board
       self.new()
 
-    # Acid
+    # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
     if acid_hit:
       self.player.health -= 1
@@ -282,6 +283,10 @@ class Game:
       self.player.health += .01
     if self.player.health <= 0:
         self.playing = False
+
+    #Bullet Collision Detection
+    # If any bullets hit any enemies kill those bullets and enemies
+    shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
 
   def events(self):
     # Game Loop - events
