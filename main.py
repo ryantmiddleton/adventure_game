@@ -26,7 +26,6 @@ from pygame.locals import (
 )
       
 class Game:
-  
   def __init__(self):
     # Initialize Game
     pg.mixer.init()
@@ -36,19 +35,18 @@ class Game:
     self.clock = pg.time.Clock()
     self.font_name = pg.font.match_font(FONT_NAME)
     self.running = True
+    self.playing = False
     self.font_name = pg.font.match_font(FONT_NAME)
     self.load_data()
-    
-    
+
   def load_data(self):
     self.dir = path.dirname(__file__)
-    img_dir = path.join(self.dir, 'imgs')
+    self.img_dir = path.join(self.dir, 'imgs')
     with open(path.join(self.dir, HS_FILE), 'w') as f:
       try:
         self.highscore = int(f.read())
       except:
         self.highscore = 0
-    self.spritesheet = Spirtesheet(path.join(img_dir, SPRITESHEET))
     self.snd_dir = path.join(self.dir, 'snd')
     self.bg_dir = path.join(self.dir, 'bg')
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
@@ -57,55 +55,59 @@ class Game:
 
   def new(self):
     # start a new game
+    # Initialize the player
+    self.player = Player(self)
+
+    # Initialize score to zero
     self.score = 0
+
+    # Define Sprite Groups
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
+    self.acid = pg.sprite.Group()
     self.enemies = pg.sprite.Group()
-    self.player = Player(self)
-    self.all_sprites.add(self.player)
-
-    # for plat in MAP1_PLATFORM_LIST:
-    #   p = Platform(*plat)
-    #   self.all_sprites.add(p)
-    #   self.platforms.add(p)
-    # self.run()
-
-    for platform in MAP3_PLATFORM_LIST:
-      # create a new platform - could also use p=Platform(*platform)
-      p = Platform(*platform)
-      spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
-      self.all_sprites.add(spider)
-      self.all_sprites.add(p)
-      self.enemies.add(spider)
-      self.platforms.add(p)
-    # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
-    # self.all_sprites.add(spider)
-    # self.enemies.add(spider)
-
-
     self.door1 = pg.sprite.Group()
     self.door2 = pg.sprite.Group()
     self.door3 = pg.sprite.Group()
     self.key1 = pg.sprite.Group()
     self.key2 = pg.sprite.Group()
     self.key3 = pg.sprite.Group()
-    
-    self.acid = pg.sprite.Group()
-    self.player = Player(self)
-    self.all_sprites.add(self.player)
-    for plat in MAP1_PLATFORM_LIST:
-      p = Platform(*plat)
-      self.all_sprites.add(p)
-      self.platforms.add(p)
-    acid = Acid(500, HEIGHT - 40, 100, 30)
-    self.all_sprites.add(acid)
-    self.acid.add(acid)  
 
-    pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
+    # Add player to sprite group
+    self.all_sprites.add(self.player)
     
-    # self.all_sprites.add(acid)
-    # self.acid.add(acid)  
+    # Load all platforms and enemies 
+    # based on current player.level
+
+    #LEVEL 1
+    if self.player.level == 1:
+      for plat in MAP1_PLATFORM_LIST:
+        p = Platform(self, *plat)
+        self.all_sprites.add(p)
+        self.platforms.add(p)
+      acid = Acid(500, HEIGHT - 40, 100, 30)
+      self.all_sprites.add(acid)
+      self.acid.add(acid)  
+
+    # LEVEL 3
+    if self.player.level == 3:
+      for platform in MAP3_PLATFORM_LIST:
+        # create a new platform - could also use p=Platform(platform[0], platform[1])
+        p = Platform(*platform)
+
+        # Add enemies to the room
+        spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
+        self.all_sprites.add(spider)
+        self.all_sprites.add(p)
+        self.enemies.add(spider)
+        self.platforms.add(p)
+      # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
+      # self.all_sprites.add(spider)
+      # self.enemies.add(spider)
+
+    # Load music to all levels
+    pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     self.run()
     
     
@@ -135,121 +137,107 @@ class Game:
         # stop the player by seting velocity to 0
         self.player.vel.y = 0;
 
+      # WHAT IS THIS CODE DOING??? DOES IT TEST IF PLAYER HITS THE BOTTOM OF A PLATFORM?
+      # if self.player.pos.y < hits[0].rect.bottom:
+      #   self.player.pos.y = hits[0].rect.top
+      #   self.player.vel.y = 0
+      #   self.player.jumping = False
+
+    # Vertical Scrolling Logic
     # If player reaches the top 25% of the screen
     # scroll all platforms down (increase y coord)
     if abs(self.player.rect.top) <= HEIGHT/4:
-        if not(isStanding(self.player)):
+        if not(self.player.isStanding()):
           for platform in self.platforms:
               platform.rect.y += abs(int(self.player.vel.y))
           for enemy in self.enemies:
               enemy.rect.y += abs(int(self.player.vel.y))
           self.player.pos.y += abs(self.player.vel.y)
     # If player reaches the bottom 25% of the screen
-    # scroll all platforms up (decrease y coord)
+    # scroll all platforms, enemies up (decrease y coord)
     if abs(self.player.rect.top) >= HEIGHT * 0.75:
-        if not(isStanding(self.player)):
+        if not(self.player.isStanding()):
           for platform in self.platforms:
               platform.rect.y -= abs(int(self.player.vel.y))
           for enemy in self.enemies:
               enemy.rect.y -= abs(int(self.player.vel.y))
           self.player.pos.y -= abs(self.player.vel.y)
-    # platform detection if falling
-    # Code for side scrolling platform update
-    # if self.player.vel.y > 0:
-    #   hits = pg.sprite.spritecollide(self.player, self.platforms, False)
-    #   if hits:
 
-    #     if self.player.pos.y < hits[0].rect.bottom:
-    #       self.player.pos.y = hits[0].rect.top
-    #       self.player.vel.y = 0
-    #       self.player.jumping = False
+    # Side Scrolling Logic
     # if self.player.rect.right <= WIDTH / 2:
-    #         self.player.pos.x += abs(self.player.vel.x)
-    #         for plat in self.platforms:
-    #               plat.rect.x += abs(self.player.vel.x)
-    #               self.score += 1
+    #   self.player.pos.x += abs(self.player.vel.x)
+    #   # self.acid.pos.x += abs(self.player.vel.x)
+    #   for plat in self.platforms:
+    #     plat.rect.x += abs(self.player.vel.x)
+    #     self.score += 1
     # elif self.player.rect.left >= WIDTH * .75:
-    #         self.player.pos.x -= abs(self.player.vel.x)
-    #         for plat in self.platforms:
-    #             plat.rect.x -= abs(self.player.vel.x)
-                # self.score += 1
-        self.player.pos.y = hits[0].rect.top
-        self.player.vel.y = 0
-    # Key detection for Key 1
-    key1_hit = pg.sprite.spritecollide(self.player, self.key1, True)
-    if key1_hit:
-      door_hit = True
-    # Door detection for Door 1
-    door_hit = pg.sprite.spritecollide(self.player, self.door1, False)
-    if door_hit:
-      while self.player.level < 50:
-        self.player.level += 1
-      print('success')
-      print(self.player.level)
+    #   self.player.pos.x -= abs(self.player.vel.x)
+    #   for plat in self.platforms:
+    #     plat.rect.x -= abs(self.player.vel.x)
+    #     # self.score += 1
 
-      self.load_level()
 
-    # Add wall blocking Level 1
-    if self.player.level == 50:
-      if self.player.pos.x > 340:
-        wall_1 = Platform(500, 0, 20, 720)
-        self.all_sprites.add(wall_1)
-        self.platforms.add(wall_1)
+
+    # # Key detection for Key 1
+    # key1_hit = pg.sprite.spritecollide(self.player, self.key1, True)
+    # if key1_hit:
+    #   door_hit = True
+    # # Door detection for Door 1
+    # door_hit = pg.sprite.spritecollide(self.player, self.door1, False)
+    # if door_hit:
+    #   while self.player.level < 50:
+    #     self.player.level += 1
+    #   print('success')
+    #   print(self.player.level)
+
+    #   self.load_level()
+
+    # # Add wall blocking Level 1
+    # if self.player.level == 50:
+    #   if self.player.pos.x > 340:
+    #     wall_1 = Platform(500, 0, 20, 720)
+    #     self.all_sprites.add(wall_1)
+    #     self.platforms.add(wall_1)
           
-    # Door detection for Door 2
-    door_hit2 = pg.sprite.spritecollide(self.player, self.door2, False)
-    if door_hit2:
-      while self.player.level < 100:
-        self.player.level += 1
-      print('success')
-      print(self.player.level)
-      self.load_level()
-    # Door detection for Door 3
-    door_hit3 = pg.sprite.spritecollide(self.player, self.door3, False)
-    if door_hit3:
-      while self.player.level < 150:
-        self.player.level += 1
-      print('success')
-      print(self.player.level)
-      self.load_level()    
+    # # Door detection for Door 2
+    # door_hit2 = pg.sprite.spritecollide(self.player, self.door2, False)
+    # if door_hit2:
+    #   while self.player.level < 100:
+    #     self.player.level += 1
+    #   print('success')
+    #   print(self.player.level)
+    #   self.load_level()
+    # # Door detection for Door 3
+    # door_hit3 = pg.sprite.spritecollide(self.player, self.door3, False)
+    # if door_hit3:
+    #   while self.player.level < 150:
+    #     self.player.level += 1
+    #   print('success')
+    #   print(self.player.level)
+    #   self.load_level()    
 
-    # Side scrolling
-    if self.player.rect.right <= WIDTH / 3:
-      self.player.pos.x += abs(self.player.vel.x)
-      for plat in self.platforms:
-        plat.rect.x += abs(self.player.vel.x)
-      for door in self.door1:
-        door.rect.x += abs(self.player.vel.x)
-      for door in self.door2:
-            door.rect.x += abs(self.player.vel.x)
-      for door in self.door3:
-            door.rect.x += abs(self.player.vel.x)
-      for key in self.key1:
-        key.rect.x += abs(self.player.vel.x)
-      for key in self.key2:
-        key.rect.x += abs(self.player.vel.x)
-      for key in self.key3:
-        key.rect.x += abs(self.player.vel.x)
-          # if plat.rect.right >= WIDTH:
-            # plat.kill()
-      self.score += 1
+    # # Side scrolling
+    # if self.player.rect.right <= WIDTH / 3:
+    #   self.player.pos.x += abs(self.player.vel.x)
+    #   for plat in self.platforms:
+    #     plat.rect.x += abs(self.player.vel.x)
+    #   for door in self.door1:
+    #     door.rect.x += abs(self.player.vel.x)
+    #   for door in self.door2:
+    #         door.rect.x += abs(self.player.vel.x)
+    #   for door in self.door3:
+    #         door.rect.x += abs(self.player.vel.x)
+    #   for key in self.key1:
+    #     key.rect.x += abs(self.player.vel.x)
+    #   for key in self.key2:
+    #     key.rect.x += abs(self.player.vel.x)
+    #   for key in self.key3:
+    #     key.rect.x += abs(self.player.vel.x)
+    #       # if plat.rect.right >= WIDTH:
+    #         # plat.kill()
+    #   self.score += 1
 
-    if self.player.pos.y < hits[0].rect.bottom:
-      self.player.pos.y = hits[0].rect.top
-      self.player.vel.y = 0
-      self.player.jumping = False
-    if self.player.rect.right <= WIDTH / 2:
-      self.player.pos.x += abs(self.player.vel.x)
-      # self.acid.pos.x += abs(self.player.vel.x)
-      for plat in self.platforms:
-        plat.rect.x += abs(self.player.vel.x)
-        self.score += 1
-    elif self.player.rect.left >= WIDTH * .75:
-      self.player.pos.x -= abs(self.player.vel.x)
-      for plat in self.platforms:
-        plat.rect.x -= abs(self.player.vel.x)
-        # self.score += 1
-
+    # Player has fallen and died
     if self.player.rect.bottom > HEIGHT:
       for sprite in self.all_sprites:
         sprite.rect.y -= max(self.player.vel.y, 10)
@@ -258,68 +246,70 @@ class Game:
         if len(self.platforms) ==0:
           self.playing= False
 
+    # Player Collision Detection
+    # Acid
+    acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
+    if acid_hit:
+      self.player.health -= 1
+    if self.player.health < self.player.max_health:
+      self.player.health += .01
+    if self.player.health <= 0:
+        self.playing = False
+
   def events(self):
     # Game Loop - events
       keys = pg.key.get_pressed()
       for event in pg.event.get():
-      # check for closing window
-        if event.type == pg.QUIT:
-            if self.playing:
-              self.playing = False
-            self.running = False
-        if self.player.health == 0:
-              self.playing = False
-          
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.jump()
-            
-        if event.type == pg.KEYUP:
-          if event.key == pg.K_UP:
-            self.player.jump_cut()
+        # check for closing window
+        if event.type == QUIT:
+          if self.playing:
+            self.playing = False
+          self.running = False
 
-        if event.key == pg.K_SPACE:
-          if keys[pg.K_d] and keys[pg.K_w]:
-            facing = 3
-            self.shoot_sound.play()
-          elif keys[pg.K_a] and keys[pg.K_w]:
-            facing = -3
-            self.shoot_sound.play()
-          elif keys[pg.K_w]:
-            facing = 2
-            self.shoot_sound.play()
-          elif keys[pg.K_d]:
-            facing = 1
-            self.shoot_sound.play()
-          elif self.player.left or keys[pg.K_a]:
-            facing = -1    
-            self.shoot_sound.play()    
-          else:
-            facing = 1
-            self.shoot_sound.play()
-          b = Bullet(self.player.pos.x, self.player.pos.y, facing)
-          self.all_sprites.add(b)
-          self.bullets.add(b)
 
-      acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
-      if acid_hit:
-        self.player.health -= 1
-      if self.player.health < self.player.max_health:
-        self.player.health += .01
-      if self.player.health <= 0:
-          self.playing = False
-
-  def events(self):
-    # Game Loop - events
-    keys = pg.key.get_pressed()
-    for event in pg.event.get():
-      # check for closing window
-      if event.type == pg.QUIT:
-        if self.playing:
-          self.playing = False
-        self.running = False
-      
-
+        if event.type == KEYDOWN:
+          #Check to see if the game is over/starting
+          # Player 'hit any key' from show_start_screen() or show_go_screen() to restart the game
+          if self.playing == False:
+            self.playing = True
+          elif self.playing == True:
+            # invoke a jump when holding down the 'UP' arrow
+            if event.key == K_UP:
+              self.player.jump()
+            elif keys[K_d] and keys[K_w]:
+              b = Bullet(self.player.pos.x, self.player.pos.y, 3)
+              self.all_sprites.add(b)
+              self.bullets.add(b)
+              self.shoot_sound.play()
+            elif keys[K_a] and keys[K_w]:
+              b = Bullet(self.player.pos.x, self.player.pos.y, -3)
+              self.all_sprites.add(b)
+              self.bullets.add(b)
+              self.shoot_sound.play()
+            elif keys[K_w]:
+              b = Bullet(self.player.pos.x, self.player.pos.y, 2)
+              self.all_sprites.add(b)
+              self.bullets.add(b)
+              self.shoot_sound.play()                
+            elif keys[K_d]:
+              b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+              self.all_sprites.add(b)
+              self.bullets.add(b)
+              self.shoot_sound.play()                    
+            elif self.player.left or keys[K_a]:
+              b = Bullet(self.player.pos.x, self.player.pos.y, -1)
+              self.all_sprites.add(b)
+              self.bullets.add(b)
+              self.shoot_sound.play()    
+            else:
+              b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+              self.all_sprites.add(b)
+              self.bullets.add(b)
+              self.shoot_sound.play()  
+            #invoke a 'shallow' jump 
+          # when tapping the 'UP' arrow
+          # if event.key == K_UP:
+          #   self.player.jump_cut()
 
 
   def draw(self):
@@ -347,7 +337,7 @@ class Game:
     if self.player.level == 1:
       # Level 1 Platforms
       for plat in MAP1_PLATFORM_LIST:
-        p = Platform(*plat)
+        p = Platform(self,*plat)
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 1 Door  
@@ -405,7 +395,9 @@ class Game:
     self.draw_text("You ready? Press a key to play", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
     self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, 15)
     pg.display.flip()
-    self.wait_for_key()
+    # Wait for player to hit a key to start
+    while self.playing == False and self.running == True:
+      self.events()
 
   def show_go_screen(self):
     #game over/continue
@@ -426,19 +418,11 @@ class Game:
     else: 
       self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
     pg.display.flip()
-    self.wait_for_key()
-    pg.mixer.music.fadeout(500)
 
-  def wait_for_key(self):
-    waiting = True
-    while waiting:
-      self.clock.tick(FPS)
-      for event in pg.event.get():
-        if event.type == pg.QUIT:
-          waiting = False
-          self.running = False
-        if event.type == pg.KEYUP:
-          waiting = False
+    # Wait for player to hit a key to restart the game OR QUIT
+    while self.playing == False and self.running == True:
+      self.events()
+    pg.mixer.music.fadeout(500)
 
   def draw_text(self, text, size, color, x, y):
     font = pg.font.Font(self.font_name, size)
@@ -451,7 +435,7 @@ class Game:
 
 g = Game()
 g.show_start_screen()
-while g.run:
+while g.running:
   g.new()
   g.show_go_screen()
 
