@@ -38,6 +38,8 @@ class Game:
     self.playing = False
     self.font_name = pg.font.match_font(FONT_NAME)
     self.load_data()
+    # Initialize the player
+    self.player = Player(self)
 
   def load_data(self):
     self.dir = path.dirname(__file__)
@@ -55,9 +57,6 @@ class Game:
 
   def new(self):
     # start a new game
-    # Initialize the player
-    self.player = Player(self)
-
     # Initialize score to zero
     self.score = 0
 
@@ -65,14 +64,10 @@ class Game:
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
-    self.acid = pg.sprite.Group()
+    self.acid_pools = pg.sprite.Group()
     self.enemies = pg.sprite.Group()
-    self.door1 = pg.sprite.Group()
-    self.door2 = pg.sprite.Group()
-    self.door3 = pg.sprite.Group()
-    self.key1 = pg.sprite.Group()
-    self.key2 = pg.sprite.Group()
-    self.key3 = pg.sprite.Group()
+    self.doors = pg.sprite.Group()
+    self.keys = pg.sprite.Group()
 
     # Add player to sprite group
     self.all_sprites.add(self.player)
@@ -82,29 +77,74 @@ class Game:
 
     #LEVEL 1
     if self.player.level == 1:
+      # Add Platforms
       for plat in MAP1_PLATFORM_LIST:
-        p = Platform(self, *plat)
-        self.all_sprites.add(p)
+        p = Platform(plat[0], plat[1], 380, 94)
+        self.all_sprites.add(p) 
         self.platforms.add(p)
+      # Add Level 1 Door  
+      d1 = Door(200, 250, 30, 50)
+      # Position player right where the door is
+      self.player.rect.x = 200
+      self.player.rect.y = 250
+      self.all_sprites.add(d1)
+      self.doors.add(d1)
+      # Add Level 1 Key
+      k1 = Key(350, 200, 10, 10)
+      self.all_sprites.add(k1)
+      self.keys.add(k1)
+      # Add Acid
       acid = Acid(500, HEIGHT - 40, 100, 30)
       self.all_sprites.add(acid)
-      self.acid.add(acid)  
+      self.acid_pools.add(acid)  
+
+    # LEVEL 2
+    if self.player.level == 2:
+      # Level 2 Platforms
+      for plat in MAP2_PLATFORM_LIST:
+            p = Platform(*plat)
+            self.all_sprites.add(p)
+            self.platforms.add(p)
+      # Level 2 Door
+      d2 = Door(300, 250, 30, 50)
+      self.all_sprites.add(d2)
+      self.doors.add(d2)
+      # Level 2 Key
+      k2 = Key(350, 200, 10, 10)
+      self.all_sprites.add(k2)
+      self.keys.add(k2)
 
     # LEVEL 3
     if self.player.level == 3:
+      # Add Platforms
       for platform in MAP3_PLATFORM_LIST:
         # create a new platform - could also use p=Platform(platform[0], platform[1])
         p = Platform(*platform)
-
-        # Add enemies to the room
+        # Add enemies to each platform
         spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
         self.all_sprites.add(spider)
-        self.all_sprites.add(p)
         self.enemies.add(spider)
+        self.all_sprites.add(p)
         self.platforms.add(p)
       # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
+      # Level 3 Door
+      d3 = Door(300, 250, 30, 50)
+      self.all_sprites.add(d3)
+      self.doors.add(d3)
+      # Level 3 Key
+      k3 = Key(350, 200, 10, 10)
+      self.all_sprites.add(k3)
+      self.keys.add(k3)
+
+    # LEVEL 4
+    if self.player.level == 150:
+      # Level 4 Platforms
+      for plat in MAP4_PLATFORM_LIST:
+       p = Platform(*plat)
+       self.all_sprites.add(p)
+       self.platforms.add(p)
 
     # Load music to all levels
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
@@ -114,7 +154,6 @@ class Game:
     # Game loop
     pg.mixer.music.play(loops=-1)
     self.playing = True
-    self.load_level()
     while self.playing:
       self.clock.tick(FPS)
       self.events()
@@ -141,99 +180,69 @@ class Game:
       #   self.player.vel.y = 0
       #   self.player.jumping = False
 
-    # Vertical Scrolling Logic
-    # If player reaches the top 25% of the screen
-    # scroll all platforms down (increase y coord)
-    if abs(self.player.rect.top) <= HEIGHT/4:
+    if self.player.level == 1 or self.player.level == 2:
+      # Side Scrolling Logic
+      if self.player.rect.right <= WIDTH / 4:
+        for plat in self.platforms:
+          plat.rect.x += abs(int(self.player.vel.x))
+          self.score += 1
+        for enemy in self.enemies:
+          enemy.rect.x += abs(int(self.player.vel.x))
+        for key in self.keys:
+            key.rect.x += abs(int(self.player.vel.x))
+        for door in self.doors:
+            door.rect.x += abs(int(self.player.vel.x))
+        for acid in self.acid_pools:
+            acid.rect.x += abs(int(self.player.vel.x))
+        self.player.pos.x += abs(self.player.vel.x)
+
+      elif self.player.rect.left >= WIDTH * .75:
+        self.player.pos.x -= abs(self.player.vel.x)
+        for plat in self.platforms:
+          plat.rect.x -= abs(self.player.vel.x)
+          # self.score += 1
+        for enemy in self.enemies:
+            enemy.rect.x -= abs(int(self.player.vel.x))
+        for key in self.keys:
+            key.rect.x -= abs(int(self.player.vel.x))
+        for door in self.doors:
+            door.rect.x -= abs(int(self.player.vel.x))
+        for acid in self.acid_pools:
+            acid.rect.x -= abs(int(self.player.vel.x))
+        self.player.pos.x += abs(self.player.vel.x)
+
+    if self.player.level == 3:
+          # Vertical Scrolling Logic
+      # If player reaches the top 25% of the screen
+      # scroll all sprites down (increase y coord)
+      if abs(self.player.rect.top) <= HEIGHT/4:
         if not(self.player.isStanding()):
           for platform in self.platforms:
               platform.rect.y += abs(int(self.player.vel.y))
           for enemy in self.enemies:
               enemy.rect.y += abs(int(self.player.vel.y))
+          for key in self.keys:
+              key.rect.y += abs(int(self.player.vel.y))
+          for door in self.doors:
+              door.rect.y += abs(int(self.player.vel.y))
+          for acid in self.acid_pools:
+              acid.rect.y += abs(int(self.player.vel.y))
           self.player.pos.y += abs(self.player.vel.y)
-    # If player reaches the bottom 25% of the screen
-    # scroll all platforms, enemies up (decrease y coord)
-    if abs(self.player.rect.top) >= HEIGHT * 0.75:
+      # If player reaches the bottom 25% of the screen
+      # scroll all sprites up (decrease y coord)
+      if abs(self.player.rect.top) >= HEIGHT * 0.75:
         if not(self.player.isStanding()):
           for platform in self.platforms:
               platform.rect.y -= abs(int(self.player.vel.y))
           for enemy in self.enemies:
               enemy.rect.y -= abs(int(self.player.vel.y))
+          for key in self.keys:
+              key.rect.y -= abs(int(self.player.vel.y))
+          for door in self.doors:
+              door.rect.y -= abs(int(self.player.vel.y))
+          for acid in self.acid_pools:
+              acid.rect.y -= abs(int(self.player.vel.y))
           self.player.pos.y -= abs(self.player.vel.y)
-
-    # Side Scrolling Logic
-    # if self.player.rect.right <= WIDTH / 2:
-    #   self.player.pos.x += abs(self.player.vel.x)
-    #   # self.acid.pos.x += abs(self.player.vel.x)
-    #   for plat in self.platforms:
-    #     plat.rect.x += abs(self.player.vel.x)
-    #     self.score += 1
-    # elif self.player.rect.left >= WIDTH * .75:
-    #   self.player.pos.x -= abs(self.player.vel.x)
-    #   for plat in self.platforms:
-    #     plat.rect.x -= abs(self.player.vel.x)
-    #     # self.score += 1
-
-
-
-    # # Key detection for Key 1
-    # key1_hit = pg.sprite.spritecollide(self.player, self.key1, True)
-    # if key1_hit:
-    #   door_hit = True
-    # # Door detection for Door 1
-    # door_hit = pg.sprite.spritecollide(self.player, self.door1, False)
-    # if door_hit:
-    #   while self.player.level < 50:
-    #     self.player.level += 1
-    #   print('success')
-    #   print(self.player.level)
-
-    #   self.load_level()
-
-    # # Add wall blocking Level 1
-    # if self.player.level == 50:
-    #   if self.player.pos.x > 340:
-    #     wall_1 = Platform(500, 0, 20, 720)
-    #     self.all_sprites.add(wall_1)
-    #     self.platforms.add(wall_1)
-          
-    # # Door detection for Door 2
-    # door_hit2 = pg.sprite.spritecollide(self.player, self.door2, False)
-    # if door_hit2:
-    #   while self.player.level < 100:
-    #     self.player.level += 1
-    #   print('success')
-    #   print(self.player.level)
-    #   self.load_level()
-    # # Door detection for Door 3
-    # door_hit3 = pg.sprite.spritecollide(self.player, self.door3, False)
-    # if door_hit3:
-    #   while self.player.level < 150:
-    #     self.player.level += 1
-    #   print('success')
-    #   print(self.player.level)
-    #   self.load_level()    
-
-    # # Side scrolling
-    # if self.player.rect.right <= WIDTH / 3:
-    #   self.player.pos.x += abs(self.player.vel.x)
-    #   for plat in self.platforms:
-    #     plat.rect.x += abs(self.player.vel.x)
-    #   for door in self.door1:
-    #     door.rect.x += abs(self.player.vel.x)
-    #   for door in self.door2:
-    #         door.rect.x += abs(self.player.vel.x)
-    #   for door in self.door3:
-    #         door.rect.x += abs(self.player.vel.x)
-    #   for key in self.key1:
-    #     key.rect.x += abs(self.player.vel.x)
-    #   for key in self.key2:
-    #     key.rect.x += abs(self.player.vel.x)
-    #   for key in self.key3:
-    #     key.rect.x += abs(self.player.vel.x)
-    #       # if plat.rect.right >= WIDTH:
-    #         # plat.kill()
-    #   self.score += 1
 
     # Player has fallen and died
     if self.player.rect.bottom > HEIGHT:
@@ -245,8 +254,28 @@ class Game:
           self.playing= False
 
     # Player Collision Detection
+    # Key detection for any of the keys
+    key_hit = pg.sprite.spritecollideany(self.player, self.keys)
+    # If a player collides with a key, the key sprite is returned (not None)
+    if key_hit != None:
+      # remove the key from the screen
+      key_hit.kill()
+      #set key_hit to True because player has the key now
+      self.player.hasKey = True
+    # Door detection for any of the doors
+    door_hit = pg.sprite.spritecollideany(self.player, self.doors)
+    # If a player collides with a door and has already gotten the key, the door sprite is returned
+    if door_hit != None and self.player.hasKey:
+      # Go to the next level
+      self.player.level += 1
+      # Reset the key boolean for next level
+      self.player.hasKey = False
+      # print('success')
+      # print(self.player.level)
+      self.new()
+
     # Acid
-    acid_hit = pg.sprite.spritecollide(self.player, self.acid, False)
+    acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
     if acid_hit:
       self.player.health -= 1
     if self.player.health < self.player.max_health:
@@ -327,62 +356,7 @@ class Game:
     if self.back_rect.right == 0:
       self.back_rect.x =0
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
-    pg.display.flip()
-
-  def load_level(self):
-  # Load Level 1
-    if self.player.level == 1:
-      # Level 1 Platforms
-      for plat in MAP1_PLATFORM_LIST:
-        p = Platform(self,*plat)
-        self.all_sprites.add(p)
-        self.platforms.add(p)
-      # Level 1 Door  
-      d1 = Door1(200, 250, 30, 50)
-      self.all_sprites.add(d1)
-      self.door1.add(d1)
-      # Level 1 Key
-      key_rect = Key1(350, 200, 10, 10)
-      self.all_sprites.add(key_rect)
-      self.key1.add(key_rect)
-  # Load Level 2
-    if self.player.level == 50:
-      # Level 2 Platforms
-      for plat in MAP2_PLATFORM_LIST:
-            p = Platform(*plat)
-            self.all_sprites.add(p)
-            self.platforms.add(p)
-      # Level 2 Door
-      d2 = Door2(300, 250, 30, 50)
-      self.all_sprites.add(d2)
-      self.door2.add(d2)
-      # Level 2 Key
-      k2 = Key2(350, 200, 10, 10)
-      self.all_sprites.add(k2)
-      self.key2.add(k2)
-  # Load Level 3 
-    if self.player.level == 100:
-      # Level 3 Platforms
-      for plat in MAP3_PLATFORM_LIST:
-            p = Platform(*plat)
-            self.all_sprites.add(p)
-            self.platforms.add(p)
-      # Level 3 Door
-      d3 = Door3(300, 250, 30, 50)
-      self.all_sprites.add(d3)
-      self.door3.add(d3)
-      # Level 3 Key
-      k3 = Key3(350, 200, 10, 10)
-      self.all_sprites.add(k3)
-      self.key3.add(k3)
-  # Load Level 4
-    if self.player.level == 150:
-      # Level 4 Platforms
-      for plat in MAP4_PLATFORM_LIST:
-       p = Platform(*plat)
-       self.all_sprites.add(p)
-       self.platforms.add(p)
-      
+    pg.display.flip()      
 
   def show_start_screen(self):
     # game splash/start screen

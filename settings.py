@@ -13,6 +13,7 @@ PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.5
 PLAYER_JUMP = 15
 PLAYER_HEALTH = 8
+HAS_KEY = False
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
@@ -30,27 +31,23 @@ PLATFORM_SPRITESHEET = "spritesheet_jumper.png"
 
 # Starting platforms
 MAP1_PLATFORM_LIST = [
-  # Ground
-  (0, HEIGHT - 40),
-  (WIDTH/2 - 50, HEIGHT * 3/4),
-  (125, HEIGHT - 350),
-  (135, 300),
-  (350, 400),
-  (175, 100),
-  (300, 300),
-  (-400, 400)
+  (0, HEIGHT - 40, WIDTH, 40),
+  (WIDTH/2 - 50, HEIGHT * 3/4, 100, 20),
+  (125, HEIGHT - 350, 100, 20),
+  (350, 200, 100, 20),
+  (175, 100, 50, 20)
 ]
 
 MAP2_PLATFORM_LIST = [
-  (0, HEIGHT - 40),
-  (WIDTH/2 - 50, HEIGHT * 3/4),
-  (125, HEIGHT - 350),
-  (350, 200),
-  (175, 100),
-  (155, 350),
-  (400, 400),
-  (350, 200),
-  (175, 100)
+  (0, HEIGHT - 40, WIDTH, 40),
+  (WIDTH/2 - 50, HEIGHT * 3/4, 100, 20),
+  (125, HEIGHT - 350, 100, 20),
+  (350, 200, 100, 20),
+  (175, 100, 50, 20),
+  (155, 350, 100, 30),
+  (400, 400, 100, 20),
+  (350, 200, 100, 20),
+  (175, 100, 50, 20)
 ]
 
 MAP3_PLATFORM_LIST = [

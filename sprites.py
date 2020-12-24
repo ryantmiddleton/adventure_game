@@ -30,6 +30,7 @@ class Player(pg.sprite.Sprite):
     pg.sprite.Sprite.__init__(self)
     self.game = game
     self.jumping = False
+    self.hasKey = False
 
     # Player Image and rectangle surface
     self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
@@ -42,7 +43,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 3
+    self.level = 1
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -84,6 +85,7 @@ class Player(pg.sprite.Sprite):
     # equations of motion
     self.vel += self.acc
     self.pos += self.vel + 0.5 * self.acc
+    
     # collision detection
     if self.pos.x > WIDTH -self.rect.width/2:
       self.pos.x = WIDTH - self.rect.width/2
@@ -160,19 +162,6 @@ class Bullet(pg.sprite.Sprite):
       self.kill()
     elif self.rect.right < 0:
       self.kill()
-  
-
-class Platform(pg.sprite.Sprite):
-  def __init__(self, game, x, y):
-    pg.sprite.Sprite.__init__(self)
-    self.game = game
-    self.game.spritesheet.get_image(0, 288, 380, 94)
-    self.image.set_colorkey(BLACK)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y  
-
-
 
 class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
@@ -313,17 +302,15 @@ class Acid(pg.sprite.Sprite):
 class Platform(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    # self.spritesheet = Spritesheet(PLATFORM_SPRITESHEET)
-    # images = [
-    #   self.spritesheet.get_image(0, 288, w, h),
-    # ]
-    # self.image = random.choice(images)
+    self.spritesheet = Spritesheet(PLATFORM_SPRITESHEET)
+    # self.image = self.spritesheet.get_image(0, 288, 380, 94)
     # self.image.set_colorkey(BLACK)
     self.image = pg.Surface((w, h))
     self.image.fill(SILVER)
     self.rect = self.image.get_rect()
+    # print("("+str(x)+","+str(y)+")")
     self.rect.x = x
-    self.rect.y = y   
+    self.rect.y = y  
 
 class Spritesheet:
   def __init__(self, strFilename):
@@ -355,6 +342,15 @@ class Spritesheet:
     cropped_image.blit(image, (0,0), (start_pos[0], start_pos[1], old_size[0], old_size[1]))
     return cropped_image
 
+class Door(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+  
 class Door1(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -378,6 +374,15 @@ class Door3(pg.sprite.Sprite):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((w, h))
     self.image.fill(RED)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Key(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((w, h))
+    self.image.fill(YELLOW)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
