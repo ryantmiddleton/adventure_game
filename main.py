@@ -79,14 +79,14 @@ class Game:
     if self.player.level == 1:
       # Add Platforms
       for plat in MAP1_PLATFORM_LIST:
-        p = Platform(plat[0], plat[1], 380, 94)
+        p = Platform(*plat)
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
       d1 = Door(200, 250, 30, 50)
       # Position player right where the door is
-      self.player.rect.x = 200
-      self.player.rect.y = 250
+      self.player.pos.x = d1.rect.x
+      self.player.pos.y = d1.rect.y
       self.all_sprites.add(d1)
       self.doors.add(d1)
       # Add Level 1 Key
@@ -272,6 +272,7 @@ class Game:
       self.player.hasKey = False
       # print('success')
       # print(self.player.level)
+      # Load a new board
       self.new()
 
     # Acid collision detection
