@@ -139,7 +139,7 @@ class Game:
       self.keys.add(k3)
 
     # LEVEL 4
-    if self.player.level == 150:
+    if self.player.level == 4:
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
        p = Platform(*plat)
@@ -180,7 +180,7 @@ class Game:
       #   self.player.vel.y = 0
       #   self.player.jumping = False
 
-    if self.player.level == 1 or self.player.level == 2:
+    if self.player.level == 1 or self.player.level == 2 or self.player.level == 4:
       # Side Scrolling Logic
       if self.player.rect.right <= WIDTH / 4:
         for plat in self.platforms:
@@ -274,7 +274,7 @@ class Game:
       # print(self.player.level)
       self.new()
 
-    # Acid
+    # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
     if acid_hit:
       self.player.health -= 1
@@ -282,6 +282,10 @@ class Game:
       self.player.health += .01
     if self.player.health <= 0:
         self.playing = False
+
+    #Bullet Collision Detection
+    # If any bullets hit any enemies kill those bullets and enemies
+    shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
 
   def events(self):
     # Game Loop - events
