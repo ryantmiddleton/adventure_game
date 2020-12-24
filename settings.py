@@ -1,13 +1,11 @@
 # game options
 TITLE = "Metoidvania"
-WIDTH = 1400
+WIDTH = 1080
 HEIGHT = 720
-FPS = 60
-FONT_NAME = 'Fixedsys'
-HS_FILE = 'highscore.txt'
-SPRITESHEET = "spritesheet_jumper.png"
-PLAYER_HEALTH = 8
+FPS = 100
 
+FONT_NAME = 'bloddy.ttf'
+HS_FILE = 'highscore.txt'
 
 # Player properties
 PLAYER_ACC = 0.5
@@ -15,6 +13,10 @@ PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.5
 PLAYER_JUMP = 15
 PLAYER_HEALTH = 8
+HAS_KEY = False
+
+# Enemy properties
+SPIDER_SPRITESHEET = "spiders.png"
 
 # Globals for tracking directions
 LEFT = 0
@@ -25,19 +27,15 @@ DOWN = 4
 #Starting Platforsms
 PLATFORM_HEIGHT = 20
 PLATFORM_WIDTH = 100
+PLATFORM_SPRITESHEET = "spritesheet_jumper.png"
 
 # Starting platforms
 MAP1_PLATFORM_LIST = [
-  # Ground
   (0, HEIGHT - 40),
-  (WIDTH *.70, HEIGHT - 40),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (125, HEIGHT - 350),
-  (135, 300),
-  (350, 400),
-  (175, 100),
-  (300, 300),
-  (-400, 400)
+  (350, 200),
+  (175, 100)
 ]
 
 MAP2_PLATFORM_LIST = [
@@ -54,7 +52,7 @@ MAP2_PLATFORM_LIST = [
 ]
 
 MAP3_PLATFORM_LIST = [
-    (0, HEIGHT-40),
+    (0, HEIGHT-40, WIDTH, 40),
     (WIDTH/2 - 50, HEIGHT *3/4),
     
     (WIDTH/2 - 250, 400),

@@ -3,6 +3,8 @@ import pygame as pg
 import math
 from settings import *
 import random
+from os import path
+
 vec = pg.math.Vector2
 pg.font.init()
 font = pg.font.SysFont(None, 26)
@@ -22,36 +24,69 @@ from pygame.locals import (
   K_d,
 )
 
-class Spritesheet:
-  def __init__(self, filename):
-    self.spritesheet = pg.image.load(filename).convert()
-
-  def get_image(self, x, y, width, height):
-    image = pg.Surface((width, height))
-    image.blit(self.spritesheet, (0,0), (x, y, width, height))
-    image = pg.transform.scale(image, (width //2, height// 2))
-    return image
-
 
 class Player(pg.sprite.Sprite):
   def __init__(self, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    # Player Image
     self.jumping = False
-    self.image = pg.image.load("imgs/idle outline.png").convert()
+    self.hasKey = False
+
+    # Player Image and rectangle surface
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
-    self.pos = vec(WIDTH * .75, HEIGHT/2)
+
+    # Player coordinates and orientation
+    self.pos = vec(0, HEIGHT-40)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
-    self.level = 1
     self.left = False
+    self.level = 1
+
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
 
+ 
 
+  def update(self):
+    self.acc = vec(0, PLAYER_GRAV)
+    keys = pg.key.get_pressed()
+
+    # update to left running player image
+    if keys[K_LEFT]:
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/left_run.png").convert(), 0, 2)
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      self.acc.x = -PLAYER_ACC
+      self.left = True
+
+    #update to right running player image 
+    if keys[K_RIGHT]:
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/run_right.png").convert(), 0, 2)
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      self.acc.x = PLAYER_ACC
+      self.left = False
+
+    # update to jumping player image
+    if keys[K_UP]:
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert(), 0, 2)
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
+    # apply friction
+    self.acc.x += self.vel.x * PLAYER_FRICTION
+    # equations of motion
+    self.vel += self.acc
+    self.pos += self.vel + 0.5 * self.acc
+
+    # collision detection
+    if self.pos.x > WIDTH -self.rect.width/2:
+      self.pos.x = WIDTH - self.rect.width/2
+    if self.pos.x < 0 + self.rect.width/2:
+      self.pos.x = 0 + self.rect.width/2
+
+    self.rect.midbottom = self.pos
+  
   def jump_cut(self):
     if self.jumping:
       if self.vel.y < -3:
@@ -61,41 +96,20 @@ class Player(pg.sprite.Sprite):
     self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
     self.rect.y -= 1
-    if hits and not self.jumping:  
+    if hits:  
       self.jumping = True
       self.vel.y = -15
       self.game.jump_sound.play()
 
-  def update(self):
-    self.acc = vec(0, PLAYER_GRAV)
-    keys = pg.key.get_pressed()
-    # move left
-    if keys[pg.K_LEFT]:
-      self.image = pg.image.load("imgs/left_run.png").convert()
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-      self.acc.x = -PLAYER_ACC
-      self.left = True
-    #move right
-    if keys[pg.K_RIGHT]:
-      self.image = pg.image.load("imgs/run_right.png").convert()
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-      self.acc.x = PLAYER_ACC
-      self.left = False
-    if keys[pg.K_UP]:
-      self.image = pg.image.load("imgs/jump outline.png").convert()
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-    # apply friction
-    self.acc.x += self.vel.x * PLAYER_FRICTION
-    # equations of motion
-    self.vel += self.acc
-    self.pos += self.vel + 0.5 * self.acc
-    # collision detection
-    if self.pos.x > WIDTH -self.rect.width/2:
-      self.pos.x = WIDTH - self.rect.width/2
-    if self.pos.x < 0 + self.rect.width/2:
-      self.pos.x = 0 + self.rect.width/2
-    self.rect.midbottom = self.pos
-
+  def isStanding(self):
+    self.rect.y += 1
+    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+    self.rect.y -= 1
+    if hits:
+      return True
+    else:  
+      return False
+ 
 
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
@@ -148,17 +162,20 @@ class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.spider_sheet = pg.image.load("img/spiders.png").convert_alpha()
-    self.size = self.spider_sheet.get_size()
-    self.frames = strip_from_sheet(self.spider_sheet,(6,6),(8,6),(self.size[0]/12,self.size[1]/8))
+    self.spider_sheet = Spritesheet(SPIDER_SPRITESHEET)
+    self.size = self.spider_sheet.image_page.get_size()
+    self.frames = self.spider_sheet.strip_from_sheet(self.spider_sheet.image_page, (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
+    # Crop each selected image from the sheet and rotate, scale it
     for i in range(len(self.frames)):
-      self.frames[i] = crop(self.frames[i],(10,20),(65,45))
+      self.frames[i] = self.spider_sheet.crop(self.frames[i],(10,20),(65,45))
       # self.frames[i] = pg.transform.flip(self.frames[i], True, False)
       self.frames[i] = pg.transform.rotozoom(self.frames[i], 0, 1)
+
     self.image_num = 0
     self.anima_speed = 6
     self.image = self.frames[self.image_num]
-    
+
+    #Initialize the spider position - self.rect.y = y, self.rect.x = x
     self.rect = self.image.get_rect(topleft=(x,y))
     # self.rect.y = y, self.rect.x = x
     # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
@@ -178,28 +195,28 @@ class Spider(pg.sprite.Sprite):
       self.anima_speed -= 1
     
     # Move the spider
-    if isHanging(self):
+    if self.isHanging():
       if self.dir == LEFT:
         self.rect.x -= 1
       elif self.dir == RIGHT:
         self.rect.x += 1
       # print("hanging")
 
-    elif isGripping_right(self):
+    elif self.isGripping_right():
       if self.dir == UP:
         self.rect.y -= 1
       if self.dir == DOWN:
         self.rect.y += 1
       # print("gripping right")
       
-    elif isStanding(self):
+    elif self.isStanding():
       if self.dir == LEFT:
         self.rect.x -= 1
       elif self.dir == RIGHT:
         self.rect.x += 1
       # print("walking")
 
-    elif isGripping_left(self):
+    elif self.isGripping_left():
       if self.dir == UP:
         self.rect.y -= 1
       if self.dir == DOWN:
@@ -231,6 +248,42 @@ class Spider(pg.sprite.Sprite):
         self.dir = LEFT
         self.orient = 180
         self.rect.x -= 1
+  
+  def isStanding(self):
+      self.rect.y += 1
+      hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+      self.rect.y -= 1
+      if hits:
+        return True
+      else:  
+        return False
+
+  def isHanging(self):
+    self.rect.y -= 1
+    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+    self.rect.y += 1
+    if hits:
+      return True
+    else:  
+      return False
+
+  def isGripping_right(self):
+    self.rect.x += 1
+    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+    self.rect.x -= 1
+    if hits:
+      return True
+    else:  
+      return False
+    
+  def isGripping_left(self):
+    self.rect.x -= 1
+    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+    self.rect.x += 1
+    if hits:
+      return True
+    else:  
+      return False
 
 class Acid(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
@@ -287,24 +340,37 @@ def isGripping_left(sprite):
   else:  
     return False
 
-def strip_from_sheet(sheet, start, end, size):
-  # Strips individual frames from a sprite sheet given a start location,
-  # sprite size, and number of columns and rows.
-  frames = []
-  for x in range(start[0],end[0]+1):
-      for y in range(start[1],end[1]+1):
-          location = (size[0]*x, size[1]*y)
-          frames.append(sheet.subsurface(pg.Rect(location, size)))
-  return frames
+class Spritesheet:
+  def __init__(self, filename):
+    # self.dir = path.dirname(__file__)
+    # self.img_dir = path.join(self.dir, 'imgs')
+    # filename = path.join(self.img_dir, Filename)
+    self.spritesheet = pg.image.load(filename).convert()
 
-def crop(image, start_pos, new_size):
-  old_size = image.get_size()
-  # start_pos = (old_size[0]-new_size[0], old_size[1]-new_size[1])
-  cropped_image = pg.Surface(new_size)
-  cropped_image.blit(image, (0,0), (start_pos[0], start_pos[1], old_size[0], old_size[1]))
-  return cropped_image
-  
-class Door1(pg.sprite.Sprite):
+  def get_image(self, x, y, width, height):
+    image = pg.Surface((width, height))
+    image.blit(self.spritesheet, (0,0), (x, y, width, height))
+    image = pg.transform.scale(image, (width //2, height// 2))
+    return image
+
+  def strip_from_sheet(self, sheet, start, end, size):
+    # Strips individual frames from a sprite sheet image given a start location,
+    # sprite size, and number of columns and rows.
+    frames = []
+    for x in range(start[0],end[0]+1):
+        for y in range(start[1],end[1]+1):
+            location = (size[0]*x, size[1]*y)
+            frames.append(sheet.subsurface(pg.Rect(location, size)))
+    return frames
+
+  def crop(self, image, start_pos, new_size):
+    old_size = image.get_size()
+    # start_pos = (old_size[0]-new_size[0], old_size[1]-new_size[1])
+    cropped_image = pg.Surface(new_size)
+    cropped_image.blit(image, (0,0), (start_pos[0], start_pos[1], old_size[0], old_size[1]))
+    return cropped_image
+
+class Door(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((w, h))
@@ -313,43 +379,7 @@ class Door1(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
-class Door2(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(RED)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Door3(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(RED)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Key1(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-  
-class Key2(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Key3(pg.sprite.Sprite):
+class Key(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((w, h))
