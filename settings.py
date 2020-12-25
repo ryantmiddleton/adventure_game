@@ -52,8 +52,8 @@ MAP2_PLATFORM_LIST = [
 ]
 
 MAP3_PLATFORM_LIST = [
-    (0, HEIGHT-40, WIDTH, 40),
-    (WIDTH/2 - 50, HEIGHT *3/4),
+    (0, HEIGHT-40),
+    (WIDTH/2 - 50, 400),
     
     (WIDTH/2 - 250, 400),
     (WIDTH/2 + 150, 400),

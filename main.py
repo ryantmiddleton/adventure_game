@@ -97,54 +97,6 @@ class Game:
       self.all_sprites.add(acid)
       self.acid_pools.add(acid)  
 
-    # LEVEL 2
-    if self.player.level == 2:
-      # Level 2 Platforms
-      for plat in MAP2_PLATFORM_LIST:
-            p = Platform(self, *plat)
-            self.all_sprites.add(p)
-            self.platforms.add(p)
-      # Level 2 Door
-      d2 = Door(300, 250, 30, 50)
-      self.all_sprites.add(d2)
-      self.doors.add(d2)
-      # Level 2 Key
-      k2 = Key(350, 200, 10, 10)
-      self.all_sprites.add(k2)
-      self.keys.add(k2)
-
-    # LEVEL 3
-    if self.player.level == 3:
-      # Add Platforms
-      for platform in MAP3_PLATFORM_LIST:
-        # create a new platform - could also use p=Platform(platform[0], platform[1])
-        p = Platform(*platform)
-        # Add enemies to each platform
-        spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
-        self.all_sprites.add(spider)
-        self.enemies.add(spider)
-        self.all_sprites.add(p)
-        self.platforms.add(p)
-      # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
-      # self.all_sprites.add(spider)
-      # self.enemies.add(spider)
-      # Level 3 Door
-      d3 = Door(300, 250, 30, 50)
-      self.all_sprites.add(d3)
-      self.doors.add(d3)
-      # Level 3 Key
-      k3 = Key(350, 200, 10, 10)
-      self.all_sprites.add(k3)
-      self.keys.add(k3)
-
-    # LEVEL 4
-    if self.player.level == 4:
-      # Level 4 Platforms
-      for plat in MAP4_PLATFORM_LIST:
-       p = Platform(*plat)
-       self.all_sprites.add(p)
-       self.platforms.add(p)
-
     # Load music to all levels
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     self.run()
@@ -170,10 +122,10 @@ class Game:
     if self.player.vel.y > 0:
       hits = pg.sprite.spritecollide(self.player, self.platforms, False)
       if hits:
-        # set the player's y position to the top (y) of the platform
-        self.player.pos.y = hits[0].rect.top
-        # stop the player by seting velocity to 0
-        self.player.vel.y = 0
+        if self.player.pos.y < hits[0].rect.bottom:
+          self.player.pos.y = hits[0].rect.top
+          self.player.vel.y = 0
+          self.player.jumping = False
 
       # WHAT IS THIS CODE DOING??? DOES IT TEST IF PLAYER HITS THE BOTTOM OF A PLATFORM?
       # if self.player.pos.y < hits[0].rect.bottom:
@@ -274,7 +226,14 @@ class Game:
       # print('success')
       # print(self.player.level)
       # Load a new board
-      self.new()
+      for plat in self.platforms:
+        plat.kill()
+      for door in self.doors:
+        door.kill()
+      for acid in self.acid_pools:
+        acid.kill()
+      self.load_level()
+      
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -288,6 +247,69 @@ class Game:
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
     shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
+
+  def load_level(self):
+  # Load Level 1
+    if self.player.level == 1:
+      # Level 1 Platforms
+      for plat in MAP1_PLATFORM_LIST:
+        p = Platform(self, *plat)
+        self.all_sprites.add(p)
+        self.platforms.add(p)
+      # Level 1 Door  
+      d1 = Door(200, 250, 30, 50)
+      self.all_sprites.add(d1)
+      self.doors.add(d1)
+      # Level 1 Key
+      # key_rect = Key1(350, 200, 10, 10)
+      # self.all_sprites.add(key_rect)
+      # self.key1.add(key_rect)
+      # LEVEL 2
+    if self.player.level == 2:
+      # Level 2 Platforms
+      for plat in MAP2_PLATFORM_LIST:
+        p = Platform(self, *plat)
+        self.all_sprites.add(p)
+        self.platforms.add(p)
+      # Level 2 Door
+      d2 = Door(300, 250, 30, 50)
+      self.all_sprites.add(d2)
+      self.doors.add(d2)
+      # Level 2 Key
+      k2 = Key(350, 200, 10, 10)
+      self.all_sprites.add(k2)
+      self.keys.add(k2)
+
+    # LEVEL 3
+    if self.player.level == 3:
+      # Add Platforms
+      for plat in MAP3_PLATFORM_LIST:
+        p = Platform(self, *plat)
+        self.all_sprites.add(p)
+        self.platforms.add(p)
+        # Add enemies to each platform
+        # spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
+        # self.all_sprites.add(spider)
+        # self.enemies.add(spider)
+      # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
+      # self.all_sprites.add(spider)
+      # self.enemies.add(spider)
+      # Level 3 Door
+      d3 = Door(300, 250, 30, 50)
+      self.all_sprites.add(d3)
+      self.doors.add(d3)
+      # Level 3 Key
+      k3 = Key(950, 200, 10, 10)
+      self.all_sprites.add(k3)
+      self.keys.add(k3)
+
+    # LEVEL 4
+    if self.player.level == 4:
+      # Level 4 Platforms
+      for plat in MAP4_PLATFORM_LIST:
+       p = Platform(self, *plat)
+       self.all_sprites.add(p)
+       self.platforms.add(p)
 
   def events(self):
     # Game Loop - events
