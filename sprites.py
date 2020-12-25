@@ -39,7 +39,7 @@ class Player(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
 
     # Player coordinates and orientation
-    self.pos = vec(0, HEIGHT-40)
+    self.pos = vec(WIDTH / 2, HEIGHT-40)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
@@ -382,8 +382,8 @@ class Door(pg.sprite.Sprite):
 class Key(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/keyYellow.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y

@@ -31,6 +31,15 @@ PLATFORM_SPRITESHEET = "spritesheet_jumper.png"
 
 # Starting platforms
 MAP1_PLATFORM_LIST = [
+  (1200, HEIGHT - 40),
+  (1050, HEIGHT - 40),
+  (900, HEIGHT - 40),
+  (750, HEIGHT - 40),
+  (600, HEIGHT - 40),
+  (450, HEIGHT - 40),
+  (300, HEIGHT - 40),  
+  (150, HEIGHT - 40),
+  (-150, HEIGHT - 40),
   (0, HEIGHT - 40),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (125, HEIGHT - 350),
@@ -39,7 +48,16 @@ MAP1_PLATFORM_LIST = [
 ]
 
 MAP2_PLATFORM_LIST = [
+  (1200, HEIGHT - 40),
+  (1050, HEIGHT - 40),
+  (900, HEIGHT - 40),
+  (750, HEIGHT - 40),
+  (600, HEIGHT - 40),
+  (450, HEIGHT - 40),
+  (300, HEIGHT - 40),  
+  (150, HEIGHT - 40),
   (0, HEIGHT - 40),
+  (-150, HEIGHT - 40),
   (0, 250),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (125, HEIGHT - 350),
@@ -52,6 +70,16 @@ MAP2_PLATFORM_LIST = [
 ]
 
 MAP3_PLATFORM_LIST = [
+    (1200, HEIGHT - 40),
+  (1050, HEIGHT - 40),
+  (900, HEIGHT - 40),
+  (750, HEIGHT - 40),
+  (600, HEIGHT - 40),
+  (450, HEIGHT - 40),
+  (300, HEIGHT - 40),  
+  (150, HEIGHT - 40),
+  (0, HEIGHT - 40),
+  (-150, HEIGHT - 40),
     (0, HEIGHT-40),
     (WIDTH/2 - 50, 400),
     
