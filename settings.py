@@ -83,7 +83,7 @@ MAP3_PLATFORM_LIST = [
     (0, HEIGHT-40),
     (WIDTH/2 - 50, 400),
     
-    (WIDTH/2 - 250, 400),
+    (WIDTH/2 - 250, 600),
     (WIDTH/2 + 150, 400),
     
     (WIDTH/2 - 50, 300),

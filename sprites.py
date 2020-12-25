@@ -39,7 +39,7 @@ class Player(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
 
     # Player coordinates and orientation
-    self.pos = vec(WIDTH / 2, HEIGHT-40)
+    self.pos = vec(WIDTH/2, HEIGHT/2)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
@@ -304,41 +304,41 @@ class Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y       
 
-def isStanding(sprite):
-  sprite.rect.y += 1
-  hits = pg.sprite.spritecollide (sprite, sprite.game.platforms, False)
-  sprite.rect.y -= 1
-  if hits:
-    return True
-  else:  
-    return False
+  def isStanding(self):
+    self.sprite.rect.y += 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.y -= 1
+    if hits:
+      return True
+    else:  
+      return False
 
-def isHanging(sprite):
-  sprite.rect.y -= 1
-  hits = pg.sprite.spritecollide (sprite, sprite.game.platforms, False)
-  sprite.rect.y += 1
-  if hits:
-    return True
-  else:  
-    return False
+  def isHanging(self):
+    self.sprite.rect.y -= 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.y += 1
+    if hits:
+      return True
+    else:  
+      return False
 
-def isGripping_right(sprite):
-  sprite.rect.x += 1
-  hits = pg.sprite.spritecollide (sprite, sprite.game.platforms, False)
-  sprite.rect.x -= 1
-  if hits:
-    return True
-  else:  
-    return False
+  def isGripping_right(self):
+    self.sprite.rect.x += 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.x -= 1
+    if hits:
+      return True
+    else:  
+      return False
   
-def isGripping_left(sprite):
-  sprite.rect.x -= 1
-  hits = pg.sprite.spritecollide (sprite, sprite.game.platforms, False)
-  sprite.rect.x += 1
-  if hits:
-    return True
-  else:  
-    return False
+  def isGripping_left(self):
+    self.sprite.rect.x -= 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.x += 1
+    if hits:
+      return True
+    else:  
+      return False
 
 class Spritesheet:
   def __init__(self, filename):

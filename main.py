@@ -82,27 +82,24 @@ class Game:
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
-      d1 = Door(200, 250, 30, 50)
+      d1 = Door(WIDTH, HEIGHT - 90, 30, 50)
       # Position player right where the door is
-      self.player.pos.x = d1.rect.x
-      self.player.pos.y = d1.rect.y
+      # self.player.pos.x = d1.rect.x
+      # self.player.pos.y = d1.rect.y
       self.all_sprites.add(d1)
       self.doors.add(d1)
       # Add Level 1 Key
-      k1 = Key(350, 200, 10, 10)
+      k1 = Key(350, 150, 10, 10)
       self.all_sprites.add(k1)
       self.keys.add(k1)
       # Add Acid
       acid = Acid(500, HEIGHT - 40, 100, 30)
       self.all_sprites.add(acid)
       self.acid_pools.add(acid)  
-
     # Load music to all levels
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     self.run()
-    # acid = Acid(500, HEIGHT - 40, 100, 30)
-    # self.all_sprites.add(acid)
-    # self.acid.add(acid) 
+    
     
     
   def run(self):
@@ -127,18 +124,12 @@ class Game:
           self.player.vel.y = 0
           self.player.jumping = False
 
-      # WHAT IS THIS CODE DOING??? DOES IT TEST IF PLAYER HITS THE BOTTOM OF A PLATFORM?
-      # if self.player.pos.y < hits[0].rect.bottom:
-      #   self.player.pos.y = hits[0].rect.top
-      #   self.player.vel.y = 0
-      #   self.player.jumping = False
-
     if self.player.level == 1 or self.player.level == 2 or self.player.level == 4:
       # Side Scrolling Logic
       if self.player.rect.right <= WIDTH / 4:
         for plat in self.platforms:
           plat.rect.x += abs(int(self.player.vel.x))
-          self.score += 1
+          # self.score += 1
         for enemy in self.enemies:
           enemy.rect.x += abs(int(self.player.vel.x))
         for key in self.keys:
@@ -147,12 +138,12 @@ class Game:
             door.rect.x += abs(int(self.player.vel.x))
         for acid in self.acid_pools:
             acid.rect.x += abs(int(self.player.vel.x))
-        self.player.pos.x += abs(self.player.vel.x)
+        self.player.pos.x += abs(int(self.player.vel.x))
 
-      elif self.player.rect.left >= WIDTH * .75:
-        self.player.pos.x -= abs(self.player.vel.x)
+      elif self.player.rect.left >= WIDTH * .7:
+        self.player.pos.x -= abs(int(self.player.vel.x))
         for plat in self.platforms:
-          plat.rect.x -= abs(self.player.vel.x)
+          plat.rect.x -= abs(int(self.player.vel.x))
           # self.score += 1
         for enemy in self.enemies:
             enemy.rect.x -= abs(int(self.player.vel.x))
@@ -162,7 +153,7 @@ class Game:
             door.rect.x -= abs(int(self.player.vel.x))
         for acid in self.acid_pools:
             acid.rect.x -= abs(int(self.player.vel.x))
-        self.player.pos.x += abs(self.player.vel.x)
+        self.player.pos.x -= abs(int(self.player.vel.x))
 
     if self.player.level == 3:
           # Vertical Scrolling Logic
@@ -180,7 +171,7 @@ class Game:
               door.rect.y += abs(int(self.player.vel.y))
           for acid in self.acid_pools:
               acid.rect.y += abs(int(self.player.vel.y))
-          self.player.pos.y += abs(self.player.vel.y)
+          self.player.pos.y += abs(int(self.player.vel.y))
       # If player reaches the bottom 25% of the screen
       # scroll all sprites up (decrease y coord)
       if abs(self.player.rect.top) >= HEIGHT * 0.75:
@@ -249,22 +240,6 @@ class Game:
     shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
 
   def load_level(self):
-  # Load Level 1
-    if self.player.level == 1:
-      # Level 1 Platforms
-      for plat in MAP1_PLATFORM_LIST:
-        p = Platform(self, *plat)
-        self.all_sprites.add(p)
-        self.platforms.add(p)
-      # Level 1 Door  
-      d1 = Door(200, 250, 30, 50)
-      self.all_sprites.add(d1)
-      self.doors.add(d1)
-      # Level 1 Key
-      # key_rect = Key1(350, 200, 10, 10)
-      # self.all_sprites.add(key_rect)
-      # self.key1.add(key_rect)
-      # LEVEL 2
     if self.player.level == 2:
       # Level 2 Platforms
       for plat in MAP2_PLATFORM_LIST:
@@ -295,7 +270,7 @@ class Game:
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
-      d3 = Door(300, 250, 30, 50)
+      d3 = Door(300, -1400, 30, 50)
       self.all_sprites.add(d3)
       self.doors.add(d3)
       # Level 3 Key
