@@ -39,6 +39,7 @@ class Game:
     self.load_data()
     # Initialize the player
     self.player = Player(self)
+    
 
   def load_data(self):
     self.dir = path.dirname(__file__)
@@ -67,9 +68,11 @@ class Game:
     self.enemies = pg.sprite.Group()
     self.doors = pg.sprite.Group()
     self.keys = pg.sprite.Group()
-
+    self.boss = pg.sprite.Group()
+    self.bosskey = pg.sprite.Group()
     # Add player to sprite group
     self.all_sprites.add(self.player)
+    self.all_sprites.add(self.boss)
     
     # Load all platforms and enemies 
     # based on current player.level
@@ -82,7 +85,7 @@ class Game:
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
-      d1 = Door(WIDTH, HEIGHT - 90, 30, 50)
+      d1 = Door(WIDTH, HEIGHT - 110, 30, 50)
       # Position player right where the door is
       # self.player.pos.x = d1.rect.x
       # self.player.pos.y = d1.rect.y
@@ -138,6 +141,10 @@ class Game:
             door.rect.x += abs(int(self.player.vel.x))
         for acid in self.acid_pools:
             acid.rect.x += abs(int(self.player.vel.x))
+        for boss in self.boss:
+            boss.rect.x += abs(int(self.player.vel.x))
+        for bk in self.bosskey:  
+            bk.rect.x += abs(int(self.player.vel.x))
         self.player.pos.x += abs(int(self.player.vel.x))
 
       elif self.player.rect.left >= WIDTH * .7:
@@ -153,6 +160,10 @@ class Game:
             door.rect.x -= abs(int(self.player.vel.x))
         for acid in self.acid_pools:
             acid.rect.x -= abs(int(self.player.vel.x))
+        for boss in self.boss:
+            boss.rect.x -= abs(int(self.player.vel.x))
+        for bk in self.bosskey:
+            bk.rect.x -= abs(int(self.player.vel.x))
         self.player.pos.x -= abs(int(self.player.vel.x))
 
     if self.player.level == 3:
@@ -206,6 +217,7 @@ class Game:
       key_hit.kill()
       #set key_hit to True because player has the key now
       self.player.hasKey = True
+    
     # Door detection for any of the doors
     door_hit = pg.sprite.spritecollideany(self.player, self.doors)
     # If a player collides with a door and has already gotten the key, the door sprite is returned
@@ -224,20 +236,40 @@ class Game:
       for acid in self.acid_pools:
         acid.kill()
       self.load_level()
-      
+    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
+    if shoot_boss:
+        self.boss.kill()
+        print("boss is dead")
+        self.player.deadboss = True
+        print("deadboss is true")
+    boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
+    if boss_key_hit != None and self.player.deadboss:
+      boss_key_hit.kill()
+      self.player.hasBoss_key = True
+      print("player has boss key")
+    
+    if self.player.hasBoss_key and door_hit != None:
+      self.player.level += 1
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
     if acid_hit:
       self.player.health -= 1
-    if self.player.health < self.player.max_health:
-      self.player.health += .01
     if self.player.health <= 0:
         self.playing = False
 
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
-    shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
+    # shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
+    
+
+    boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
+    if boss_hit:
+      self.player.health -= 1
+    if self.player.health <= 0:
+      self.playing = False
+
+    
 
   def load_level(self):
     if self.player.level == 2:
@@ -247,7 +279,7 @@ class Game:
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 2 Door
-      d2 = Door(300, 250, 30, 50)
+      d2 = Door(-100, HEIGHT - 110, 30, 50)
       self.all_sprites.add(d2)
       self.doors.add(d2)
       # Level 2 Key
@@ -270,7 +302,7 @@ class Game:
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
-      d3 = Door(300, -1400, 30, 50)
+      d3 = Door(300, -1420, 30, 50)
       self.all_sprites.add(d3)
       self.doors.add(d3)
       # Level 3 Key
@@ -285,6 +317,22 @@ class Game:
        p = Platform(self, *plat)
        self.all_sprites.add(p)
        self.platforms.add(p)
+      boss = Boss(self, 300, 200, 30, 50)
+      self.all_sprites.add(boss)
+      self.boss.add(boss)
+      bk= BossKey(-100, HEIGHT - 110, 35, 35)
+      self.all_sprites.add(bk)
+      self.bosskey.add(bk)
+      d4 = Door(-50, HEIGHT - 110, 30, 50)
+      self.all_sprites.add(d4)
+      self.doors.add(d4)
+    
+    if self.player.level == 5:
+      for plat in MAP2_PLATFORM_LIST:
+        p = Platform(self, *plat)
+        self.all_sprites.add(p)
+        self.platforms.add(p)
+      # Level 2 Door
 
   def events(self):
     # Game Loop - events
@@ -354,9 +402,12 @@ class Game:
     self.screen.blit(self.back_image, self.back_rect.move(0,0))
     self.all_sprites.draw(self.screen)
     self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
-    pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*20), 5))
-    pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*20), 5))
+    pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
+    pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
+    # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
+    # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
     self.screen.blit(self.player.image, self.player.rect)
+    # self.screen.blit(self.boss.image, self.boss.rect)
     self.back_rect.move_ip(-2, 0)
     if self.back_rect.right == 0:
       self.back_rect.x =0

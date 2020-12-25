@@ -31,6 +31,9 @@ class Player(pg.sprite.Sprite):
     self.game = game
     self.jumping = False
     self.hasKey = False
+    self.deadboss = False
+    self.hasBoss_key = False
+
 
     # Player Image and rectangle surface
     self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
@@ -124,7 +127,7 @@ class Bullet(pg.sprite.Sprite):
       self.image = pg.image.load("img/bullet-left.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-40
-      self.rect.y = y-20
+      self.rect.y = y-30
     elif facing == 3:
       self.image = pg.image.load("img/bullet-diag-right.png").convert()
       self.rect = self.image.get_rect()
@@ -139,7 +142,7 @@ class Bullet(pg.sprite.Sprite):
       self.image = pg.image.load("img/bullet.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
-      self.rect.y = y-20
+      self.rect.y = y-30
     self.image.set_colorkey((WHITE), RLEACCEL)
 
   def update(self):
@@ -373,8 +376,8 @@ class Spritesheet:
 class Door(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/door_closedMid.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
@@ -387,3 +390,24 @@ class Key(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
+
+class BossKey(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_key.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+class Boss(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+    # self.health = 25
+
