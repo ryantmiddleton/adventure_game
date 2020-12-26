@@ -85,10 +85,7 @@ class Game:
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
-      d1 = Door(WIDTH, HEIGHT - 110, 30, 50)
-      # Position player right where the door is
-      # self.player.pos.x = d1.rect.x
-      # self.player.pos.y = d1.rect.y
+      d1 = Door(WIDTH, HEIGHT - 160, 30, 50)
       self.all_sprites.add(d1)
       self.doors.add(d1)
       # Add Level 1 Key
@@ -96,9 +93,18 @@ class Game:
       self.all_sprites.add(k1)
       self.keys.add(k1)
       # Add Acid
-      acid = Acid(500, HEIGHT - 40, 100, 30)
+      acid = Acid(self, 500, HEIGHT - 60)
+      acid1 = Acid(self, 530, HEIGHT - 60)
+      acid2 = Acid(self, 900, HEIGHT - 60)
+      acid3 = Acid(self, 930, HEIGHT - 60)
       self.all_sprites.add(acid)
-      self.acid_pools.add(acid)  
+      self.acid_pools.add(acid)
+      self.all_sprites.add(acid1)
+      self.acid_pools.add(acid1)
+      self.all_sprites.add(acid2)
+      self.acid_pools.add(acid2)
+      self.all_sprites.add(acid3)
+      self.acid_pools.add(acid3)
     # Load music to all levels
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     self.run()
@@ -147,8 +153,7 @@ class Game:
             bk.rect.x += abs(int(self.player.vel.x))
         self.player.pos.x += abs(int(self.player.vel.x))
 
-      elif self.player.rect.left >= WIDTH * .7:
-        self.player.pos.x -= abs(int(self.player.vel.x))
+      elif self.player.rect.left >= WIDTH * .75:
         for plat in self.platforms:
           plat.rect.x -= abs(int(self.player.vel.x))
           # self.score += 1
@@ -215,6 +220,7 @@ class Game:
     if key_hit != None:
       # remove the key from the screen
       key_hit.kill()
+      print("Door is Now Open")
       #set key_hit to True because player has the key now
       self.player.hasKey = True
     
@@ -236,20 +242,22 @@ class Game:
       for acid in self.acid_pools:
         acid.kill()
       self.load_level()
+      print("Loading Level " + str(self.player.level))
     shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
-    if shoot_boss:
+    for boss in self.boss:
+      if shoot_boss:
         self.boss.kill()
         print("boss is dead")
-        self.player.deadboss = True
-        print("deadboss is true")
-    boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
-    if boss_key_hit != None and self.player.deadboss:
-      boss_key_hit.kill()
-      self.player.hasBoss_key = True
-      print("player has boss key")
+        self.boss.deadboss = True
+        print("boss is dead and deadboss is true")
+    # boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
+    # if boss_key_hit != None and self.player.deadboss:
+    #   boss_key_hit.kill()
+    #   self.player.hasBoss_key = True
+    #   print("player has boss key")
     
-    if self.player.hasBoss_key and door_hit != None:
-      self.player.level += 1
+    # if self.player.hasBoss_key and door_hit != None:
+    #   self.player.level += 1
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -279,11 +287,11 @@ class Game:
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 2 Door
-      d2 = Door(-100, HEIGHT - 110, 30, 50)
+      d2 = Door(-100, HEIGHT - 160, 30, 50)
       self.all_sprites.add(d2)
       self.doors.add(d2)
       # Level 2 Key
-      k2 = Key(350, 200, 10, 10)
+      k2 = Key(350, 140, 10, 10)
       self.all_sprites.add(k2)
       self.keys.add(k2)
 
@@ -302,7 +310,7 @@ class Game:
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
-      d3 = Door(300, -1420, 30, 50)
+      d3 = Door(300, -1470, 30, 50)
       self.all_sprites.add(d3)
       self.doors.add(d3)
       # Level 3 Key
@@ -320,19 +328,18 @@ class Game:
       boss = Boss(self, 300, 200, 30, 50)
       self.all_sprites.add(boss)
       self.boss.add(boss)
-      bk= BossKey(-100, HEIGHT - 110, 35, 35)
-      self.all_sprites.add(bk)
-      self.bosskey.add(bk)
-      d4 = Door(-50, HEIGHT - 110, 30, 50)
+      k3 = Key(950, 200, 10, 10)
+      self.all_sprites.add(k3)
+      self.keys.add(k3)
+      # bk= BossKey(-100, HEIGHT - 110, 35, 35)
+      # self.all_sprites.add(bk)
+      # self.bosskey.add(bk)
+      d4 = Door(-50, HEIGHT - 160, 30, 50)
       self.all_sprites.add(d4)
       self.doors.add(d4)
-    
+
     if self.player.level == 5:
-      for plat in MAP2_PLATFORM_LIST:
-        p = Platform(self, *plat)
-        self.all_sprites.add(p)
-        self.platforms.add(p)
-      # Level 2 Door
+      g.win_screen()
 
   def events(self):
     # Game Loop - events
@@ -426,6 +433,25 @@ class Game:
     while self.playing == False and self.running == True:
       self.events()
 
+  def win_screen(self):
+    pg.mixer.music.load(path.join(self.snd_dir, 'end.ogg'))
+    pg.mixer.music.play(loops = -1)
+    self.screen.fill(BLACK)
+    self.draw_text("Congrats! You have won!!!", 48, BLUE, WIDTH /2, HEIGHT / 4)
+    self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
+    self.draw_text("Press key to play again", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
+    if self.score > self.highscore:
+      self.highscore = self.score
+      self.draw_text("New High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
+      with open(path.join(self.dir, HS_FILE), 'w') as f:
+        f.write(str(self.score))
+    else: 
+      self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
+    pg.display.flip()
+    while self.playing == True and self.running == True:
+      self.events()
+
+
   def show_go_screen(self):
     #game over/continue
     pg.mixer.music.load(path.join(self.snd_dir, 'end.ogg'))
@@ -462,6 +488,8 @@ g = Game()
 g.show_start_screen()
 while g.running:
   g.new()
+  g.win_screen()
   g.show_go_screen()
+  
 
 pg.quit()

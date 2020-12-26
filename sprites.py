@@ -31,7 +31,7 @@ class Player(pg.sprite.Sprite):
     self.game = game
     self.jumping = False
     self.hasKey = False
-    self.deadboss = False
+    
     self.hasBoss_key = False
 
 
@@ -289,10 +289,11 @@ class Spider(pg.sprite.Sprite):
       return False
 
 class Acid(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
+  def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(GREEN)
+    self.game = game
+    self.image = self.game.spritesheet.get_image(232, 1390, 95, 53)
+    self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
@@ -376,7 +377,7 @@ class Spritesheet:
 class Door(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/door_closedMid.png").convert(),0,1)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/door.png").convert(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.x = x
@@ -409,5 +410,6 @@ class Boss(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
+    self.deadboss = False
     # self.health = 25
 

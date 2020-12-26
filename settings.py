@@ -2,7 +2,7 @@
 TITLE = "Metoidvania"
 WIDTH = 1080
 HEIGHT = 720
-FPS = 100
+FPS = 60
 
 FONT_NAME = 'bloddy.ttf'
 HS_FILE = 'highscore.txt'
@@ -61,13 +61,10 @@ MAP2_PLATFORM_LIST = [
   (-150, HEIGHT - 40),
   (0, 250),
   (WIDTH/2 - 50, HEIGHT * 3/4),
-  (125, HEIGHT - 350),
-  (350, 300),
-  (175, 100),
-  (155, 350),
-  (400, 400),
   (350, 200),
-  (175, 100)
+  (175, 100),
+  (155, 400),
+  (400, 400),
 ]
 
 MAP3_PLATFORM_LIST = [
@@ -140,6 +137,19 @@ MAP4_PLATFORM_LIST = [
   (-200, HEIGHT -350),
   (-100, HEIGHT -500),
   (0, HEIGHT - 700),
+]
+
+MAP5_PLATFORM_LIST = [
+  (1200, HEIGHT - 40),
+  (1050, HEIGHT - 40),
+  (900, HEIGHT - 40),
+  (750, HEIGHT - 40),
+  (600, HEIGHT - 40),
+  (450, HEIGHT - 40),
+  (300, HEIGHT - 40),  
+  (150, HEIGHT - 40),
+  (0, HEIGHT - 40),
+  (-150, HEIGHT - 40),
 ]
 
 # define colors
