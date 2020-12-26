@@ -85,7 +85,7 @@ class Game:
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
-      d1 = Door(WIDTH, HEIGHT - 160, 30, 50)
+      d1 = Door(WIDTH, HEIGHT - 160, 10, 20)
       self.all_sprites.add(d1)
       self.doors.add(d1)
       # Add Level 1 Key
@@ -220,6 +220,7 @@ class Game:
     if key_hit != None:
       # remove the key from the screen
       key_hit.kill()
+      self.score += 5
       print("Door is Now Open")
       #set key_hit to True because player has the key now
       self.player.hasKey = True
@@ -230,6 +231,7 @@ class Game:
     if door_hit != None and self.player.hasKey:
       # Go to the next level
       self.player.level += 1
+      self.score += 10
       # Reset the key boolean for next level
       self.player.hasKey = False
       # print('success')
@@ -244,20 +246,21 @@ class Game:
       self.load_level()
       print("Loading Level " + str(self.player.level))
     shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
-    for boss in self.boss:
-      if shoot_boss:
+    if shoot_boss:
+      self.score += 15
+      self.boss.deadboss = True
+      print("boss is dead and deadboss is True")
+      for boss in self.boss:
         self.boss.kill()
-        print("boss is dead")
-        self.boss.deadboss = True
-        print("boss is dead and deadboss is true")
-    # boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
-    # if boss_key_hit != None and self.player.deadboss:
-    #   boss_key_hit.kill()
-    #   self.player.hasBoss_key = True
-    #   print("player has boss key")
-    
-    # if self.player.hasBoss_key and door_hit != None:
-    #   self.player.level += 1
+    boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
+    if boss_key_hit and self.boss.deadboss:
+      boss_key_hit.kill()
+      self.player.hasBoss_key = True
+      print("player has boss key")
+    if self.player.hasBoss_key and door_hit != None:
+      self.player.level += 1
+      self.load_level()
+      print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -287,7 +290,7 @@ class Game:
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 2 Door
-      d2 = Door(-100, HEIGHT - 160, 30, 50)
+      d2 = Door(-100, HEIGHT - 160, 10, 20)
       self.all_sprites.add(d2)
       self.doors.add(d2)
       # Level 2 Key
@@ -310,7 +313,7 @@ class Game:
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
-      d3 = Door(300, -1470, 30, 50)
+      d3 = Door(300, -1470, 10, 20)
       self.all_sprites.add(d3)
       self.doors.add(d3)
       # Level 3 Key
@@ -325,16 +328,16 @@ class Game:
        p = Platform(self, *plat)
        self.all_sprites.add(p)
        self.platforms.add(p)
-      boss = Boss(self, 300, 200, 30, 50)
+      boss = Boss(self, 300, 200, 20, 40)
       self.all_sprites.add(boss)
       self.boss.add(boss)
-      k3 = Key(950, 200, 10, 10)
-      self.all_sprites.add(k3)
-      self.keys.add(k3)
-      # bk= BossKey(-100, HEIGHT - 110, 35, 35)
-      # self.all_sprites.add(bk)
-      # self.bosskey.add(bk)
-      d4 = Door(-50, HEIGHT - 160, 30, 50)
+      # k3 = Key(950, 200, 10, 10)
+      # self.all_sprites.add(k3)
+      # self.keys.add(k3)
+      bk= BossKey(950, 200, 10, 10)
+      self.all_sprites.add(bk)
+      self.bosskey.add(bk)
+      d4 = Door(-50, HEIGHT - 160, 10, 20)
       self.all_sprites.add(d4)
       self.doors.add(d4)
 
@@ -408,7 +411,7 @@ class Game:
     self.screen.fill(BLACK)
     self.screen.blit(self.back_image, self.back_rect.move(0,0))
     self.all_sprites.draw(self.screen)
-    self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
+    self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, 35) 
     pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
     pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
     # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
@@ -418,7 +421,7 @@ class Game:
     self.back_rect.move_ip(-2, 0)
     if self.back_rect.right == 0:
       self.back_rect.x =0
-    self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15) 
+    self.draw_text("Level " + str(self.player.level), 22, WHITE, WIDTH / 2, 15) 
     pg.display.flip()      
 
   def show_start_screen(self):
@@ -434,7 +437,7 @@ class Game:
       self.events()
 
   def win_screen(self):
-    pg.mixer.music.load(path.join(self.snd_dir, 'end.ogg'))
+    pg.mixer.music.load(path.join(self.snd_dir, 'win.wav'))
     pg.mixer.music.play(loops = -1)
     self.screen.fill(BLACK)
     self.draw_text("Congrats! You have won!!!", 48, BLUE, WIDTH /2, HEIGHT / 4)
