@@ -245,22 +245,24 @@ class Game:
         acid.kill()
       self.load_level()
       print("Loading Level " + str(self.player.level))
+    
+    # boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
+    self.boss.deadboss = False
     shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
     if shoot_boss:
       self.score += 15
       self.boss.deadboss = True
-      print("boss is dead and deadboss is True")
       for boss in self.boss:
         self.boss.kill()
-    boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
-    if boss_key_hit and self.boss.deadboss:
-      boss_key_hit.kill()
-      self.player.hasBoss_key = True
-      print("player has boss key")
-    if self.player.hasBoss_key and door_hit != None:
       self.player.level += 1
       self.load_level()
       print("You Have Won!")
+    # if boss_key_hit != None and self.boss.deadboss:
+    #   boss_key_hit.kill()
+    #   self.player.hasBoss_key = True
+    #   print("player has boss key")
+      
+      
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -334,12 +336,12 @@ class Game:
       # k3 = Key(950, 200, 10, 10)
       # self.all_sprites.add(k3)
       # self.keys.add(k3)
-      bk= BossKey(950, 200, 10, 10)
-      self.all_sprites.add(bk)
-      self.bosskey.add(bk)
-      d4 = Door(-50, HEIGHT - 160, 10, 20)
-      self.all_sprites.add(d4)
-      self.doors.add(d4)
+      # bk= BossKey(950, 200, 10, 10)
+      # self.all_sprites.add(bk)
+      # self.bosskey.add(bk)
+      # d4 = Door(-50, HEIGHT - 160, 10, 20)
+      # self.all_sprites.add(d4)
+      # self.doors.add(d4)
 
     if self.player.level == 5:
       g.win_screen()
@@ -426,6 +428,8 @@ class Game:
 
   def show_start_screen(self):
     # game splash/start screen
+    pg.mixer.music.load(path.join(self.snd_dir, 'prologue.ogg'))
+    pg.mixer.music.play(loops = -1)
     self.screen.fill(BLACK)
     self.draw_text("Welcome to Metroidvania... Enter if you dare!", 48, BLUE, WIDTH /2, HEIGHT / 4)
     self.draw_text("Controls: Right and Left Arrow to move, Up Arrow to jump, Space Bar to shoot, AWSD for directional shooting", 22, WHITE, WIDTH / 2, HEIGHT /2)
@@ -435,9 +439,10 @@ class Game:
     # Wait for player to hit a key to start
     while self.playing == False and self.running == True:
       self.events()
+    pg.mixer.music.fadeout(1000)
 
   def win_screen(self):
-    pg.mixer.music.load(path.join(self.snd_dir, 'win.wav'))
+    pg.mixer.music.load(path.join(self.snd_dir, 'win.ogg'))
     pg.mixer.music.play(loops = -1)
     self.screen.fill(BLACK)
     self.draw_text("Congrats! You have won!!!", 48, BLUE, WIDTH /2, HEIGHT / 4)
