@@ -380,6 +380,7 @@ class Door(pg.sprite.Sprite):
     self.image = pg.transform.rotozoom(pg.image.load("imgs/door.png").convert(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
 
@@ -389,6 +390,7 @@ class Key(pg.sprite.Sprite):
     self.image = pg.transform.rotozoom(pg.image.load("imgs/keyYellow.png").convert(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
 
@@ -398,6 +400,7 @@ class BossKey(pg.sprite.Sprite):
     self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_key.png").convert(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
 
@@ -408,8 +411,19 @@ class Boss(pg.sprite.Sprite):
     self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
     self.deadboss = False
     # self.health = 25
 
+class Heart(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/heart.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
