@@ -328,6 +328,11 @@ class Game:
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
     if acid_hit:
       self.player.health -= 1
+      self.player.vel.y -= 5
+      if self.player.left == True:
+        self.player.vel.x += 10
+      else:
+        self.player.vel.x -= 10
     if self.player.health <= 0:
         self.playing = False
 
@@ -344,6 +349,11 @@ class Game:
     spider_hit = pg.sprite.spritecollide(self.player, self.enemies, False)
     if spider_hit:
       self.player.health -= 1
+      self.player.vel.y -= 5
+      if self.player.left == True:
+        self.player.vel.x += 10
+      else:
+        self.player.vel.x -= 10
     if self.player.health <= 0:
       self.playing = False
 
