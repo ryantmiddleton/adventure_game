@@ -31,9 +31,7 @@ class Player(pg.sprite.Sprite):
     self.game = game
     self.jumping = False
     self.hasKey = False
-    
     self.hasBoss_key = False
-
 
     # Player Image and rectangle surface
     self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
@@ -46,7 +44,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 1
+    self.level = 3
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -113,7 +111,6 @@ class Player(pg.sprite.Sprite):
     else:  
       return False
  
-
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
@@ -165,12 +162,12 @@ class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.spider_sheet = Spritesheet(SPIDER_SPRITESHEET)
-    self.size = self.spider_sheet.image_page.get_size()
-    self.frames = self.spider_sheet.strip_from_sheet(self.spider_sheet.image_page, (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
+    self.spritesheet = game.spider_spritesheet
+    self.size = self.spritesheet.image_sheet.get_size()
+    self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet , (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
     # Crop each selected image from the sheet and rotate, scale it
     for i in range(len(self.frames)):
-      self.frames[i] = self.spider_sheet.crop(self.frames[i],(10,20),(65,45))
+      self.frames[i] = self.spritesheet.crop(self.frames[i],(10,20),(65,45))
       # self.frames[i] = pg.transform.flip(self.frames[i], True, False)
       self.frames[i] = pg.transform.rotozoom(self.frames[i], 0, 1)
 
@@ -292,17 +289,16 @@ class Acid(pg.sprite.Sprite):
   def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.image = self.game.spritesheet.get_image(232, 1390, 95, 53)
+    self.image = self.game.platform_spritesheet.get_image(232, 1390, 95, 53)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
     
 class Platform(pg.sprite.Sprite):
-  def __init__(self, game, x, y):
-    pg.sprite.Sprite.__init__(self)
-    self.game = game
-    self.image = self.game.spritesheet.get_image(0, 288, 380, 94)
+  def __init__(self, spritesheet, x, y):
+    pg.sprite.Sprite.__init__(self) 
+    self.image = spritesheet.get_image(0, 288, 380, 94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
@@ -346,14 +342,11 @@ class Platform(pg.sprite.Sprite):
 
 class Spritesheet:
   def __init__(self, filename):
-    # self.dir = path.dirname(__file__)
-    # self.img_dir = path.join(self.dir, 'imgs')
-    # filename = path.join(self.img_dir, Filename)
-    self.spritesheet = pg.image.load(filename).convert()
+    self.image_sheet = pg.image.load(filename).convert()
 
   def get_image(self, x, y, width, height):
     image = pg.Surface((width, height))
-    image.blit(self.spritesheet, (0,0), (x, y, width, height))
+    image.blit(self.image_sheet, (0,0), (x, y, width, height))
     image = pg.transform.scale(image, (width //2, height// 2))
     return image
 

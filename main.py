@@ -42,16 +42,22 @@ class Game:
     
 
   def load_data(self):
+    # Initialize Path directories
     self.dir = path.dirname(__file__)
-    img_dir = path.join(self.dir, 'imgs')
+    self.img_dir = path.join(self.dir, 'imgs')
+    self.snd_dir = path.join(self.dir, 'snd')
+    self.bg_dir = path.join(self.dir, 'bg')
     with open(path.join(self.dir, HS_FILE), 'w') as f:
       try:
         self.highscore = int(f.read())
       except:
         self.highscore = 0
-    self.spritesheet = Spritesheet(path.join(img_dir, PLATFORM_SPRITESHEET))
-    self.snd_dir = path.join(self.dir, 'snd')
-    self.bg_dir = path.join(self.dir, 'bg')
+
+    # Initialize Spritesheets
+    self.platform_spritesheet = Spritesheet(path.join(self.img_dir, PLATFORM_SPRITESHEET))
+    self.spider_spritesheet = Spritesheet(path.join(self.img_dir, SPIDER_SPRITESHEET))
+    
+    # Initialize Sounds
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
 
@@ -74,49 +80,11 @@ class Game:
     # Add player to sprite group
     self.all_sprites.add(self.player)
     self.all_sprites.add(self.boss)
-    
-    # Load all platforms and enemies 
-    # based on current player.level
 
-    #LEVEL 1
-    if self.player.level == 1:
-      # Add Platforms
-      for plat in MAP1_PLATFORM_LIST:
-        p = Platform(self, *plat)
-        self.all_sprites.add(p) 
-        self.platforms.add(p)
-      # Add Level 1 Door  
-      d1 = Door(WIDTH, HEIGHT - 135, 10, 20)
-      self.all_sprites.add(d1)
-      self.doors.add(d1)
-      h1 = Heart(self, 250, 60, 10, 10)
-      self.all_sprites.add(h1)
-      self.heart.add(h1)
-      # Add Level 1 Key
-      k1 = Key(500, 175, 10, 10)
-      self.all_sprites.add(k1)
-      self.keys.add(k1)
-      # Add Acid
-      acid = Acid(self, 500, HEIGHT - 60)
-      acid1 = Acid(self, 530, HEIGHT - 60)
-      acid2 = Acid(self, 900, HEIGHT - 60)
-      acid3 = Acid(self, 930, HEIGHT - 60)
-      acid4 = Acid(self, 350, 180)
-      self.all_sprites.add(acid)
-      self.acid_pools.add(acid)
-      self.all_sprites.add(acid1)
-      self.acid_pools.add(acid1)
-      self.all_sprites.add(acid2)
-      self.acid_pools.add(acid2)
-      self.all_sprites.add(acid3)
-      self.acid_pools.add(acid3)
-      self.all_sprites.add(acid4)
-      self.acid_pools.add(acid4)
     # Load music to all levels
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
+    self.load_level()
     self.run()
-    
-    
     
   def run(self):
     # Game loop
@@ -238,7 +206,6 @@ class Game:
       # remove the key from the screen
       key_hit.kill()
       self.score += 5
-      print("Door " + str(self.player.level) + "is Now Open")
       #set key_hit to True because player has the key now
       self.player.hasKey = True
     
@@ -261,7 +228,6 @@ class Game:
         for acid in self.acid_pools:
           acid.kill()
         self.load_level()
-        print("Loading Level " + str(self.player.level))
     
     # boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
     self.boss.deadboss = False
@@ -284,9 +250,8 @@ class Game:
 
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
-    # shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
+    shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
     
-
     boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
     if boss_hit:
       self.player.health -= 1
@@ -296,57 +261,93 @@ class Game:
     
 
   def load_level(self):
+    #LEVEL 1
+    if self.player.level == 1:
+      # Add Platforms
+      for plat in MAP1_PLATFORM_LIST:
+        p = Platform(self.platform_spritesheet, *plat)
+        self.all_sprites.add(p) 
+        self.platforms.add(p)
+      # Add Level 1 Door  
+      d = Door(WIDTH, HEIGHT - 135, 10, 20)
+      self.all_sprites.add(d)
+      self.doors.add(d)
+      h = Heart(self, 250, 60, 10, 10)
+      self.all_sprites.add(h)
+      self.heart.add(h)
+      # Add Level 1 Key
+      k = Key(500, 175, 10, 10)
+      self.all_sprites.add(k)
+      self.keys.add(k)
+      # Add Acid
+      acid = Acid(self, 500, HEIGHT - 60)
+      acid1 = Acid(self, 530, HEIGHT - 60)
+      acid2 = Acid(self, 900, HEIGHT - 60)
+      acid3 = Acid(self, 930, HEIGHT - 60)
+      acid4 = Acid(self, 350, 180)
+      self.all_sprites.add(acid)
+      self.acid_pools.add(acid)
+      self.all_sprites.add(acid1)
+      self.acid_pools.add(acid1)
+      self.all_sprites.add(acid2)
+      self.acid_pools.add(acid2)
+      self.all_sprites.add(acid3)
+      self.acid_pools.add(acid3)
+      self.all_sprites.add(acid4)
+      self.acid_pools.add(acid4)
+
+    # LEVEL 2
     if self.player.level == 2:
       # Level 2 Platforms
       for plat in MAP2_PLATFORM_LIST:
-        p = Platform(self, *plat)
+        p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 2 Door
-      d2 = Door(-100, HEIGHT - 135, 10, 20)
-      self.all_sprites.add(d2)
-      self.doors.add(d2)
+      d = Door(-100, HEIGHT - 135, 10, 20)
+      self.all_sprites.add(d)
+      self.doors.add(d)
       # Level 2 Key
-      k2 = Key(350, 170, 10, 10)
-      self.all_sprites.add(k2)
-      self.keys.add(k2)
+      k = Key(350, 170, 10, 10)
+      self.all_sprites.add(k)
+      self.keys.add(k)
 
     # LEVEL 3
     if self.player.level == 3:
       # Add Platforms
       for plat in MAP3_PLATFORM_LIST:
-        p = Platform(self, *plat)
+        p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
         self.platforms.add(p)
         # Add enemies to each platform
-        # spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
-        # self.all_sprites.add(spider)
-        # self.enemies.add(spider)
+        spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
+        self.all_sprites.add(spider)
+        self.enemies.add(spider)
       # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
-      d3 = Door(300, -1445, 10, 20)
-      self.all_sprites.add(d3)
-      self.doors.add(d3)
+      d = Door(300, -1445, 10, 20)
+      self.all_sprites.add(d)
+      self.doors.add(d)
       # Level 3 Key
-      k3 = Key(950, 200, 10, 10)
-      self.all_sprites.add(k3)
-      self.keys.add(k3)
+      k = Key(950, 200, 10, 10)
+      self.all_sprites.add(k)
+      self.keys.add(k)
 
     # LEVEL 4
     if self.player.level == 4:
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
-       p = Platform(self, *plat)
+       p = Platform(self.platform_spritesheet, *plat)
        self.all_sprites.add(p)
        self.platforms.add(p)
       boss = Boss(self, 300, 200, 20, 40)
       self.all_sprites.add(boss)
       self.boss.add(boss)
-      h2= Heart(self, -400, HEIGHT * .75 - 50, 10, 10)
-      self.all_sprites.add(h2)
-      self.heart.add(h2)
+      h= Heart(self, -400, HEIGHT * .75 - 50, 10, 10)
+      self.all_sprites.add(h)
+      self.heart.add(h)
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
@@ -365,23 +366,18 @@ class Game:
             self.playing = False
           self.running = False
         if event.type == pg.KEYDOWN:
+          if self.playing == False:
+                self.playing = True
+          elif self.playing == True:
+            self.playing ==True
           if event.key == pg.K_UP:
               self.player.jump()
             
         if event.type == pg.KEYUP:
           if event.key == pg.K_UP:
             self.player.jump_cut()
-
-        if event.type == KEYDOWN:
-          #Check to see if the game is over/starting
-          # Player 'hit any key' from show_start_screen() or show_go_screen() to restart the game
-          if self.playing == False:
-            self.playing = True
-          elif self.playing == True:
-            self.playing ==True
-            # invoke a jump when holding down the 'UP' arrow
-
-          if event.key == pg.K_SPACE:
+        
+          if keys:
             if keys[K_d] and keys[K_w]:
                 b = Bullet(self.player.pos.x, self.player.pos.y, 3)
                 self.all_sprites.add(b)
@@ -402,16 +398,12 @@ class Game:
                 self.all_sprites.add(b)
                 self.bullets.add(b)
                 self.shoot_sound.play()                    
-            elif self.player.left or keys[K_a]:
+            elif keys[K_a]:
                 b = Bullet(self.player.pos.x, self.player.pos.y, -1)
                 self.all_sprites.add(b)
                 self.bullets.add(b)
                 self.shoot_sound.play()    
-            else:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()  
+
 
 
   def draw(self):
