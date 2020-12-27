@@ -121,7 +121,6 @@ class Player(pg.sprite.Sprite):
     else:  
       return False
  
-
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
@@ -308,7 +307,8 @@ class Acid(pg.sprite.Sprite):
     
 class Platform(pg.sprite.Sprite):
   def __init__(self, spritesheet, x, y):
-    pg.sprite.Sprite.__init__(self)
+
+    pg.sprite.Sprite.__init__(self) 
     self.image = spritesheet.get_image(0, 288, 380, 94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
