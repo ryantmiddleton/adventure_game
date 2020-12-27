@@ -63,6 +63,7 @@ class Game:
     # Define Sprite Groups
     self.all_sprites = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
+    self.platform_boss = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
     self.acid_pools = pg.sprite.Group()
     self.enemies = pg.sprite.Group()
@@ -140,7 +141,22 @@ class Game:
           self.player.vel.y = 0
           self.player.jumping = False
 
-    if self.player.level == 1 or self.player.level == 2 or self.player.level == 4:
+      bp_hits = pg.sprite.spritecollide(self.player, self.platform_boss, False)
+      if bp_hits:
+        if self.player.pos.y < bp_hits[0].rect.bottom:
+          self.player.pos.y = bp_hits[0].rect.top
+          self.player.vel.y = 0
+          self.player.jumping = False
+
+    # if self.player.pos.x >= self.boss.rect.x:
+    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
+    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
+    # if self.player.pos.x <= self.boss.rect.x:
+    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
+    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
+    if self.player.level == 1 or self.player.level == 2:
       # Side Scrolling Logic
       if self.player.rect.right <= WIDTH / 4:
         for plat in self.platforms:
@@ -215,6 +231,47 @@ class Game:
               acid.rect.y -= abs(int(self.player.vel.y))
           self.player.pos.y -= abs(self.player.vel.y)
 
+    if self.player.level == 4:
+      if self.player.rect.right <= WIDTH / 4:
+        for plat in self.platform_boss:
+          plat.rect.x += abs(int(self.player.vel.x))
+          # self.score += 1
+        for enemy in self.enemies:
+          enemy.rect.x += abs(int(self.player.vel.x))
+        for key in self.keys:
+            key.rect.x += abs(int(self.player.vel.x))
+        for door in self.doors:
+            door.rect.x += abs(int(self.player.vel.x))
+        for acid in self.acid_pools:
+            acid.rect.x += abs(int(self.player.vel.x))
+        for boss in self.boss:
+            boss.rect.x += abs(int(self.player.vel.x))
+        for bk in self.bosskey:  
+            bk.rect.x += abs(int(self.player.vel.x))
+        for heart in self.heart:
+            heart.rect.x += abs(int(self.player.vel.x))
+        self.player.pos.x += abs(int(self.player.vel.x))
+
+      elif self.player.rect.left >= WIDTH * .75:
+        for plat in self.platform_boss:
+          plat.rect.x -= abs(int(self.player.vel.x))
+          # self.score += 1
+        for enemy in self.enemies:
+            enemy.rect.x -= abs(int(self.player.vel.x))
+        for key in self.keys:
+            key.rect.x -= abs(int(self.player.vel.x))
+        for door in self.doors:
+            door.rect.x -= abs(int(self.player.vel.x))
+        for acid in self.acid_pools:
+            acid.rect.x -= abs(int(self.player.vel.x))
+        for boss in self.boss:
+            boss.rect.x -= abs(int(self.player.vel.x))
+        for bk in self.bosskey:
+            bk.rect.x -= abs(int(self.player.vel.x))
+        for heart in self.heart:
+            heart.rect.x -= abs(int(self.player.vel.x))
+        self.player.pos.x -= abs(int(self.player.vel.x))
+
     # Player has fallen and died
     if self.player.rect.bottom > HEIGHT:
       for sprite in self.all_sprites:
@@ -227,9 +284,33 @@ class Game:
     # Player Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
     if heart_hit:
-      heart_hit.kill()
-      self.player.health += 5
-      print("Player Health increases by 5")
+      if self.player.health == 25:
+        heart_hit.kill()
+        print("Player Health Does Not Increase")
+      if self.player.health == 24:
+        heart_hit.kill()
+        self.player.health += 1
+        print("Player Health increases by 1")
+      if self.player.health == 23:
+        heart_hit.kill()
+        self.player.health += 2
+        print("Player Health increases by 2")
+      if self.player.health == 22:
+        heart_hit.kill()
+        self.player.health += 3
+        print("Player Health increases by 3")
+      if self.player.health == 21:
+        heart_hit.kill()
+        self.player.health += 4
+        print("Player Health increases by 4")
+      if self.player.health == 20:
+        heart_hit.kill()
+        self.player.health += 5
+        print("Player Health increases by 5")
+      if self.player.health <= 19:
+        heart_hit.kill()
+        self.player.health += 5
+        print("Player Health increases by 5")
 
     # Key detection for any of the keys
     key_hit = pg.sprite.spritecollideany(self.player, self.keys)
@@ -256,6 +337,8 @@ class Game:
         # Load a new board
         for plat in self.platforms:
           plat.kill()
+        for boss_plat in self.platform_boss:
+          boss_plat.kill()
         for door in self.doors:
           door.kill()
         for acid in self.acid_pools:
@@ -263,7 +346,7 @@ class Game:
         self.load_level()
         print("Loading Level " + str(self.player.level))
     
-    # boss_key_hit = pg.sprite.spritecollideany(self.player, self.bosskey)
+   
     self.boss.deadboss = False
     shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
     if shoot_boss:
@@ -338,9 +421,9 @@ class Game:
     if self.player.level == 4:
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
-       p = Platform(self, *plat)
+       p = Platform_Boss(self, *plat)
        self.all_sprites.add(p)
-       self.platforms.add(p)
+       self.platform_boss.add(p)
       boss = Boss(self, 300, 200, 20, 40)
       self.all_sprites.add(boss)
       self.boss.add(boss)
@@ -364,6 +447,7 @@ class Game:
           if self.playing:
             self.playing = False
           self.running = False
+
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
               self.player.jump()
@@ -372,6 +456,10 @@ class Game:
           if event.key == pg.K_UP:
             self.player.jump_cut()
 
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_UP:
+            self.player.boss_jump()
+
         if event.type == KEYDOWN:
           #Check to see if the game is over/starting
           # Player 'hit any key' from show_start_screen() or show_go_screen() to restart the game
@@ -379,7 +467,6 @@ class Game:
             self.playing = True
           elif self.playing == True:
             self.playing ==True
-            # invoke a jump when holding down the 'UP' arrow
 
           if event.key == pg.K_SPACE:
             if keys[K_d] and keys[K_w]:
@@ -416,24 +503,44 @@ class Game:
 
   def draw(self):
     #Game Loop - draw 
-    self.back_image = pg.image.load('bg/plx-4.png')
-    self.back_image = pg.transform.scale(self.back_image, (1400, 720))
-    self.back_rect = self.back_image.get_rect()
-    self.screen.fill(BLACK)
-    self.screen.blit(self.back_image, self.back_rect.move(0,0))
-    self.all_sprites.draw(self.screen)
-    self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, 35) 
-    pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
-    pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
-    self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
-    # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
-    # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
-    self.screen.blit(self.player.image, self.player.rect)
-    # self.screen.blit(self.boss.image, self.boss.rect)
-    self.back_rect.move_ip(-2, 0)
-    if self.back_rect.right == 0:
-      self.back_rect.x =0
-    self.draw_text("Level " + str(self.player.level), 22, WHITE, WIDTH / 2, 15) 
+    if self.player.level == 1 or self.player.level == 2 or self.player.level == 3:
+      self.back_image = pg.image.load('bg/plx-4.png')
+      self.back_image = pg.transform.scale(self.back_image, (1400, 720))
+      self.back_rect = self.back_image.get_rect()
+      self.screen.fill(BLACK)
+      self.screen.blit(self.back_image, self.back_rect.move(0,0))
+      self.all_sprites.draw(self.screen)
+      self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, 35) 
+      pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
+      pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
+      self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
+      # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
+      # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
+      self.screen.blit(self.player.image, self.player.rect)
+      # self.screen.blit(self.boss.image, self.boss.rect)
+      self.back_rect.move_ip(-2, 0)
+      if self.back_rect.right == 0:
+        self.back_rect.x =0
+      self.draw_text("Level " + str(self.player.level), 22, WHITE, WIDTH / 2, 15) 
+    if self.player.level == 4:
+      self.back_image = pg.image.load('bg/boss_level.jpg')
+      self.back_image = pg.transform.scale(self.back_image, (1400, 720))
+      self.back_rect = self.back_image.get_rect()
+      self.screen.fill(BLACK)
+      self.screen.blit(self.back_image, self.back_rect.move(0,0))
+      self.all_sprites.draw(self.screen)
+      self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, 35) 
+      pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
+      pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
+      self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
+      # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
+      # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
+      self.screen.blit(self.player.image, self.player.rect)
+      # self.screen.blit(self.boss.image, self.boss.rect)
+      self.back_rect.move_ip(-2, 0)
+      if self.back_rect.right == 0:
+        self.back_rect.x =0
+      self.draw_text("Level " + str(self.player.level), 22, WHITE, WIDTH / 2, 15) 
     pg.display.flip()      
 
   def show_start_screen(self):

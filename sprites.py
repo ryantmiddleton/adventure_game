@@ -104,6 +104,16 @@ class Player(pg.sprite.Sprite):
       self.vel.y = -15
       self.game.jump_sound.play()
 
+  def boss_jump(self):
+    self.rect.y += 1
+    hits = pg.sprite.spritecollide(self, self.game.platform_boss, False)
+    self.rect.y -= 1
+    if hits:  
+      self.jumping = True
+      self.vel.y = -15
+      self.game.jump_sound.play()
+
+
   def isStanding(self):
     self.rect.y += 1
     hits = pg.sprite.spritecollide (self, self.game.platforms, False)
@@ -344,6 +354,53 @@ class Platform(pg.sprite.Sprite):
     else:  
       return False
 
+class Platform_Boss(pg.sprite.Sprite):
+  def __init__(self, game, x, y):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = self.game.spritesheet.get_image(0,96,380,94)
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y       
+
+  # def isStanding(self):
+  #   self.sprite.rect.y += 1
+  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platform_boss, False)
+  #   self.sprite.rect.y -= 1
+  #   if hits:
+  #     return True
+  #   else:  
+  #     return False
+
+  # def isHanging(self):
+  #   self.sprite.rect.y -= 1
+  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+  #   self.sprite.rect.y += 1
+  #   if hits:
+  #     return True
+  #   else:  
+  #     return False
+
+  # def isGripping_right(self):
+  #   self.sprite.rect.x += 1
+  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+  #   self.sprite.rect.x -= 1
+  #   if hits:
+  #     return True
+  #   else:  
+  #     return False
+  
+  # def isGripping_left(self):
+  #   self.sprite.rect.x -= 1
+  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+  #   self.sprite.rect.x += 1
+  #   if hits:
+  #     return True
+  #   else:  
+  #     return False
+
+
 class Spritesheet:
   def __init__(self, filename):
     # self.dir = path.dirname(__file__)
@@ -416,6 +473,8 @@ class Boss(pg.sprite.Sprite):
     self.rect.y = y
     self.deadboss = False
     # self.health = 25
+
+  
 
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
