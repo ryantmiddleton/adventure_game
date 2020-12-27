@@ -139,19 +139,6 @@ MAP4_PLATFORM_LIST = [
   (0, HEIGHT - 700),
 ]
 
-MAP5_PLATFORM_LIST = [
-  (1200, HEIGHT - 40),
-  (1050, HEIGHT - 40),
-  (900, HEIGHT - 40),
-  (750, HEIGHT - 40),
-  (600, HEIGHT - 40),
-  (450, HEIGHT - 40),
-  (300, HEIGHT - 40),  
-  (150, HEIGHT - 40),
-  (0, HEIGHT - 40),
-  (-150, HEIGHT - 40),
-]
-
 # define colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
