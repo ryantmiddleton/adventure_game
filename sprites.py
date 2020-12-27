@@ -31,6 +31,9 @@ class Player(pg.sprite.Sprite):
     self.game = game
     self.jumping = False
     self.hasKey = False
+    
+    self.hasBoss_key = False
+
 
     # Player Image and rectangle surface
     self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
@@ -39,7 +42,7 @@ class Player(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
 
     # Player coordinates and orientation
-    self.pos = vec(0, HEIGHT-40)
+    self.pos = vec(WIDTH/2, HEIGHT/2)
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
@@ -48,14 +51,7 @@ class Player(pg.sprite.Sprite):
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
 
- # def jump(self):
-  #   self.rect.y += 1
-  #   hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-  #   self.rect.y -= 1
-  #   if hits and not self.jumping:  
-  #     self.jumping = True
-  #     self.vel.y = -PLAYER_JUMP
-  #     self.game.jump_sound.play()
+ 
 
   def update(self):
     self.acc = vec(0, PLAYER_GRAV)
@@ -104,7 +100,9 @@ class Player(pg.sprite.Sprite):
     hits = pg.sprite.spritecollide(self, self.game.platforms, False)
     self.rect.y -= 1
     if hits:  
-      self.vel.y = -PLAYER_JUMP
+      self.jumping = True
+      self.vel.y = -15
+      self.game.jump_sound.play()
 
   def isStanding(self):
     self.rect.y += 1
@@ -129,7 +127,7 @@ class Bullet(pg.sprite.Sprite):
       self.image = pg.image.load("img/bullet-left.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-40
-      self.rect.y = y-20
+      self.rect.y = y-30
     elif facing == 3:
       self.image = pg.image.load("img/bullet-diag-right.png").convert()
       self.rect = self.image.get_rect()
@@ -144,7 +142,7 @@ class Bullet(pg.sprite.Sprite):
       self.image = pg.image.load("img/bullet.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
-      self.rect.y = y-20
+      self.rect.y = y-30
     self.image.set_colorkey((WHITE), RLEACCEL)
 
   def update(self):
@@ -182,7 +180,7 @@ class Spider(pg.sprite.Sprite):
 
     #Initialize the spider position - self.rect.y = y, self.rect.x = x
     self.rect = self.image.get_rect(topleft=(x,y))
-
+    # self.rect.y = y, self.rect.x = x
     # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
     self.orient = 180
     self.dir = LEFT
@@ -291,37 +289,71 @@ class Spider(pg.sprite.Sprite):
       return False
 
 class Acid(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
+  def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(GREEN)
+    self.game = game
+    self.image = self.game.spritesheet.get_image(232, 1390, 95, 53)
+    self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
     
 class Platform(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
+  def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.spritesheet = Spritesheet(PLATFORM_SPRITESHEET)
-    # self.image = self.spritesheet.get_image(0, 288, 380, 94)
-    # self.image.set_colorkey(BLACK)
-    self.image = pg.Surface((w, h))
-    self.image.fill(SILVER)
+    self.game = game
+    self.image = self.game.spritesheet.get_image(0, 288, 380, 94)
+    self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
-    # print("("+str(x)+","+str(y)+")")
     self.rect.x = x
-    self.rect.y = y  
+    self.rect.y = y       
+
+  def isStanding(self):
+    self.sprite.rect.y += 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.y -= 1
+    if hits:
+      return True
+    else:  
+      return False
+
+  def isHanging(self):
+    self.sprite.rect.y -= 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.y += 1
+    if hits:
+      return True
+    else:  
+      return False
+
+  def isGripping_right(self):
+    self.sprite.rect.x += 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.x -= 1
+    if hits:
+      return True
+    else:  
+      return False
+  
+  def isGripping_left(self):
+    self.sprite.rect.x -= 1
+    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
+    self.sprite.rect.x += 1
+    if hits:
+      return True
+    else:  
+      return False
 
 class Spritesheet:
-  def __init__(self, strFilename):
-    self.dir = path.dirname(__file__)
-    self.img_dir = path.join(self.dir, 'imgs')
-    filename = path.join(self.img_dir, strFilename)
-    self.image_page = pg.image.load(filename).convert()
+  def __init__(self, filename):
+    # self.dir = path.dirname(__file__)
+    # self.img_dir = path.join(self.dir, 'imgs')
+    # filename = path.join(self.img_dir, Filename)
+    self.spritesheet = pg.image.load(filename).convert()
 
   def get_image(self, x, y, width, height):
     image = pg.Surface((width, height))
-    image.blit(self.image_page, (0,0), (x, y, width, height))
+    image.blit(self.spritesheet, (0,0), (x, y, width, height))
     image = pg.transform.scale(image, (width //2, height// 2))
     return image
 
@@ -345,17 +377,53 @@ class Spritesheet:
 class Door(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(RED)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/door.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
 
 class Key(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((w, h))
-    self.image.fill(YELLOW)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/keyYellow.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+
+class BossKey(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_key.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+
+class Boss(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+    self.deadboss = False
+    # self.health = 25
+
+class Heart(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/heart.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
