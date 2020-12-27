@@ -31,7 +31,7 @@ class Player(pg.sprite.Sprite):
     self.game = game
     self.jumping = False
     self.hasKey = False
-    self.hasBoss_key = False
+
 
     # Player Image and rectangle surface
     self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
@@ -307,12 +307,13 @@ class Acid(pg.sprite.Sprite):
     
 class Platform(pg.sprite.Sprite):
   def __init__(self, spritesheet, x, y):
+
     pg.sprite.Sprite.__init__(self) 
     self.image = spritesheet.get_image(0, 288, 380, 94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
-    self.rect.y = y       
+    self.rect.y = y
 
   def isStanding(self):
     self.sprite.rect.y += 1

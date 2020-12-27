@@ -81,8 +81,8 @@ class Game:
     # Add player to sprite group
     self.all_sprites.add(self.player)
     self.all_sprites.add(self.boss)
-
     # Load music to all levels
+
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
     self.load_level()
     self.run()
@@ -339,7 +339,10 @@ class Game:
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
     shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
-    
+
+    if shoot_enemy:
+      self.score += 1
+
     boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
     if boss_hit:
       self.player.health -= 1
@@ -366,6 +369,8 @@ class Game:
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
+
+
       d = Door(WIDTH, HEIGHT - 135, 10, 20)
       self.all_sprites.add(d)
       self.doors.add(d)
@@ -376,6 +381,7 @@ class Game:
       k = Key(500, 175, 10, 10)
       self.all_sprites.add(k)
       self.keys.add(k)
+
       # Add Acid
       acid = Acid(self, 500, HEIGHT - 60)
       acid1 = Acid(self, 530, HEIGHT - 60)
@@ -393,7 +399,9 @@ class Game:
       self.all_sprites.add(acid4)
       self.acid_pools.add(acid4)
 
+
     # LEVEL 2
+
     if self.player.level == 2:
       # Level 2 Platforms
       for plat in MAP2_PLATFORM_LIST:
@@ -420,6 +428,7 @@ class Game:
         spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
         self.all_sprites.add(spider)
         self.enemies.add(spider)
+
       # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
@@ -436,7 +445,7 @@ class Game:
     if self.player.level == 4:
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
-       p = Platform(self.platform_spritesheet, *plat)
+       p = Platform_Boss(self.platform_spritesheet, *plat)
        self.all_sprites.add(p)
        self.platform_boss.add(p)
       boss = Boss(self, 300, 200, 20, 40)
