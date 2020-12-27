@@ -422,11 +422,7 @@ class Game:
     if self.player.level == 4:
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
-<<<<<<< HEAD
        p = Platform(self.platform_spritesheet, *plat)
-=======
-       p = Platform_Boss(self, *plat)
->>>>>>> d38e26bb99a5936c1aca222c77160612736279a7
        self.all_sprites.add(p)
        self.platform_boss.add(p)
       boss = Boss(self, 300, 200, 20, 40)
@@ -464,25 +460,8 @@ class Game:
         if event.type == pg.KEYUP:
           if event.key == pg.K_UP:
             self.player.jump_cut()
-<<<<<<< HEAD
         
           if keys:
-=======
-
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.boss_jump()
-
-        if event.type == KEYDOWN:
-          #Check to see if the game is over/starting
-          # Player 'hit any key' from show_start_screen() or show_go_screen() to restart the game
-          if self.playing == False:
-            self.playing = True
-          elif self.playing == True:
-            self.playing ==True
-
-          if event.key == pg.K_SPACE:
->>>>>>> d38e26bb99a5936c1aca222c77160612736279a7
             if keys[K_d] and keys[K_w]:
                 b = Bullet(self.player.pos.x, self.player.pos.y, 3)
                 self.all_sprites.add(b)
