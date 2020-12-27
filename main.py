@@ -140,6 +140,14 @@ class Game:
           self.player.vel.y = 0
           self.player.jumping = False
 
+    # if self.player.pos.x >= self.boss.rect.x:
+    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
+    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
+    # if self.player.pos.x <= self.boss.rect.x:
+    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
+    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
     if self.player.level == 1 or self.player.level == 2 or self.player.level == 4:
       # Side Scrolling Logic
       if self.player.rect.right <= WIDTH / 4:
@@ -227,9 +235,33 @@ class Game:
     # Player Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
     if heart_hit:
-      heart_hit.kill()
-      self.player.health += 5
-      print("Player Health increases by 5")
+      if self.player.health == 25:
+        heart_hit.kell()
+        print("Player Health Does Not Increase")
+      if self.player.health == 24:
+        heart_hit.kill()
+        self.player.health += 1
+        print("Player Health increases by 1")
+      if self.player.health == 23:
+        heart_hit.kill()
+        self.player.health += 2
+        print("Player Health increases by 2")
+      if self.player.health == 22:
+        heart_hit.kill()
+        self.player.health += 3
+        print("Player Health increases by 3")
+      if self.player.health == 21:
+        heart_hit.kill()
+        self.player.health += 4
+        print("Player Health increases by 4")
+      if self.player.health == 20:
+        heart_hit.kill()
+        self.player.health += 5
+        print("Player Health increases by 5")
+      if self.player.health <= 19:
+        heart_hit.kill()
+        self.player.health += 5
+        print("Player Health increases by 5")
 
     # Key detection for any of the keys
     key_hit = pg.sprite.spritecollideany(self.player, self.keys)

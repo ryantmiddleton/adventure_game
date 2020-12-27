@@ -417,6 +417,8 @@ class Boss(pg.sprite.Sprite):
     self.deadboss = False
     # self.health = 25
 
+  
+
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
