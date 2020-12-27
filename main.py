@@ -341,7 +341,11 @@ class Game:
     if self.player.health <= 0:
       self.playing = False
 
-    
+    spider_hit = pg.sprite.spritecollide(self.player, self.enemies, False)
+    if spider_hit:
+      self.player.health -= 1
+    if self.player.health <= 0:
+      self.playing = False
 
   def load_level(self):
     #LEVEL 1
@@ -451,17 +455,13 @@ class Game:
 
         if event.type == pg.KEYDOWN:
           if self.playing == False:
-                self.playing = True
+            self.playing = True
           elif self.playing == True:
-            self.playing ==True
+            self.playing == True
           if event.key == pg.K_UP:
-              self.player.jump()
-            
-        if event.type == pg.KEYUP:
-          if event.key == pg.K_UP:
-            self.player.jump_cut()
-        
-          if keys:
+            self.player.jump()
+
+          if event.key == pg.K_SPACE:
             if keys[K_d] and keys[K_w]:
                 b = Bullet(self.player.pos.x, self.player.pos.y, 3)
                 self.all_sprites.add(b)
@@ -482,11 +482,20 @@ class Game:
                 self.all_sprites.add(b)
                 self.bullets.add(b)
                 self.shoot_sound.play()                    
-            elif keys[K_a]:
+            elif self.player.left or keys[K_a]:
                 b = Bullet(self.player.pos.x, self.player.pos.y, -1)
                 self.all_sprites.add(b)
                 self.bullets.add(b)
                 self.shoot_sound.play()    
+            else:
+                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                self.all_sprites.add(b)
+                self.bullets.add(b)
+                self.shoot_sound.play()    
+
+          if event.type == pg.KEYUP:
+            if event.key == pg.K_UP:
+                self.player.jump_cut()
 
 
 
