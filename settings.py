@@ -13,7 +13,6 @@ PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.5
 PLAYER_JUMP = 15
 PLAYER_HEALTH = 8
-HAS_KEY = False
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
