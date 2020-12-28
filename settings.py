@@ -18,7 +18,7 @@ HAS_KEY = False
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
-
+EXPLOSION_SPRITESHEET = "explosion_sheet.png"
 # Globals for tracking directions
 LEFT = 0
 UP = 1

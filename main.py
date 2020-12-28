@@ -40,7 +40,6 @@ class Game:
     # Initialize the player
     self.player = Player(self)
     
-
   def load_data(self):
     # Initialize Path directories
     self.dir = path.dirname(__file__)
@@ -56,7 +55,7 @@ class Game:
     # Initialize Spritesheets
     self.platform_spritesheet = Spritesheet(path.join(self.img_dir, PLATFORM_SPRITESHEET))
     self.spider_spritesheet = Spritesheet(path.join(self.img_dir, SPIDER_SPRITESHEET))
-    
+    self.explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
     # Initialize Sounds
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
@@ -116,138 +115,72 @@ class Game:
           self.player.vel.y = 0
           self.player.jumping = False
 
-    # if self.player.pos.x >= self.boss.rect.x:
-    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
-    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
-    # if self.player.pos.x <= self.boss.rect.x:
-    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
-    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
-    if self.player.level == 1 or self.player.level == 2:
-      # Side Scrolling Logic
-      if self.player.rect.right <= WIDTH / 4:
-        for plat in self.platforms:
-          plat.rect.x += abs(int(self.player.vel.x))
-          # self.score += 1
-        for enemy in self.enemies:
-          enemy.rect.x += abs(int(self.player.vel.x))
-        for key in self.keys:
-            key.rect.x += abs(int(self.player.vel.x))
-        for door in self.doors:
-            door.rect.x += abs(int(self.player.vel.x))
-        for acid in self.acid_pools:
-            acid.rect.x += abs(int(self.player.vel.x))
-        for boss in self.boss:
-            boss.rect.x += abs(int(self.player.vel.x))
-        for bk in self.bosskey:  
-            bk.rect.x += abs(int(self.player.vel.x))
-        for heart in self.heart:
-            heart.rect.x += abs(int(self.player.vel.x))
-        self.player.pos.x += abs(int(self.player.vel.x))
-
-      elif self.player.rect.left >= WIDTH * .75:
-        for plat in self.platforms:
-          plat.rect.x -= abs(int(self.player.vel.x))
-          # self.score += 1
-        for enemy in self.enemies:
-            enemy.rect.x -= abs(int(self.player.vel.x))
-        for key in self.keys:
-            key.rect.x -= abs(int(self.player.vel.x))
-        for door in self.doors:
-            door.rect.x -= abs(int(self.player.vel.x))
-        for acid in self.acid_pools:
-            acid.rect.x -= abs(int(self.player.vel.x))
-        for boss in self.boss:
-            boss.rect.x -= abs(int(self.player.vel.x))
-        for bk in self.bosskey:
-            bk.rect.x -= abs(int(self.player.vel.x))
-        for heart in self.heart:
-            heart.rect.x -= abs(int(self.player.vel.x))
-        self.player.pos.x -= abs(int(self.player.vel.x))
-
+    # Set scrolling variables 
     if self.player.level == 3:
-          # Vertical Scrolling Logic
-      # If player reaches the top 25% of the screen
-      # scroll all sprites down (increase y coord)
-      if abs(self.player.rect.top) <= HEIGHT/4:
-        if not(self.player.isStanding()):
-          for platform in self.platforms:
-              platform.rect.y += abs(int(self.player.vel.y))
-          for enemy in self.enemies:
-              enemy.rect.y += abs(int(self.player.vel.y))
-          for key in self.keys:
-              key.rect.y += abs(int(self.player.vel.y))
-          for door in self.doors:
-              door.rect.y += abs(int(self.player.vel.y))
-          for acid in self.acid_pools:
-              acid.rect.y += abs(int(self.player.vel.y))
-          self.player.pos.y += abs(int(self.player.vel.y))
-      # If player reaches the bottom 25% of the screen
-      # scroll all sprites up (decrease y coord)
-      if abs(self.player.rect.top) >= HEIGHT * 0.75:
-        if not(self.player.isStanding()):
-          for platform in self.platforms:
-              platform.rect.y -= abs(int(self.player.vel.y))
-          for enemy in self.enemies:
-              enemy.rect.y -= abs(int(self.player.vel.y))
-          for key in self.keys:
-              key.rect.y -= abs(int(self.player.vel.y))
-          for door in self.doors:
-              door.rect.y -= abs(int(self.player.vel.y))
-          for acid in self.acid_pools:
-              acid.rect.y -= abs(int(self.player.vel.y))
-          self.player.pos.y -= abs(self.player.vel.y)
+      # Vertical (y) scrolling
+      scroll_dir = 1
+      scroll_dim = 3
+      screen_dim = HEIGHT
+    else:
+      # Side (x) scrolling
+      scroll_dir = 0
+      scroll_dim = 2
+      screen_dim = WIDTH
 
-    if self.player.level == 4:
-      if self.player.rect.right <= WIDTH / 4:
-        for plat in self.platform_boss:
-          plat.rect.x += abs(int(self.player.vel.x))
-          # self.score += 1
-        for enemy in self.enemies:
-          enemy.rect.x += abs(int(self.player.vel.x))
-        for key in self.keys:
-            key.rect.x += abs(int(self.player.vel.x))
-        for door in self.doors:
-            door.rect.x += abs(int(self.player.vel.x))
-        for acid in self.acid_pools:
-            acid.rect.x += abs(int(self.player.vel.x))
-        for boss in self.boss:
-            boss.rect.x += abs(int(self.player.vel.x))
-        for bk in self.bosskey:  
-            bk.rect.x += abs(int(self.player.vel.x))
-        for heart in self.heart:
-            heart.rect.x += abs(int(self.player.vel.x))
-        self.player.pos.x += abs(int(self.player.vel.x))
-
-      elif self.player.rect.left >= WIDTH * .75:
-        for plat in self.platform_boss:
-          plat.rect.x -= abs(int(self.player.vel.x))
-          # self.score += 1
-        for enemy in self.enemies:
-            enemy.rect.x -= abs(int(self.player.vel.x))
-        for key in self.keys:
-            key.rect.x -= abs(int(self.player.vel.x))
-        for door in self.doors:
-            door.rect.x -= abs(int(self.player.vel.x))
-        for acid in self.acid_pools:
-            acid.rect.x -= abs(int(self.player.vel.x))
-        for boss in self.boss:
-            boss.rect.x -= abs(int(self.player.vel.x))
-        for bk in self.bosskey:
-            bk.rect.x -= abs(int(self.player.vel.x))
-        for heart in self.heart:
-            heart.rect.x -= abs(int(self.player.vel.x))
-        self.player.pos.x -= abs(int(self.player.vel.x))
+    # If player reaches the top/right 25% of the screen
+    # scroll all sprites down (increase x/y coord)
+    if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 4:
+      for sprite in self.all_sprites:
+        sprite.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for plat in self.platforms:
+      #   plat.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for enemy in self.enemies:
+      #   enemy.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for key in self.keys:
+      #     key.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for door in self.doors:
+      #     door.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for acid in self.acid_pools:
+      #     acid.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for boss in self.boss:
+      #     boss.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for bk in self.bosskey:  
+      #     bk.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      # for heart in self.heart:
+      #     heart.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+      self.player.pos[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
+  
+    # If player reaches the bottom/left 25% of the screen
+    # scroll all sprites up (decrease x/y coord)
+    elif self.player.rect[scroll_dir] >= screen_dim * .75:
+      for sprite in self.all_sprites:
+            sprite.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for plat in self.platforms:
+      #       plat.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for enemy in self.enemies:
+      #     enemy.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for key in self.keys:
+      #     key.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for door in self.doors:
+      #     door.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for acid in self.acid_pools:
+      #     acid.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for boss in self.boss:
+      #     boss.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for bk in self.bosskey:
+      #     bk.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      # for heart in self.heart:
+      #     heart.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
+      self.player.pos[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
 
     # Player has fallen and died
     if self.player.rect.bottom > HEIGHT:
-      for sprite in self.all_sprites:
-        sprite.rect.y -= max(self.player.vel.y, 10)
-        if sprite.rect.bottom <0:
-          sprite.kill()
-        if len(self.platforms) ==0:
-          self.playing= False
+      # for sprite in self.all_sprites:
+      #   sprite.rect.y -= max(self.player.vel.y, 10)
+      #   if sprite.rect.bottom <0:
+      #     sprite.kill()
+      #   if len(self.platforms) ==0:
+      self.playing= False
 
     # Player Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
@@ -333,15 +266,18 @@ class Game:
 
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
-    shoot_enemy = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
-    
+    bullet_kill_list = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
+    if bullet_kill_list:
+      for bullet, enemy in bullet_kill_list.items():
+        # print(enemy[0].rect)
+        explosion = Explosion(enemy[0].rect.x, enemy[0].rect.y, self)
+        self.all_sprites.add(explosion)
+
     boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
     if boss_hit:
       self.player.health -= 1
     if self.player.health <= 0:
       self.playing = False
-
-    
 
   def load_level(self):
     #LEVEL 1
@@ -434,7 +370,6 @@ class Game:
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
-      
 
     if self.player.level == 5:
       g.win_screen()
@@ -487,8 +422,6 @@ class Game:
                 self.all_sprites.add(b)
                 self.bullets.add(b)
                 self.shoot_sound.play()    
-
-
 
   def draw(self):
     #Game Loop - draw 

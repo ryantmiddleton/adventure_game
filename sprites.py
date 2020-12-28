@@ -44,7 +44,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 1
+    self.level = 3
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -111,16 +111,6 @@ class Player(pg.sprite.Sprite):
       self.vel.y = -15
       self.game.jump_sound.play()
 
-
-  def isStanding(self):
-    self.rect.y += 1
-    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-    self.rect.y -= 1
-    if hits:
-      return True
-    else:  
-      return False
- 
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
@@ -174,7 +164,7 @@ class Spider(pg.sprite.Sprite):
     self.game = game
     self.spritesheet = game.spider_spritesheet
     self.size = self.spritesheet.image_sheet.get_size()
-    self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet , (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
+    self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet, (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
     # Crop each selected image from the sheet and rotate, scale it
     for i in range(len(self.frames)):
       self.frames[i] = self.spritesheet.crop(self.frames[i],(10,20),(65,45))
@@ -200,6 +190,7 @@ class Spider(pg.sprite.Sprite):
         self.image_num = 0
       self.anima_speed = 6
       self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+      self.image = self.image.convert_alpha()
       # print(self.orient)
     else:
       self.anima_speed -= 1
@@ -314,42 +305,6 @@ class Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y       
 
-  def isStanding(self):
-    self.sprite.rect.y += 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.y -= 1
-    if hits:
-      return True
-    else:  
-      return False
-
-  def isHanging(self):
-    self.sprite.rect.y -= 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.y += 1
-    if hits:
-      return True
-    else:  
-      return False
-
-  def isGripping_right(self):
-    self.sprite.rect.x += 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.x -= 1
-    if hits:
-      return True
-    else:  
-      return False
-  
-  def isGripping_left(self):
-    self.sprite.rect.x -= 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.x += 1
-    if hits:
-      return True
-    else:  
-      return False
-
 class Platform_Boss(pg.sprite.Sprite):
   def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
@@ -360,46 +315,9 @@ class Platform_Boss(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y       
 
-  # def isStanding(self):
-  #   self.sprite.rect.y += 1
-  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platform_boss, False)
-  #   self.sprite.rect.y -= 1
-  #   if hits:
-  #     return True
-  #   else:  
-  #     return False
-
-  # def isHanging(self):
-  #   self.sprite.rect.y -= 1
-  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-  #   self.sprite.rect.y += 1
-  #   if hits:
-  #     return True
-  #   else:  
-  #     return False
-
-  # def isGripping_right(self):
-  #   self.sprite.rect.x += 1
-  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-  #   self.sprite.rect.x -= 1
-  #   if hits:
-  #     return True
-  #   else:  
-  #     return False
-  
-  # def isGripping_left(self):
-  #   self.sprite.rect.x -= 1
-  #   hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-  #   self.sprite.rect.x += 1
-  #   if hits:
-  #     return True
-  #   else:  
-  #     return False
-
-
-class Spritesheet:
+class Spritesheet():
   def __init__(self, filename):
-    self.image_sheet = pg.image.load(filename).convert()
+    self.image_sheet = pg.image.load(filename).convert_alpha()
 
   def get_image(self, x, y, width, height):
     image = pg.Surface((width, height))
@@ -411,8 +329,8 @@ class Spritesheet:
     # Strips individual frames from a sprite sheet image given a start location,
     # sprite size, and number of columns and rows.
     frames = []
-    for x in range(start[0],end[0]+1):
-        for y in range(start[1],end[1]+1):
+    for y in range(start[1],end[1]+1):
+        for x in range(start[0],end[0]+1):
             location = (size[0]*x, size[1]*y)
             frames.append(sheet.subsurface(pg.Rect(location, size)))
     return frames
@@ -420,7 +338,7 @@ class Spritesheet:
   def crop(self, image, start_pos, new_size):
     old_size = image.get_size()
     # start_pos = (old_size[0]-new_size[0], old_size[1]-new_size[1])
-    cropped_image = pg.Surface(new_size)
+    cropped_image = pg.Surface(new_size, pg.SRCALPHA, 32)
     cropped_image.blit(image, (0,0), (start_pos[0], start_pos[1], old_size[0], old_size[1]))
     return cropped_image
 
@@ -467,8 +385,6 @@ class Boss(pg.sprite.Sprite):
     self.deadboss = False
     # self.health = 25
 
-  
-
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -479,3 +395,24 @@ class Heart(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
+
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, x, y, game):
+      pg.sprite.Sprite.__init__(self)
+      self.game = game
+      self.spritesheet = self.game.explosion_spritesheet
+      self.size = self.spritesheet.image_sheet.get_size()
+      self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet , (0,0), (7,4), (self.size[0]/8,self.size[1]/8))
+      # print("num pics = " + str(len(self.frames)))
+      self.image = self.frames[0]
+      self.rect = self.image.get_rect(topleft=(x,y))
+      self.image_num = 0
+
+    def update(self):
+      # Animate the explosion by cycling through each image
+      if self.image_num < len(self.frames)-1: 
+        self.image_num += 1
+        # print(self.image_num)
+        self.image = self.frames[self.image_num]
+      else:
+        self.kill()
