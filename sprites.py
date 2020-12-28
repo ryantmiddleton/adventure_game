@@ -359,6 +359,7 @@ class Ground_Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
   
+
 class Platform_Boss(pg.sprite.Sprite):
   def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
