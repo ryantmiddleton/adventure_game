@@ -18,7 +18,14 @@ HAS_KEY = False
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
+<<<<<<< HEAD
 EXPLOSION_SPRITESHEET = "explosion_sheet.png"
+=======
+BOSS_ACC = 0.5
+BOSS_GRAV = 0
+BOSS_HEALTH = 25
+
+>>>>>>> bac4a6b736115764e4998355e16d6938b371c52e
 # Globals for tracking directions
 LEFT = 0
 UP = 1
@@ -32,16 +39,6 @@ PLATFORM_SPRITESHEET = "spritesheet_jumper.png"
 
 # Starting platforms
 MAP1_PLATFORM_LIST = [
-  (1200, HEIGHT - 40),
-  (1050, HEIGHT - 40),
-  (900, HEIGHT - 40),
-  (750, HEIGHT - 40),
-  (600, HEIGHT - 40),
-  (450, HEIGHT - 40),
-  (300, HEIGHT - 40),  
-  (150, HEIGHT - 40),
-  (-150, HEIGHT - 40),
-  (0, HEIGHT - 40),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (125, HEIGHT - 350),
   (350, 200),
@@ -49,36 +46,16 @@ MAP1_PLATFORM_LIST = [
 ]
 
 MAP2_PLATFORM_LIST = [
-  (1200, HEIGHT - 40),
-  (1050, HEIGHT - 40),
-  (900, HEIGHT - 40),
-  (750, HEIGHT - 40),
-  (600, HEIGHT - 40),
-  (450, HEIGHT - 40),
-  (300, HEIGHT - 40),  
-  (150, HEIGHT - 40),
-  (0, HEIGHT - 40),
-  (-150, HEIGHT - 40),
   (0, 250),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (350, 200),
   (175, 100),
+  (700, 100),
   (155, 400),
   (400, 400),
 ]
 
 MAP3_PLATFORM_LIST = [
-    (1200, HEIGHT - 40),
-  (1050, HEIGHT - 40),
-  (900, HEIGHT - 40),
-  (750, HEIGHT - 40),
-  (600, HEIGHT - 40),
-  (450, HEIGHT - 40),
-  (300, HEIGHT - 40),  
-  (150, HEIGHT - 40),
-  (0, HEIGHT - 40),
-  (-150, HEIGHT - 40),
-    (0, HEIGHT-40),
     (WIDTH/2 - 50, 400),
     
     (WIDTH/2 - 250, 600),
@@ -148,4 +125,3 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 GOLD = 	(255,215,0)
 SILVER = (192,192,192)
-

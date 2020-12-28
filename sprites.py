@@ -2,7 +2,7 @@
 import pygame as pg
 import math
 from settings import *
-import random
+from random import choice, randrange
 from os import path
 
 vec = pg.math.Vector2
@@ -31,7 +31,7 @@ class Player(pg.sprite.Sprite):
     self.game = game
     self.jumping = False
     self.hasKey = False
-    self.hasBoss_key = False
+
 
     # Player Image and rectangle surface
     self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
@@ -111,6 +111,24 @@ class Player(pg.sprite.Sprite):
       self.vel.y = -15
       self.game.jump_sound.play()
 
+  def ground_jump(self):
+        self.rect.y += 1
+    hits = pg.sprite.spritecollide(self, self.game.groundplatform, False)
+    self.rect.y -= 1
+    if hits:  
+      self.jumping = True
+      self.vel.y = -15
+      self.game.jump_sound.play()
+
+  def isStanding(self):
+    self.rect.y += 1
+    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
+    self.rect.y -= 1
+    if hits:
+      return True
+    else:  
+      return False
+ 
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
@@ -162,7 +180,7 @@ class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.spritesheet = game.spider_spritesheet
+    self.spritesheet = self.game.spider_spritesheet
     self.size = self.spritesheet.image_sheet.get_size()
     self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet, (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
     # Crop each selected image from the sheet and rotate, scale it
@@ -324,18 +342,18 @@ class Acid(pg.sprite.Sprite):
     
 class Platform(pg.sprite.Sprite):
   def __init__(self, spritesheet, x, y):
+
     pg.sprite.Sprite.__init__(self) 
     self.image = spritesheet.get_image(0, 288, 380, 94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
-    self.rect.y = y       
+    self.rect.y = y
 
 class Platform_Boss(pg.sprite.Sprite):
-  def __init__(self, game, x, y):
+      def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.game = game
-    self.image = self.game.spritesheet.get_image(0,96,380,94)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
@@ -388,16 +406,6 @@ class Key(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
-class BossKey(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_key.png").convert(),0,1)
-    self.image.set_colorkey((255, 255, 255), RLEACCEL)
-    self.rect = self.image.get_rect()
-    self.rect.center = (WIDTH/2, HEIGHT/2)
-    self.rect.x = x
-    self.rect.y = y
-
 class Boss(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -408,8 +416,21 @@ class Boss(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
+    
+    self.health = BOSS_HEALTH
+    self.max_health = BOSS_HEALTH
+
     self.deadboss = False
-    # self.health = 25
+
+  def update(self):
+        if self.rect.x <= WIDTH/2:
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
+    if self.rect.x >= WIDTH/2:
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
+      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+
 
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
