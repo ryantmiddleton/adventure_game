@@ -78,6 +78,7 @@ class Game:
     self.boss = pg.sprite.Group()
     self.bosskey = pg.sprite.Group()
     self.heart = pg.sprite.Group()
+    self.bat_timer = 0
     # Add player to sprite group
     self.all_sprites.add(self.player)
     self.all_sprites.add(self.boss)
@@ -115,6 +116,16 @@ class Game:
           self.player.pos.y = bp_hits[0].rect.top
           self.player.vel.y = 0
           self.player.jumping = False
+    
+    # Load enemies - bats
+    if self.player.level == 2:
+    # Spawn bats
+      now = pg.time.get_ticks()
+      if now - self.bat_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+        self.bat_timer = now
+        bat = Bat(self)
+        self.all_sprites.add(bat)
+        self.enemies.add(bat)
 
     # if self.player.pos.x >= self.boss.rect.x:
     #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
@@ -401,7 +412,6 @@ class Game:
 
 
     # LEVEL 2
-
     if self.player.level == 2:
       # Level 2 Platforms
       for plat in MAP2_PLATFORM_LIST:
@@ -409,13 +419,14 @@ class Game:
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 2 Door
-      d = Door(-100, HEIGHT - 135, 10, 20)
+      d = Door(-200, HEIGHT - 135, 10, 20)
       self.all_sprites.add(d)
       self.doors.add(d)
       # Level 2 Key
-      k = Key(350, 170, 10, 10)
+      k = Key(775, 75, 10, 10)
       self.all_sprites.add(k)
       self.keys.add(k)
+
 
     # LEVEL 3
     if self.player.level == 3:
@@ -471,10 +482,13 @@ class Game:
           if self.playing:
             self.playing = False
           self.running = False
-
+        
         if event.type == pg.KEYDOWN:
           if self.playing == False:
+            # Start game if key pressed
             self.playing = True
+            self.player.level = 1
+            self.player.health = 25
           elif self.playing == True:
             self.playing == True
           if event.key == pg.K_UP:
@@ -594,6 +608,7 @@ class Game:
     else: 
       self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
     pg.display.flip()
+    # Wait for player to hit a key to restart game
     while self.playing == True and self.running == True:
       self.events()
 
@@ -607,8 +622,8 @@ class Game:
       self.draw_text("You are pretty bad at this! GAME OVER!!!", 48, RED, WIDTH /2, HEIGHT / 4)
     else:
       self.draw_text("So Close! GAME OVER!", 48, RED, WIDTH /2, HEIGHT / 4)
-    self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
-    self.draw_text("Press key to play again", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
+      self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
+      self.draw_text("Press key to play again", 22, WHITE, WIDTH /2, HEIGHT * 3/4)
     if self.score > self.highscore:
       self.highscore = self.score
       self.draw_text("New High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)

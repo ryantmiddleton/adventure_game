@@ -49,6 +49,7 @@ MAP1_PLATFORM_LIST = [
 ]
 
 MAP2_PLATFORM_LIST = [
+  # Base platforms
   (1200, HEIGHT - 40),
   (1050, HEIGHT - 40),
   (900, HEIGHT - 40),
@@ -59,10 +60,13 @@ MAP2_PLATFORM_LIST = [
   (150, HEIGHT - 40),
   (0, HEIGHT - 40),
   (-150, HEIGHT - 40),
+  (-300, HEIGHT - 40),
+  # Elevated Platforms
   (0, 250),
   (WIDTH/2 - 50, HEIGHT * 3/4),
   (350, 200),
   (175, 100),
+  (700, 100),
   (155, 400),
   (400, 400),
 ]
