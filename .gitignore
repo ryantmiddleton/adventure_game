@@ -1,7 +1,2 @@
-<<<<<<< HEAD
-*.pyc
+__pycache__
 highscore.txt
-=======
-__pychache__
-highschore.txt
->>>>>>> bac4a6b736115764e4998355e16d6938b371c52e
