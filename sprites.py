@@ -350,6 +350,16 @@ class Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
+class Ground_Platform(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
+    
 class Platform_Boss(pg.sprite.Sprite):
   def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
@@ -431,7 +441,6 @@ class Boss(pg.sprite.Sprite):
       self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
-
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -463,3 +472,44 @@ class Explosion(pg.sprite.Sprite):
         self.image = self.frames[self.image_num]
       else:
         self.kill()
+
+class Bat(pg.sprite.Sprite):
+  def __init__(self, game):
+    pg.sprite.Sprite.__init__(self)
+    self.vel = vec(0, 0)
+    self.game = game
+
+    self.image_up = pg.image.load("imgs/bat-up.jpg")
+    self.image_up = self.image_up.convert_alpha()
+    self.image_mid = pg.image.load("imgs/bat-mid.jpg")
+    self.image_mid = self.image_mid.convert_alpha()
+    self.image_down = pg.image.load("imgs/bat-down.jpg")
+    self.image_down = self.image_down.convert_alpha()
+    self.image = self.image_up
+    self.rect = self.image.get_rect()
+    # Randomly choose starting left or right
+    self.rect.centerx = choice([-100, WIDTH + 100])
+    # Randomly choose speed
+    self.vel.x = randrange(1, 4)
+    if self.rect.centerx > WIDTH:
+      self.vel.x *= -1
+    # Randomly spawn in top half of screen
+    self.rect.y = randrange(HEIGHT / 2)
+    self.vel.y = 0
+    self.dy = 0.5
+
+  def update(self):
+    self.rect.x += self.vel.x
+    self.vel.y += self.dy
+    if self.vel.y > 3 or self.vel.y <-3:
+      self.dy *= -1
+    center = self.rect.center
+    if self.dy < 0:
+      self.image = self.image_up
+    else:
+      self.image = self.image_down
+    self.rect = self.image.get_rect()
+    self.rect.center = center
+    self.rect.y += self.vel.y
+    if self.rect.left > WIDTH + 100 or self.rect.right < -100:
+      self.kill() 
