@@ -361,13 +361,13 @@ class Ground_Platform(pg.sprite.Sprite):
 
     
 class Platform_Boss(pg.sprite.Sprite):
-  def __init__(self, game, x, y):
+  def __init__(self, spritesheet, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
+    self.image = spritesheet.get_image(0,96,380,94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
-    self.rect.y = y       
+    self.rect.y = y   
 
 class Spritesheet():
   def __init__(self, filename):
@@ -481,11 +481,15 @@ class Bat(pg.sprite.Sprite):
 
     self.image_up = pg.image.load("imgs/bat-up.jpg")
     self.image_up = self.image_up.convert_alpha()
+    self.image_up.set_colorkey(BLACK)
     self.image_mid = pg.image.load("imgs/bat-mid.jpg")
     self.image_mid = self.image_mid.convert_alpha()
+    self.image_mid.set_colorkey(BLACK)
     self.image_down = pg.image.load("imgs/bat-down.jpg")
     self.image_down = self.image_down.convert_alpha()
+    self.image_down.set_colorkey(BLACK)
     self.image = self.image_up
+    
     self.rect = self.image.get_rect()
     # Randomly choose starting left or right
     self.rect.centerx = choice([-100, WIDTH + 100])
@@ -513,3 +517,13 @@ class Bat(pg.sprite.Sprite):
     self.rect.y += self.vel.y
     if self.rect.left > WIDTH + 100 or self.rect.right < -100:
       self.kill() 
+
+class Coin(pg.sprite.Sprite):
+  def __init__(self, spritesheet, x, y):
+    pg.sprite.Sprite.__init__(self)
+    self.image = spritesheet.get_image(244,1981,61,61)    
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
