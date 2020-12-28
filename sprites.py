@@ -112,7 +112,7 @@ class Player(pg.sprite.Sprite):
       self.game.jump_sound.play()
 
   def ground_jump(self):
-        self.rect.y += 1
+    self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.groundplatform, False)
     self.rect.y -= 1
     if hits:  
@@ -350,8 +350,17 @@ class Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
+class Ground_Platform(pg.sprite.Sprite):
+  def __init__(self, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.rect.x = x
+    self.rect.y = y
+
 class Platform_Boss(pg.sprite.Sprite):
-      def __init__(self, game, x, y):
+  def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
     self.image.set_colorkey(BLACK)
@@ -423,7 +432,7 @@ class Boss(pg.sprite.Sprite):
     self.deadboss = False
 
   def update(self):
-        if self.rect.x <= WIDTH/2:
+    if self.rect.x <= WIDTH/2:
       self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
