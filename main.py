@@ -79,6 +79,7 @@ class Game:
     self.heart = pg.sprite.Group()
     # Add player to sprite group
     self.all_sprites.add(self.player)
+    self.player.health = self.player.max_health
     self.all_sprites.add(self.boss)
 
     # Load music to all levels
@@ -132,55 +133,22 @@ class Game:
     if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 4:
       for sprite in self.all_sprites:
         sprite.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for plat in self.platforms:
-      #   plat.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for enemy in self.enemies:
-      #   enemy.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for key in self.keys:
-      #     key.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for door in self.doors:
-      #     door.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for acid in self.acid_pools:
-      #     acid.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for boss in self.boss:
-      #     boss.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for bk in self.bosskey:  
-      #     bk.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-      # for heart in self.heart:
-      #     heart.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
-  
     # If player reaches the bottom/left 25% of the screen
     # scroll all sprites up (decrease x/y coord)
     elif self.player.rect[scroll_dir] >= screen_dim * .75:
       for sprite in self.all_sprites:
             sprite.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for plat in self.platforms:
-      #       plat.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for enemy in self.enemies:
-      #     enemy.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for key in self.keys:
-      #     key.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for door in self.doors:
-      #     door.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for acid in self.acid_pools:
-      #     acid.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for boss in self.boss:
-      #     boss.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for bk in self.bosskey:
-      #     bk.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
-      # for heart in self.heart:
-      #     heart.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
 
     # Player has fallen and died
     if self.player.rect.bottom > HEIGHT:
-      # for sprite in self.all_sprites:
-      #   sprite.rect.y -= max(self.player.vel.y, 10)
-      #   if sprite.rect.bottom <0:
-      #     sprite.kill()
-      #   if len(self.platforms) ==0:
-      self.playing= False
+      for sprite in self.all_sprites:
+        sprite.rect.y -= max(self.player.vel.y, 10)
+        if sprite.rect.bottom <0:
+          sprite.kill()
+        if len(self.platforms) ==0:
+          self.playing= False
 
     # Player Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
@@ -282,6 +250,7 @@ class Game:
   def load_level(self):
     #LEVEL 1
     if self.player.level == 1:
+      self.player.pos = vec(WIDTH/2, HEIGHT/2)
       # Add Platforms
       for plat in MAP1_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
@@ -386,9 +355,7 @@ class Game:
 
         if event.type == pg.KEYDOWN:
           if self.playing == False:
-                self.playing = True
-          elif self.playing == True:
-            self.playing ==True
+            self.playing = True
           if event.key == pg.K_UP:
               self.player.jump()
             
