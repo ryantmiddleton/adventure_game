@@ -18,6 +18,7 @@ HAS_KEY = False
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
+EXPLOSION_SPRITESHEET = "explosion_sheet.png"
 BOSS_ACC = 0.5
 BOSS_GRAV = 0
 BOSS_HEALTH = 25

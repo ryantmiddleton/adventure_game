@@ -112,7 +112,7 @@ class Player(pg.sprite.Sprite):
       self.game.jump_sound.play()
 
   def ground_jump(self):
-    self.rect.y += 1
+        self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.groundplatform, False)
     self.rect.y -= 1
     if hits:  
@@ -197,8 +197,8 @@ class Spider(pg.sprite.Sprite):
     self.rect = self.image.get_rect(topleft=(x,y))
     # self.rect.y = y, self.rect.x = x
     # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
-    self.orient = 180
-    self.dir = LEFT
+    self.orient = 0
+    self.dir = RIGHT
 
   def update(self):
     # Animate the spider's legs by cycling through each image
@@ -208,9 +208,31 @@ class Spider(pg.sprite.Sprite):
         self.image_num = 0
       self.anima_speed = 6
       self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+      self.image = self.image.convert_alpha()
       # print(self.orient)
     else:
       self.anima_speed -= 1
+    
+    # Check if spider is holding onto any platforms
+    # cur_platform = pg.sprite.spritecollide(self, self.game.platforms, False)
+    # if cur_platform:
+    #   print(cur_platform[0].rect.x)
+    #   print(cur_platform[0].rect.y)
+    #   # Test if bottomright of spider is touching the platform
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.bottomright):
+    #     print("bottomright is touching: " + str(self.rect.bottomright))
+    #   # Test if bottom left of spider is touching
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.bottomleft):
+    #     print("bottomleft is touching: " + str(self.rect.bottomleft))
+    #   # Test if topright of Spider is touching the platform
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.topright):
+    #     print("topright is touching")
+    #   # Test if topleft of spider is touching the platform
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.topleft):
+    #     print("topleft is touching")
+    # else:
+    #   # Fall 
+    #   self.rect.y += 1
     
     # Move the spider
     if self.isHanging():
@@ -268,19 +290,24 @@ class Spider(pg.sprite.Sprite):
         self.rect.x -= 1
   
   def isStanding(self):
-      self.rect.y += 1
+      self.rect.bottom -= 1
       hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-      self.rect.y -= 1
+      self.rect.bottom += 1
       if hits:
+        # print("isStanding")
         return True
       else:  
         return False
 
   def isHanging(self):
-    self.rect.y -= 1
+    self.rect.top += 1
     hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-    self.rect.y += 1
+    self.rect.top -= 1
     if hits:
+      # print("hangin")
+      # print(hits[0])
+      # test_point = self.rect.bottomright
+      # print(pg.Rect.collidepoint(hits[0].rect, test_point))
       return True
     else:  
       return False
@@ -323,63 +350,18 @@ class Platform(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
-  def isStanding(self):
-    self.sprite.rect.y += 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.y -= 1
-    if hits:
-      return True
-    else:  
-      return False
-
-  def isHanging(self):
-    self.sprite.rect.y -= 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.y += 1
-    if hits:
-      return True
-    else:  
-      return False
-
-  def isGripping_right(self):
-    self.sprite.rect.x += 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.x -= 1
-    if hits:
-      return True
-    else:  
-      return False
-  
-  def isGripping_left(self):
-    self.sprite.rect.x -= 1
-    hits = pg.sprite.spritecollide (self, self.sprite.game.platforms, False)
-    self.sprite.rect.x += 1
-    if hits:
-      return True
-    else:  
-      return False
-
-class Ground_Platform(pg.sprite.Sprite):
-  def __init__(self, x, y, w, h):
+class Platform_Boss(pg.sprite.Sprite):
+      def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
-    self.rect.y = y
+    self.rect.y = y       
 
-class Platform_Boss(pg.sprite.Sprite):
-  def __init__(self, spritesheet, x, y):
-    pg.sprite.Sprite.__init__(self)
-    self.image = spritesheet.get_image(0,96,380,94)
-    self.image.set_colorkey(BLACK)
-    self.rect = self.image.get_rect()
-    self.rect.x = x
-    self.rect.y = y
-
-class Spritesheet:
+class Spritesheet():
   def __init__(self, filename):
-    self.image_sheet = pg.image.load(filename).convert()
+    self.image_sheet = pg.image.load(filename).convert_alpha()
 
   def get_image(self, x, y, width, height):
     image = pg.Surface((width, height))
@@ -391,8 +373,8 @@ class Spritesheet:
     # Strips individual frames from a sprite sheet image given a start location,
     # sprite size, and number of columns and rows.
     frames = []
-    for x in range(start[0],end[0]+1):
-        for y in range(start[1],end[1]+1):
+    for y in range(start[1],end[1]+1):
+        for x in range(start[0],end[0]+1):
             location = (size[0]*x, size[1]*y)
             frames.append(sheet.subsurface(pg.Rect(location, size)))
     return frames
@@ -400,7 +382,7 @@ class Spritesheet:
   def crop(self, image, start_pos, new_size):
     old_size = image.get_size()
     # start_pos = (old_size[0]-new_size[0], old_size[1]-new_size[1])
-    cropped_image = pg.Surface(new_size)
+    cropped_image = pg.Surface(new_size, pg.SRCALPHA, 32)
     cropped_image.blit(image, (0,0), (start_pos[0], start_pos[1], old_size[0], old_size[1]))
     return cropped_image
 
@@ -441,7 +423,7 @@ class Boss(pg.sprite.Sprite):
     self.deadboss = False
 
   def update(self):
-    if self.rect.x <= WIDTH/2:
+        if self.rect.x <= WIDTH/2:
       self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
@@ -461,43 +443,23 @@ class Heart(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
-class Bat(pg.sprite.Sprite):
-  def __init__(self, game):
-    pg.sprite.Sprite.__init__(self)
-    self.vel = vec(0, 0)
-    self.game = game
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, x, y, game):
+      pg.sprite.Sprite.__init__(self)
+      self.game = game
+      self.spritesheet = self.game.explosion_spritesheet
+      self.size = self.spritesheet.image_sheet.get_size()
+      self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet , (0,0), (7,4), (self.size[0]/8,self.size[1]/8))
+      # print("num pics = " + str(len(self.frames)))
+      self.image = self.frames[0]
+      self.rect = self.image.get_rect(topleft=(x,y))
+      self.image_num = 0
 
-    self.image_up = pg.image.load("imgs/bat-up.jpg")
-    self.image_up.set_colorkey(BLACK)
-    self.image_mid = pg.image.load("imgs/bat-mid.jpg")
-    self.image_mid.set_colorkey(BLACK)
-    self.image_down = pg.image.load("imgs/bat-down.jpg")
-    self.image_down.set_colorkey(BLACK)
-    self.image = self.image_up
-    self.rect = self.image.get_rect()
-    # Randomly choose starting left or right
-    self.rect.centerx = choice([-100, WIDTH + 100])
-    # Randomly choose speed
-    self.vel.x = randrange(1, 4)
-    if self.rect.centerx > WIDTH:
-      self.vel.x *= -1
-    # Randomly spawn in top half of screen
-    self.rect.y = randrange(HEIGHT / 2)
-    self.vel.y = 0
-    self.dy = 0.5
-
-  def update(self):
-    self.rect.x += self.vel.x
-    self.vel.y += self.dy
-    if self.vel.y > 3 or self.vel.y <-3:
-      self.dy *= -1
-    center = self.rect.center
-    if self.dy < 0:
-      self.image = self.image_up
-    else:
-      self.image = self.image_down
-    self.rect = self.image.get_rect()
-    self.rect.center = center
-    self.rect.y += self.vel.y
-    if self.rect.left > WIDTH + 100 or self.rect.right < -100:
-      self.kill()
+    def update(self):
+      # Animate the explosion by cycling through each image
+      if self.image_num < len(self.frames)-1: 
+        self.image_num += 1
+        # print(self.image_num)
+        self.image = self.frames[self.image_num]
+      else:
+        self.kill()
