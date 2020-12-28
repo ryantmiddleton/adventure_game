@@ -358,7 +358,7 @@ class Ground_Platform(pg.sprite.Sprite):
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
-
+    
 class Platform_Boss(pg.sprite.Sprite):
   def __init__(self, game, x, y):
     pg.sprite.Sprite.__init__(self)
@@ -439,7 +439,6 @@ class Boss(pg.sprite.Sprite):
     if self.rect.x >= WIDTH/2:
       self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
 
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
