@@ -68,6 +68,7 @@ class Game:
 
     # Define Sprite Groups
     self.all_sprites = pg.sprite.Group()
+    self.groundplatform = pg.sprite.Group()
     self.platforms = pg.sprite.Group()
     self.platform_boss = pg.sprite.Group()
     self.bullets = pg.sprite.Group()
@@ -76,7 +77,6 @@ class Game:
     self.doors = pg.sprite.Group()
     self.keys = pg.sprite.Group()
     self.boss = pg.sprite.Group()
-    self.bosskey = pg.sprite.Group()
     self.heart = pg.sprite.Group()
     self.bat_timer = 0
     # Add player to sprite group
@@ -103,6 +103,13 @@ class Game:
     # Game Loop - Update
     self.all_sprites.update()
     if self.player.vel.y > 0:
+      gp_hits = pg.sprite.spritecollide(self.player, self.groundplatform, False)
+      if gp_hits:
+        if self.player.pos.y < gp_hits[0].rect.bottom:
+          self.player.pos.y = gp_hits[0].rect.top
+          self.player.vel.y = 0
+          self.player.jumping = False
+      
       hits = pg.sprite.spritecollide(self.player, self.platforms, False)
       if hits:
         if self.player.pos.y < hits[0].rect.bottom:
@@ -127,18 +134,14 @@ class Game:
         self.all_sprites.add(bat)
         self.enemies.add(bat)
 
-    # if self.player.pos.x >= self.boss.rect.x:
-    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
-    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
-    # if self.player.pos.x <= self.boss.rect.x:
-    #   self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
-    #   self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    
 
     if self.player.level == 1 or self.player.level == 2:
       # Side Scrolling Logic
       if self.player.rect.right <= WIDTH / 4:
         for plat in self.platforms:
+          plat.rect.x += abs(int(self.player.vel.x))
+        for plat in self.groundplatform:
           plat.rect.x += abs(int(self.player.vel.x))
           # self.score += 1
         for enemy in self.enemies:
@@ -151,8 +154,7 @@ class Game:
             acid.rect.x += abs(int(self.player.vel.x))
         for boss in self.boss:
             boss.rect.x += abs(int(self.player.vel.x))
-        for bk in self.bosskey:  
-            bk.rect.x += abs(int(self.player.vel.x))
+        
         for heart in self.heart:
             heart.rect.x += abs(int(self.player.vel.x))
         self.player.pos.x += abs(int(self.player.vel.x))
@@ -160,7 +162,8 @@ class Game:
       elif self.player.rect.left >= WIDTH * .75:
         for plat in self.platforms:
           plat.rect.x -= abs(int(self.player.vel.x))
-          # self.score += 1
+        for plat in self.groundplatform:
+          plat.rect.x -= abs(int(self.player.vel.x))
         for enemy in self.enemies:
             enemy.rect.x -= abs(int(self.player.vel.x))
         for key in self.keys:
@@ -171,8 +174,7 @@ class Game:
             acid.rect.x -= abs(int(self.player.vel.x))
         for boss in self.boss:
             boss.rect.x -= abs(int(self.player.vel.x))
-        for bk in self.bosskey:
-            bk.rect.x -= abs(int(self.player.vel.x))
+       
         for heart in self.heart:
             heart.rect.x -= abs(int(self.player.vel.x))
         self.player.pos.x -= abs(int(self.player.vel.x))
@@ -184,6 +186,8 @@ class Game:
       if abs(self.player.rect.top) <= HEIGHT/4:
         if not(self.player.isStanding()):
           for platform in self.platforms:
+              platform.rect.y += abs(int(self.player.vel.y))
+          for platform in self.groundplatform:
               platform.rect.y += abs(int(self.player.vel.y))
           for enemy in self.enemies:
               enemy.rect.y += abs(int(self.player.vel.y))
@@ -200,6 +204,8 @@ class Game:
         if not(self.player.isStanding()):
           for platform in self.platforms:
               platform.rect.y -= abs(int(self.player.vel.y))
+          for plat in self.groundplatform:
+              plat.rect.y -= abs(int(self.player.vel.y))
           for enemy in self.enemies:
               enemy.rect.y -= abs(int(self.player.vel.y))
           for key in self.keys:
@@ -225,8 +231,7 @@ class Game:
             acid.rect.x += abs(int(self.player.vel.x))
         for boss in self.boss:
             boss.rect.x += abs(int(self.player.vel.x))
-        for bk in self.bosskey:  
-            bk.rect.x += abs(int(self.player.vel.x))
+        
         for heart in self.heart:
             heart.rect.x += abs(int(self.player.vel.x))
         self.player.pos.x += abs(int(self.player.vel.x))
@@ -245,8 +250,7 @@ class Game:
             acid.rect.x -= abs(int(self.player.vel.x))
         for boss in self.boss:
             boss.rect.x -= abs(int(self.player.vel.x))
-        for bk in self.bosskey:
-            bk.rect.x -= abs(int(self.player.vel.x))
+       
         for heart in self.heart:
             heart.rect.x -= abs(int(self.player.vel.x))
         self.player.pos.x -= abs(int(self.player.vel.x))
@@ -327,23 +331,24 @@ class Game:
     self.boss.deadboss = False
     shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
     if shoot_boss:
-      self.score += 15
-      self.boss.deadboss = True
-      for boss in self.boss:
-        self.boss.kill()
-      self.player.level += 1
-      self.load_level()
-      print("You Have Won!")
+        self.boss.deadboss = True
+        self.score += 15
+        for boss in self.boss:
+          self.boss.kill()
+        self.player.level += 1   
+        self.load_level()
+        print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
     if acid_hit:
       self.player.health -= 1
-      self.player.vel.y -= 5
+      self.score -= .5
+      self.player.vel.y = -5
       if self.player.left == True:
-        self.player.vel.x += 10
+        self.player.vel.x = 10
       else:
-        self.player.vel.x -= 10
+        self.player.vel.x = -10
     if self.player.health <= 0:
         self.playing = False
 
@@ -357,17 +362,19 @@ class Game:
     boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
     if boss_hit:
       self.player.health -= 1
+      self.score -= .5
     if self.player.health <= 0:
       self.playing = False
 
     spider_hit = pg.sprite.spritecollide(self.player, self.enemies, False)
     if spider_hit:
       self.player.health -= 1
-      self.player.vel.y -= 5
+      self.score -= .5
+      self.player.vel.y = -5
       if self.player.left == True:
-        self.player.vel.x += 10
+        self.player.vel.x = 10
       else:
-        self.player.vel.x -= 10
+        self.player.vel.x = -10
     if self.player.health <= 0:
       self.playing = False
 
@@ -375,13 +382,15 @@ class Game:
     #LEVEL 1
     if self.player.level == 1:
       # Add Platforms
+      gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
+      self.all_sprites.add(gp)
+      self.groundplatform.add(gp)
       for plat in MAP1_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p) 
         self.platforms.add(p)
       # Add Level 1 Door  
-
-
+      
       d = Door(WIDTH, HEIGHT - 135, 10, 20)
       self.all_sprites.add(d)
       self.doors.add(d)
@@ -414,6 +423,9 @@ class Game:
     # LEVEL 2
     if self.player.level == 2:
       # Level 2 Platforms
+      gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
+      self.all_sprites.add(gp)
+      self.groundplatform.add(gp)
       for plat in MAP2_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
@@ -431,14 +443,17 @@ class Game:
     # LEVEL 3
     if self.player.level == 3:
       # Add Platforms
+      gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
+      self.all_sprites.add(gp)
+      self.groundplatform.add(gp)
       for plat in MAP3_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
         self.platforms.add(p)
         # Add enemies to each platform
-        spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
-        self.all_sprites.add(spider)
-        self.enemies.add(spider)
+        # spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
+        # self.all_sprites.add(spider)
+        # self.enemies.add(spider)
 
       # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
       # self.all_sprites.add(spider)
@@ -491,8 +506,23 @@ class Game:
             self.player.health = 25
           elif self.playing == True:
             self.playing == True
+
+        if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
-            self.player.jump()
+              self.player.jump()
+            
+        if event.type == pg.KEYUP:
+          if event.key == pg.K_UP:
+            self.player.jump_cut()
+
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_UP:
+            self.player.boss_jump()
+
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_UP:
+            self.player.ground_jump()
+
 
           if event.key == pg.K_SPACE:
             if keys[K_d] and keys[K_w]:
@@ -545,10 +575,7 @@ class Game:
       pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
       pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
       self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
-      # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
-      # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
       self.screen.blit(self.player.image, self.player.rect)
-      # self.screen.blit(self.boss.image, self.boss.rect)
       self.back_rect.move_ip(-2, 0)
       if self.back_rect.right == 0:
         self.back_rect.x =0
