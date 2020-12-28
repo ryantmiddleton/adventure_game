@@ -460,11 +460,11 @@ class Game:
                 self.all_sprites.add(b)
                 self.bullets.add(b)
                 self.shoot_sound.play()    
-            else:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()    
+            # else:
+            #     b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+            #     self.all_sprites.add(b)
+            #     self.bullets.add(b)
+            #     self.shoot_sound.play()    
 
           if event.type == pg.KEYUP:
             if event.key == pg.K_UP:
