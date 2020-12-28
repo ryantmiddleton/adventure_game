@@ -481,11 +481,15 @@ class Bat(pg.sprite.Sprite):
 
     self.image_up = pg.image.load("imgs/bat-up.jpg")
     self.image_up = self.image_up.convert_alpha()
+    self.image_up.set_colorkey(BLACK)
     self.image_mid = pg.image.load("imgs/bat-mid.jpg")
     self.image_mid = self.image_mid.convert_alpha()
+    self.image_mid.set_colorkey(BLACK)
     self.image_down = pg.image.load("imgs/bat-down.jpg")
     self.image_down = self.image_down.convert_alpha()
+    self.image_down.set_colorkey(BLACK)
     self.image = self.image_up
+    
     self.rect = self.image.get_rect()
     # Randomly choose starting left or right
     self.rect.centerx = choice([-100, WIDTH + 100])
