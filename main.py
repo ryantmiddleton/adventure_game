@@ -333,11 +333,11 @@ class Game:
     if acid_hit:
       self.player.health -= 1
       self.score -= .5
-      self.player.vel.y -= 5
+      self.player.vel.y = -5
       if self.player.left == True:
-        self.player.vel.x += 10
+        self.player.vel.x = 10
       else:
-        self.player.vel.x -= 10
+        self.player.vel.x = -10
     if self.player.health <= 0:
         self.playing = False
 
@@ -359,11 +359,11 @@ class Game:
     if spider_hit:
       self.player.health -= 1
       self.score -= .5
-      self.player.vel.y -= 5
+      self.player.vel.y = -5
       if self.player.left == True:
-        self.player.vel.x += 10
+        self.player.vel.x = 10
       else:
-        self.player.vel.x -= 10
+        self.player.vel.x = -10
     if self.player.health <= 0:
       self.playing = False
 
