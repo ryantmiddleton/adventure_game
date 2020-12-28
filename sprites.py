@@ -112,7 +112,7 @@ class Player(pg.sprite.Sprite):
       self.game.jump_sound.play()
 
   def ground_jump(self):
-        self.rect.y += 1
+    self.rect.y += 1
     hits = pg.sprite.spritecollide(self, self.game.groundplatform, False)
     self.rect.y -= 1
     if hits:  
@@ -432,7 +432,7 @@ class Boss(pg.sprite.Sprite):
     self.deadboss = False
 
   def update(self):
-        if self.rect.x <= WIDTH/2:
+    if self.rect.x <= WIDTH/2:
       self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
