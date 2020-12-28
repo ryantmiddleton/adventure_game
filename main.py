@@ -325,6 +325,10 @@ class Game:
           door.kill()
         for acid in self.acid_pools:
           acid.kill()
+        for heart in self.heart:
+          heart.kill()
+        for spider in self.enemies:
+          spider.kill()
         self.load_level()
     
    
