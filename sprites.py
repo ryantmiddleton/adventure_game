@@ -2,7 +2,7 @@
 import pygame as pg
 import math
 from settings import *
-import random
+from random import choice, randrange
 from os import path
 
 vec = pg.math.Vector2
@@ -460,3 +460,44 @@ class Heart(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
+
+class Bat(pg.sprite.Sprite):
+  def __init__(self, game):
+    pg.sprite.Sprite.__init__(self)
+    self.vel = vec(0, 0)
+    self.game = game
+
+    self.image_up = pg.image.load("imgs/bat-up.jpg")
+    self.image_up.set_colorkey(BLACK)
+    self.image_mid = pg.image.load("imgs/bat-mid.jpg")
+    self.image_mid.set_colorkey(BLACK)
+    self.image_down = pg.image.load("imgs/bat-down.jpg")
+    self.image_down.set_colorkey(BLACK)
+    self.image = self.image_up
+    self.rect = self.image.get_rect()
+    # Randomly choose starting left or right
+    self.rect.centerx = choice([-100, WIDTH + 100])
+    # Randomly choose speed
+    self.vel.x = randrange(1, 4)
+    if self.rect.centerx > WIDTH:
+      self.vel.x *= -1
+    # Randomly spawn in top half of screen
+    self.rect.y = randrange(HEIGHT / 2)
+    self.vel.y = 0
+    self.dy = 0.5
+
+  def update(self):
+    self.rect.x += self.vel.x
+    self.vel.y += self.dy
+    if self.vel.y > 3 or self.vel.y <-3:
+      self.dy *= -1
+    center = self.rect.center
+    if self.dy < 0:
+      self.image = self.image_up
+    else:
+      self.image = self.image_down
+    self.rect = self.image.get_rect()
+    self.rect.center = center
+    self.rect.y += self.vel.y
+    if self.rect.left > WIDTH + 100 or self.rect.right < -100:
+      self.kill()
