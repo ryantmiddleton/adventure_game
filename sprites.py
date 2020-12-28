@@ -179,8 +179,8 @@ class Spider(pg.sprite.Sprite):
     self.rect = self.image.get_rect(topleft=(x,y))
     # self.rect.y = y, self.rect.x = x
     # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
-    self.orient = 180
-    self.dir = LEFT
+    self.orient = 0
+    self.dir = RIGHT
 
   def update(self):
     # Animate the spider's legs by cycling through each image
@@ -194,6 +194,27 @@ class Spider(pg.sprite.Sprite):
       # print(self.orient)
     else:
       self.anima_speed -= 1
+    
+    # Check if spider is holding onto any platforms
+    # cur_platform = pg.sprite.spritecollide(self, self.game.platforms, False)
+    # if cur_platform:
+    #   print(cur_platform[0].rect.x)
+    #   print(cur_platform[0].rect.y)
+    #   # Test if bottomright of spider is touching the platform
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.bottomright):
+    #     print("bottomright is touching: " + str(self.rect.bottomright))
+    #   # Test if bottom left of spider is touching
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.bottomleft):
+    #     print("bottomleft is touching: " + str(self.rect.bottomleft))
+    #   # Test if topright of Spider is touching the platform
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.topright):
+    #     print("topright is touching")
+    #   # Test if topleft of spider is touching the platform
+    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.topleft):
+    #     print("topleft is touching")
+    # else:
+    #   # Fall 
+    #   self.rect.y += 1
     
     # Move the spider
     if self.isHanging():
@@ -251,19 +272,24 @@ class Spider(pg.sprite.Sprite):
         self.rect.x -= 1
   
   def isStanding(self):
-      self.rect.y += 1
+      self.rect.bottom -= 1
       hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-      self.rect.y -= 1
+      self.rect.bottom += 1
       if hits:
+        # print("isStanding")
         return True
       else:  
         return False
 
   def isHanging(self):
-    self.rect.y -= 1
+    self.rect.top += 1
     hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-    self.rect.y += 1
+    self.rect.top -= 1
     if hits:
+      # print("hangin")
+      # print(hits[0])
+      # test_point = self.rect.bottomright
+      # print(pg.Rect.collidepoint(hits[0].rect, test_point))
       return True
     else:  
       return False

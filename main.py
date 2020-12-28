@@ -248,6 +248,7 @@ class Game:
       self.playing = False
 
   def load_level(self):
+    
     #LEVEL 1
     if self.player.level == 1:
       self.player.pos = vec(WIDTH/2, HEIGHT/2)
@@ -311,7 +312,7 @@ class Game:
         spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
         self.all_sprites.add(spider)
         self.enemies.add(spider)
-      # spider = Spider(WIDTH/2, HEIGHT *3/4+20, self)
+      # spider = Spider(WIDTH/2 -200, HEIGHT *3/4+20, self)
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
