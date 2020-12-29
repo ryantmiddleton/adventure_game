@@ -432,15 +432,6 @@ class Boss(pg.sprite.Sprite):
 
     self.deadboss = False
 
-  def update(self):
-    if self.rect.x <= WIDTH/2:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
-    if self.rect.x >= WIDTH/2:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -527,3 +518,16 @@ class Coin(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
+
+class Small_Boss(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/small_boss.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+    self.rect.y = randrange(HEIGHT)
+    self.rect.x = randrange(WIDTH)
