@@ -409,6 +409,8 @@ class Game:
 
     # LEVEL 4
     if self.player.level == 4:
+      temp = self.score
+      print(temp)
       self.score = 0
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
@@ -522,8 +524,10 @@ class Game:
       pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
       pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
       self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
-      # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
-      # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
+      for boss in self.boss:
+        pg.draw.rect(self.screen, RED, (20, 20, (boss.max_health*10), 5))
+        pg.draw.rect(self.screen, GREEN, (20, 20, (boss.health*10), 5))
+        self.draw_text("Boss Health: " + str(boss.health) + "/5", 22, WHITE, 100, 75) 
       self.screen.blit(self.player.image, self.player.rect)
       # self.screen.blit(self.boss.image, self.boss.rect)
       self.back_rect.move_ip(-2, 0)
