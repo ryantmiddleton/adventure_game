@@ -250,9 +250,9 @@ class Game:
         self.score += 15
         for boss in self.boss:
           boss.kill()
-        self.player.level += 1   
-        self.load_level()
-        print("You Have Won!")
+        # self.player.level += 1   
+        # self.load_level()
+        # print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -421,6 +421,9 @@ class Game:
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
+      boss = Boss(self, 1000, 200, 10, 10)
+      self.all_sprites.add(boss)
+      self.boss.add(boss)
       
     if self.player.level == 5:
       g.win_screen()
