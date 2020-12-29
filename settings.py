@@ -21,7 +21,7 @@ SPIDER_SPRITESHEET = "spiders.png"
 EXPLOSION_SPRITESHEET = "explosion_sheet.png"
 BOSS_ACC = 0.5
 BOSS_GRAV = 0
-BOSS_HEALTH = 25
+BOSS_HEALTH = 5
 
 # Globals for tracking directions
 LEFT = 0

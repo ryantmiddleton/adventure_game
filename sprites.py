@@ -426,10 +426,8 @@ class Boss(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
-    
     self.health = BOSS_HEALTH
     self.max_health = BOSS_HEALTH
-
     self.deadboss = False
 
   def update(self):

@@ -80,8 +80,6 @@ class Game:
     self.bat_timer = 0
     # Add player to sprite group
     self.all_sprites.add(self.player)
-    self.player.health = self.player.max_health
-    self.all_sprites.add(self.boss)
     # Load music to all levels
 
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
@@ -235,14 +233,16 @@ class Game:
           spider.kill()
         self.load_level()
     
-   
-    self.boss.deadboss = False
-    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
-    if shoot_boss:
-        self.boss.deadboss = True
+
+    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, False)
+    for boss in self.boss:
+      if shoot_boss:
+        boss.health -= 1
+      if boss.health <= 0:
+        boss.deadboss = True
         self.score += 15
         for boss in self.boss:
-          self.boss.kill()
+          boss.kill()
         self.player.level += 1   
         self.load_level()
         print("You Have Won!")
