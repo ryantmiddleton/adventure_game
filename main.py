@@ -169,6 +169,8 @@ class Game:
         if len(self.platforms) ==0:
           self.playing= False
 
+    bullet_platform_hit = pg.sprite.groupcollide(self.bullets, self.platforms, True, False)  
+
     # Player Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
     if heart_hit:
@@ -459,11 +461,26 @@ class Game:
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
+              elif keys[K_d] and keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 4)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_a] and keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -4)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
               elif keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 2)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
-                  self.shoot_sound.play()                
+                  self.shoot_sound.play()
+              elif keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -2)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                    
               elif keys[K_d]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 1)
                   self.all_sprites.add(b)
@@ -473,7 +490,7 @@ class Game:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
-                  self.shoot_sound.play()    
+                  self.shoot_sound.play()                  
               else:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 1)
                   self.all_sprites.add(b)
