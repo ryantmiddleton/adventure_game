@@ -77,7 +77,9 @@ class Game:
     self.keys = pg.sprite.Group()
     self.boss = pg.sprite.Group()
     self.heart = pg.sprite.Group()
+    self.coin = pg.sprite.Group()
     self.bat_timer = 0
+    self.small_boss_timer = 0
     # Add player to sprite group
     self.all_sprites.add(self.player)
     # Load music to all levels
@@ -132,6 +134,7 @@ class Game:
         self.all_sprites.add(bat)
         self.enemies.add(bat)
 
+    
     # Set scrolling variables 
     if self.player.level == 3:
       # Vertical (y) scrolling
@@ -221,6 +224,8 @@ class Game:
         # Load a new board
         for plat in self.platforms:
           plat.kill()
+        for gp in self.groundplatform:
+          gp.kill()
         for boss_plat in self.platform_boss:
           boss_plat.kill()
         for door in self.doors:
@@ -228,9 +233,11 @@ class Game:
         for acid in self.acid_pools:
           acid.kill()
         for heart in self.heart:
-              heart.kill()
+          heart.kill()
         for spider in self.enemies:
           spider.kill()
+        for coin in self.coin:
+          coin.kill()
         self.load_level()
     
 
@@ -260,12 +267,19 @@ class Game:
     if self.player.health <= 0:
         self.playing = False
 
+    coin_hit = pg.sprite.spritecollide(self.player, self.coin, False)
+    if coin_hit:
+      self.score += 1
+      for coin in self.coin:
+        coin.kill()
+
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
     bullet_kill_list = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
     if bullet_kill_list:
       for bullet, enemy in bullet_kill_list.items():
         # print(enemy[0].rect)
+        self.score += 5
         explosion = Explosion(enemy[0].rect.x, enemy[0].rect.y, self)
         self.all_sprites.add(explosion)
 
@@ -287,6 +301,18 @@ class Game:
         self.player.vel.x = -10
     if self.player.health <= 0:
       self.playing = False
+
+    if self.player.level == 4:    
+      now = pg.time.get_ticks()
+      if now - self.small_boss_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+        self.small_boss_timer = now
+        small_boss = Small_Boss(self, WIDTH, HEIGHT, 10, 10)
+        self.all_sprites.add(small_boss)
+        self.enemies.add(small_boss)
+      if self.score > 100:
+        self.player.level += 1
+        self.load_level()
+
 
   def load_level(self):
     
@@ -331,11 +357,14 @@ class Game:
       self.all_sprites.add(acid4)
       self.acid_pools.add(acid4)
 
+      coin = Coin(self.platform_spritesheet, 250, 20)
+      self.all_sprites.add(coin)
+      self.coin.add(coin)
 
     # LEVEL 2
     if self.player.level == 2:
       # Level 2 Platforms
-      gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
+      gp = Ground_Platform(-500, HEIGHT - 40, 2000, 96)
       self.all_sprites.add(gp)
       self.groundplatform.add(gp)
       for plat in MAP2_PLATFORM_LIST:
@@ -380,21 +409,19 @@ class Game:
 
     # LEVEL 4
     if self.player.level == 4:
+      self.score = 0
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
        p = Platform_Boss(self.platform_spritesheet, *plat)
        self.all_sprites.add(p)
        self.platform_boss.add(p)
-      boss = Boss(self, 300, 200, 20, 40)
-      self.all_sprites.add(boss)
-      self.boss.add(boss)
       h= Heart(self, -400, HEIGHT * .75 - 50, 10, 10)
       self.all_sprites.add(h)
       self.heart.add(h)
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
-
+      
     if self.player.level == 5:
       g.win_screen()
 
