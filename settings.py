@@ -19,14 +19,9 @@ HAS_KEY = False
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
 EXPLOSION_SPRITESHEET = "explosion_sheet.png"
-<<<<<<< HEAD
 BOSS_ACC = 0.5
 BOSS_GRAV = 0
 BOSS_HEALTH = 5
-=======
-
-BOSS_HEALTH = 25
->>>>>>> 666d749ea14136831bc5b6470d3ebe620e41a860
 
 # Globals for tracking directions
 LEFT = 0
