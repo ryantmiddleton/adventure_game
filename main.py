@@ -82,8 +82,6 @@ class Game:
     self.small_boss_timer = 0
     # Add player to sprite group
     self.all_sprites.add(self.player)
-    self.player.health = self.player.max_health
-    self.all_sprites.add(self.boss)
     # Load music to all levels
 
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
@@ -242,14 +240,16 @@ class Game:
           coin.kill()
         self.load_level()
     
-   
-    self.boss.deadboss = False
-    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
-    if shoot_boss:
-        self.boss.deadboss = True
+
+    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, False)
+    for boss in self.boss:
+      if shoot_boss:
+        boss.health -= 1
+      if boss.health <= 0:
+        boss.deadboss = True
         self.score += 15
         for boss in self.boss:
-          self.boss.kill()
+          boss.kill()
         self.player.level += 1   
         self.load_level()
         print("You Have Won!")
@@ -430,6 +430,51 @@ class Game:
       keys = pg.key.get_pressed()
       for event in pg.event.get():
         # check for closing window
+        
+        if self.playing == True:
+
+          if event.type == pg.KEYUP:
+            if event.key == pg.K_UP:
+              self.player.jump_cut()
+
+          if event.type == pg.KEYDOWN:
+            if event.key == pg.K_UP:
+              self.player.jump()
+              self.player.boss_jump()
+              self.player.ground_jump()
+
+            if event.key == pg.K_SPACE:
+              if keys[K_d] and keys[K_w]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 3)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_a] and keys[K_w]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -3)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_w]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 2)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                
+              elif keys[K_d]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                    
+              elif self.player.left or keys[K_a]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()    
+              else:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+
         if event.type == QUIT:
           if self.playing:
             self.playing = False
@@ -444,58 +489,6 @@ class Game:
           elif self.playing == True:
             self.playing == True
 
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-              self.player.jump()
-            
-        if event.type == pg.KEYUP:
-          if event.key == pg.K_UP:
-            self.player.jump_cut()
-
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.boss_jump()
-
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.ground_jump()
-
-
-          if event.key == pg.K_SPACE:
-            if keys[K_d] and keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 3)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()
-            elif keys[K_a] and keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, -3)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()
-            elif keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 2)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()                
-            elif keys[K_d]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()                    
-            elif self.player.left or keys[K_a]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, -1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()    
-            else:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()    
-
-          if event.type == pg.KEYUP:
-            if event.key == pg.K_UP:
-                self.player.jump_cut()
 
   def draw(self):
     #Game Loop - draw 
