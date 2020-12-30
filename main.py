@@ -54,8 +54,22 @@ class Game:
 
     # Initialize Spritesheets
     self.platform_spritesheet = Spritesheet(path.join(self.img_dir, PLATFORM_SPRITESHEET))
-    self.spider_spritesheet = Spritesheet(path.join(self.img_dir, SPIDER_SPRITESHEET))
-    self.explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
+    
+    # Load Spider Images
+    spider_spritesheet = Spritesheet(path.join(self.img_dir, SPIDER_SPRITESHEET))
+    size = spider_spritesheet.image_sheet.get_size()
+    self.spider_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,6), (8,6), (size[0]/12,size[1]/8))
+    # Crop each image from spritesheet
+    for i in range(len(self.spider_images)):
+      self.spider_images[i] = spider_spritesheet.crop(self.spider_images[i],(10,20),(65,45))
+      # Iniitialize a rotation and scale
+      # self.spider_images[i] = pg.transform.rotozoom(self.spider_images[i], 0, 1)
+
+    # Load Explosion Images
+    explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
+    size = explosion_spritesheet.image_sheet.get_size()
+    self.explosion_images = explosion_spritesheet.strip_from_sheet(explosion_spritesheet.image_sheet , (0,0), (7,4), (size[0]/8,size[1]/8))
+    
     # Initialize Sounds
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
@@ -77,11 +91,11 @@ class Game:
     self.keys = pg.sprite.Group()
     self.boss = pg.sprite.Group()
     self.heart = pg.sprite.Group()
+    self.coin = pg.sprite.Group()
     self.bat_timer = 0
+    self.small_boss_timer = 0
     # Add player to sprite group
     self.all_sprites.add(self.player)
-    self.player.health = self.player.max_health
-    self.all_sprites.add(self.boss)
     # Load music to all levels
 
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
@@ -134,6 +148,7 @@ class Game:
         self.all_sprites.add(bat)
         self.enemies.add(bat)
 
+    
     # Set scrolling variables 
     if self.player.level == 3:
       # Vertical (y) scrolling
@@ -153,7 +168,7 @@ class Game:
         sprite.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
     # If player reaches the bottom/left 25% of the screen
-    # scroll all sprites up (decrease x/y coord)
+    # scroll all sprites up/right (decrease x/y coord)
     elif self.player.rect[scroll_dir] >= screen_dim * .75:
       for sprite in self.all_sprites:
             sprite.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
@@ -168,7 +183,10 @@ class Game:
         if len(self.platforms) ==0:
           self.playing= False
 
+    bullet_platform_hit = pg.sprite.groupcollide(self.bullets, self.platforms, True, False)  
+
     # Player Collision Detection
+    # Heart Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
     if heart_hit:
       if self.player.health == 25:
@@ -199,7 +217,7 @@ class Game:
         self.player.health += 5
         print("Player Health increases by 5")
 
-    # Key detection for any of the keys
+    # Key collision detection for any of the keys
     key_hit = pg.sprite.spritecollideany(self.player, self.keys)
     # If a player collides with a key, the key sprite is returned (not None)
     if key_hit != None:
@@ -209,7 +227,7 @@ class Game:
       #set key_hit to True because player has the key now
       self.player.hasKey = True
     
-    # Door detection for any of the doors
+    # Door collision detection for any of the doors
     door_hit = pg.sprite.spritecollideany(self.player, self.doors)
     # If a player collides with a door and has already gotten the key, the door sprite is returned
     if door_hit != None and self.player.hasKey:
@@ -220,9 +238,11 @@ class Game:
         self.player.hasKey = False
         # print('success')
         # print(self.player.level)
-        # Load a new board
+        # Kill all sprites from the board
         for plat in self.platforms:
           plat.kill()
+        for gp in self.groundplatform:
+          gp.kill()
         for boss_plat in self.platform_boss:
           boss_plat.kill()
         for door in self.doors:
@@ -230,22 +250,27 @@ class Game:
         for acid in self.acid_pools:
           acid.kill()
         for heart in self.heart:
-              heart.kill()
+          heart.kill()
         for spider in self.enemies:
           spider.kill()
+        for coin in self.coin:
+          coin.kill()
+        # Load a new level
         self.load_level()
     
-   
-    self.boss.deadboss = False
-    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
-    if shoot_boss:
-        self.boss.deadboss = True
+
+    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, False)
+    for boss in self.boss:
+      if shoot_boss:
+        boss.health -= 1
+      if boss.health <= 0:
+        boss.deadboss = True
         self.score += 15
         for boss in self.boss:
-          self.boss.kill()
-        self.player.level += 1   
-        self.load_level()
-        print("You Have Won!")
+          boss.kill()
+        # self.player.level += 1   
+        # self.load_level()
+        # print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -260,22 +285,33 @@ class Game:
     if self.player.health <= 0:
         self.playing = False
 
+    # Coin Collision Detection
+    coin_hit = pg.sprite.spritecollide(self.player, self.coin, False)
+    if coin_hit:
+      self.score += 1
+      for coin in self.coin:
+        coin.kill()
+
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
     bullet_kill_list = pg.sprite.groupcollide(self.bullets, self.enemies, True, True)
     if bullet_kill_list:
       for bullet, enemy in bullet_kill_list.items():
         # print(enemy[0].rect)
+        self.score += 5
         explosion = Explosion(enemy[0].rect.x, enemy[0].rect.y, self)
         self.all_sprites.add(explosion)
 
-    boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
-    if boss_hit:
-      self.player.health -= 1
-      self.score -= .5
-    if self.player.health <= 0:
-      self.playing = False
+    # Check for player collision with boss enemey (only level 4)
+    if self.player.level == 4:
+      boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
+      if boss_hit:
+        self.player.health -= 1
+        self.score -= .5
+      if self.player.health <= 0:
+        self.playing = False
 
+    # Player collision with Spiders
     spider_hit = pg.sprite.spritecollide(self.player, self.enemies, False)
     if spider_hit:
       self.player.health -= 1
@@ -288,8 +324,20 @@ class Game:
     if self.player.health <= 0:
       self.playing = False
 
+    if self.player.level == 4:    
+      now = pg.time.get_ticks()
+      if now - self.small_boss_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+        self.small_boss_timer = now
+        small_boss = Small_Boss(self, WIDTH, HEIGHT, 10, 10)
+        self.all_sprites.add(small_boss)
+        self.enemies.add(small_boss)
+      if self.score > 100:
+        self.player.level += 1
+        self.load_level()
+
+
   def load_level(self):
-    
+    print ("Player level is " + str(self.player.level))
     #LEVEL 1
     if self.player.level == 1:
       self.player.pos = vec(WIDTH/2, HEIGHT/2)
@@ -331,11 +379,14 @@ class Game:
       self.all_sprites.add(acid4)
       self.acid_pools.add(acid4)
 
+      coin = Coin(self.platform_spritesheet, 250, 20)
+      self.all_sprites.add(coin)
+      self.coin.add(coin)
 
     # LEVEL 2
     if self.player.level == 2:
       # Level 2 Platforms
-      gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
+      gp = Ground_Platform(-500, HEIGHT - 40, 2000, 96)
       self.all_sprites.add(gp)
       self.groundplatform.add(gp)
       for plat in MAP2_PLATFORM_LIST:
@@ -379,9 +430,9 @@ class Game:
     # LEVEL 3
     if self.player.level == 3:
       # Add Platforms
-      gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
+      gp = Ground_Platform(0, HEIGHT - 40, WIDTH, 96)
       self.all_sprites.add(gp)
-      self.groundplatform.add(gp)
+      self.platforms.add(gp)
       for plat in MAP3_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
@@ -390,7 +441,7 @@ class Game:
         spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
         self.all_sprites.add(spider)
         self.enemies.add(spider)
-      # spider = Spider(WIDTH/2 -200, HEIGHT *3/4+20, self)
+      # spider = Spider(WIDTH/2, HEIGHT *3/4-10, self)
       # self.all_sprites.add(spider)
       # self.enemies.add(spider)
       # Level 3 Door
@@ -404,21 +455,24 @@ class Game:
 
     # LEVEL 4
     if self.player.level == 4:
+      temp = self.score
+      print(temp)
+      self.score = 0
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
        p = Platform_Boss(self.platform_spritesheet, *plat)
        self.all_sprites.add(p)
        self.platform_boss.add(p)
-      boss = Boss(self, 300, 200, 20, 40)
-      self.all_sprites.add(boss)
-      self.boss.add(boss)
       h= Heart(self, -400, HEIGHT * .75 - 50, 10, 10)
       self.all_sprites.add(h)
       self.heart.add(h)
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
-
+      boss = Boss(self, 1000, 200, 10, 10)
+      self.all_sprites.add(boss)
+      self.boss.add(boss)
+      
     if self.player.level == 5:
       g.win_screen()
 
@@ -427,72 +481,78 @@ class Game:
       keys = pg.key.get_pressed()
       for event in pg.event.get():
         # check for closing window
-        if event.type == QUIT:
-          if self.playing:
-            self.playing = False
-          self.running = False
-        
         if event.type == pg.KEYDOWN:
           if self.playing == False:
             # Start game if key pressed
             self.playing = True
-            self.player.level = 1
+            # self.player.level = 1
             self.player.health = 25
+          
           elif self.playing == True:
             self.playing == True
 
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-              self.player.jump()
-            
         if event.type == pg.KEYUP:
           if event.key == pg.K_UP:
             self.player.jump_cut()
 
         if event.type == pg.KEYDOWN:
           if event.key == pg.K_UP:
+            self.player.jump()
             self.player.boss_jump()
-
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
             self.player.ground_jump()
-
 
           if event.key == pg.K_SPACE:
             if keys[K_d] and keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 3)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 3)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
             elif keys[K_a] and keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, -3)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -3)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+            elif keys[K_d] and keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 4)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+            elif keys[K_a] and keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -4)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
             elif keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 2)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()                
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 2)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+            elif keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -2)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                    
             elif keys[K_d]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()                    
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                    
             elif self.player.left or keys[K_a]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, -1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()    
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                  
             else:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()    
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
 
-          if event.type == pg.KEYUP:
-            if event.key == pg.K_UP:
-                self.player.jump_cut()
+        if event.type == QUIT:
+          if self.playing:
+            self.playing = False
+          self.running = False
+
 
   def draw(self):
     #Game Loop - draw 
@@ -523,8 +583,10 @@ class Game:
       pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
       pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
       self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
-      # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
-      # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
+      for boss in self.boss:
+        pg.draw.rect(self.screen, RED, (20, 20, (boss.max_health*10), 5))
+        pg.draw.rect(self.screen, GREEN, (20, 20, (boss.health*10), 5))
+        self.draw_text("Boss Health: " + str(boss.health) + "/5", 22, WHITE, 100, 75) 
       self.screen.blit(self.player.image, self.player.rect)
       # self.screen.blit(self.boss.image, self.boss.rect)
       self.back_rect.move_ip(-2, 0)
@@ -570,7 +632,6 @@ class Game:
     # Wait for player to hit a key to restart game
     while self.playing == True and self.running == True:
       self.events()
-
 
   def show_go_screen(self):
     #game over/continue

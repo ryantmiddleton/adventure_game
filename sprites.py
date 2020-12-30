@@ -133,42 +133,73 @@ class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
     self.facing = facing
+    #Shoot Up
     if facing == 2:
-      self.image = pg.image.load("img/bullet-up.png").convert()
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 90).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-80
+    #Shoot Down
+    elif facing == -2:
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 270).convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y
+    #Shoot Left  
     elif facing == -1:
-      self.image = pg.image.load("img/bullet-left.png").convert()
+      self.image = pg.transform.flip(pg.image.load("img/bullet.png"), 180, 0).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-40
       self.rect.y = y-30
+    #Shoot Shoot Up Right
     elif facing == 3:
-      self.image = pg.image.load("img/bullet-diag-right.png").convert()
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 45).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-50
+    #Shoot Up Left
     elif facing == -3:
-      self.image = pg.image.load("img/bullet-diag-left.png").convert()
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 135).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-20
       self.rect.y = y-50
+    #Shoot Down Right
+    elif facing == 4:
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 315).convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-50
+    #Shoot Down left
+    elif facing == -4:
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 225).convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x-20
+      self.rect.y = y-50
+    #Shoot Right
     else:
       self.image = pg.image.load("img/bullet.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-30
-    self.image.set_colorkey((WHITE), RLEACCEL)
+    self.image.set_colorkey((BLACK), RLEACCEL)
 
   def update(self):
     if self.facing == 3:
-      self.rect.y += -8
+      self.rect.y -= 8
       self.rect.x += 8
     elif self.facing == -3:
-      self.rect.y += -8
-      self.rect.x += -8
+      self.rect.y -= 8
+      self.rect.x -= 8
     elif self.facing == 2:
-      self.rect.y += -8
+      self.rect.y -= 8
+    elif self.facing == -2:
+      self.rect.y += 8
+    elif self.facing == 4:
+      self.rect.y += 8
+      self.rect.x += 8
+    elif self.facing == -4:
+      self.rect.y += 8
+      self.rect.x -= 8
     else:
       self.rect.x += (8*self.facing)
     if self.rect.left > WIDTH: 
@@ -180,15 +211,8 @@ class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.spritesheet = self.game.spider_spritesheet
-    self.size = self.spritesheet.image_sheet.get_size()
-    self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet, (6,6), (8,6), (self.size[0]/12,self.size[1]/8))
-    # Crop each selected image from the sheet and rotate, scale it
-    for i in range(len(self.frames)):
-      self.frames[i] = self.spritesheet.crop(self.frames[i],(10,20),(65,45))
-      # self.frames[i] = pg.transform.flip(self.frames[i], True, False)
-      self.frames[i] = pg.transform.rotozoom(self.frames[i], 0, 1)
-
+    self.frames = game.spider_images
+    self.vel = 1
     self.image_num = 0
     self.anima_speed = 6
     self.image = self.frames[self.image_num]
@@ -199,8 +223,157 @@ class Spider(pg.sprite.Sprite):
     # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
     self.orient = 0
     self.dir = RIGHT
+    self.falling = False
 
   def update(self):
+    # Check if spider is holding onto any platforms
+    collided_platforms = pg.sprite.spritecollide(self, self.game.platforms, False)
+    if collided_platforms:
+      # print("platform topleft: " + str(collided_platforms[0].rect.topleft))
+      # print("platform bottomleft: " + str(collided_platforms[0].rect.bottomleft))
+      # print(self.rect.bottom)
+
+      contact_points = {
+        "BL": False,
+        "BR": False,
+        "TL": False,
+        "TR": False,
+        "MT": False,
+        "MB": False,
+        "ML": False,
+        "MR": False
+      }
+      # Loop through each platform the spider is touching
+      # And see which points of the spider are touching
+      for platform in collided_platforms:
+        # Test if bottomright of spider is touching any platforms
+        if pg.Rect.collidepoint(platform.rect, self.rect.bottomright):
+          # print("bottomright is touching: " + str(self.rect.bottomright))
+          contact_points["BR"] = True
+        # Test if bottom left of spider is touching any platforms
+        if pg.Rect.collidepoint(platform.rect, self.rect.bottomleft):
+          # print("bottomleft is touching: " + str(self.rect.bottomleft))
+          contact_points["BL"] = True
+        # Test if topright of spider is touching any platforms
+        if pg.Rect.collidepoint(platform.rect, self.rect.topright):
+          # print("topright is touching")
+          contact_points["TR"] = True
+        # Test if topleft of spider is touching any platforms
+        if pg.Rect.collidepoint(platform.rect, self.rect.topleft):
+          # print("topleft is touching")
+          contact_points["TL"] = True
+        # Test if midtop of spider is touching any platforms
+        if pg.Rect.collidepoint(platform.rect, self.rect.midtop):
+          # print("midtop is touching")
+          contact_points["MT"] = True
+        # Test if midbottom of spider is touching any platforms
+        if pg.Rect.collidepoint(platform.rect, self.rect.midbottom):
+          # print("midbottom is touching")
+          contact_points["MB"] = True
+        if pg.Rect.collidepoint(platform.rect, self.rect.midleft):
+          # print("midleft is touching")
+          contact_points["ML"] = True
+        if pg.Rect.collidepoint(platform.rect, self.rect.midright):
+          # print("midright is touching")
+          contact_points["MR"] = True
+      
+
+      # Advance the spider based on orientation
+      if self.isHanging(contact_points):
+        if self.dir == LEFT:
+          self.rect.x -= 1
+        elif self.dir == RIGHT:
+          self.rect.x += 1
+        # print("hanging")
+        # print("spider right border " + str(self.rect.right))
+        # print("spider topmiddle coords: " + str(self.rect.midtop))
+
+      elif self.isWalking(contact_points):
+        if self.dir == LEFT:
+          self.rect.x -= 1
+        elif self.dir == RIGHT:
+          self.rect.x += 1
+        # print("walking")
+        # print("spider bottomright: " + str(self.rect.bottomright))
+
+      elif self.isGripping_right(contact_points):
+        if self.dir == UP:
+          self.rect.y -= 1
+        if self.dir == DOWN:
+          self.rect.y += 1
+        # print("gripping right")
+
+      elif self.isGripping_left(contact_points):
+        if self.dir == UP:
+          self.rect.y -= 1
+        if self.dir == DOWN:
+          self.rect.y += 1
+        # print("gripping left")
+
+      else:
+        if self.dir == LEFT:
+          # print("spider topmiddle coords: " + str(self.rect.midtop))
+          if contact_points["MB"] or contact_points["MT"]:
+            self.rect.x -= 1
+          elif contact_points["TR"]:
+            # print("rotating UP to 90")
+            self.orient = 90
+            self.rect.right -= self.rect.w/2 - 2
+            self.rect.top -= self.rect.h/2 - 1
+            self.dir = UP
+            # print("spider middleright coords: " + str(self.rect.midright))
+            # self.rect.y -= self.rect.w/2 
+
+        elif self.dir == UP:
+          # print("spider middleright coords: " + str(self.rect.midright))
+          if contact_points["ML"] or contact_points["MR"]:
+            self.rect.y -= 1
+          elif contact_points["BR"]:
+            # print("rotating RIGHT to 0")
+            self.orient = 0
+            self.rect.bottom -= self.rect.h/2 - 2
+            self.rect.left += self.rect.w/2 + 1
+            self.dir = RIGHT
+            # print("spider midbottom coords: " + str(self.rect.midbottom))
+
+        elif self.dir == RIGHT:
+          # print("spider middlebottom coords: " + str(self.rect.midbottom))
+          if contact_points["MB"] or contact_points["MT"]:
+            self.rect.x += 1
+          elif contact_points["BL"]:
+            # print("rotating DOWN to 270")
+            self.orient = 270
+            # adjust the position 
+            self.rect.left += self.rect.w/2 - 1
+            self.rect.bottom += self.rect.h/2 + 1
+            self.dir = DOWN
+            # print(self.rect)
+            # print("spider midleft coords: " + str(self.rect.midleft))
+
+        elif self.dir == DOWN:
+          # print("spider midleft coords: " + str(self.rect.midleft))
+          if contact_points["ML"] or contact_points["MR"]:
+            self.rect.y += 1
+          elif contact_points["TL"]:
+            # print("rotating RIGHT to 180")
+            self.orient = 180
+            # adjust the x position of the spider to accomodate for the rest of the body
+            self.rect.top += self.rect.h/2 - 1
+            self.rect.left -= self.rect.w/2 - 1
+            self.dir = LEFT
+            # print("spider midtop coords: " + str(self.rect.midtop))
+            
+
+    else:
+      # Fall 
+      # print("Falling")
+      # print("spider midbottom coords: " + str(self.rect.midbottom))
+      self.falling = True
+      self.vel += self.vel/9.8
+      self.rect.y += self.vel
+
+    
+  
     # Animate the spider's legs by cycling through each image
     if self.image_num < len(self.frames) and self.anima_speed == 0:
       self.image_num += 1
@@ -209,126 +382,23 @@ class Spider(pg.sprite.Sprite):
       self.anima_speed = 6
       self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
       self.image = self.image.convert_alpha()
+      # print("spider right border " + str(self.rect.right))
+      # print("spider midright coords: " + str(self.rect.midright))
       # print(self.orient)
     else:
       self.anima_speed -= 1
+
+  def isWalking(self, points):
+    return points["BL"] and points["BR"] and (points["TL"] == False and points["TR"] == False)
+
+  def isHanging(self, points):
+    return points["TL"] and points["TR"] and (points["BL"] == False and points["BR"] == False)
+
+  def isGripping_right(self, points):
+    return points["TR"] and points["BR"] and (points["BL"] == False and points["TL"] == False)
     
-    # Check if spider is holding onto any platforms
-    # cur_platform = pg.sprite.spritecollide(self, self.game.platforms, False)
-    # if cur_platform:
-    #   print(cur_platform[0].rect.x)
-    #   print(cur_platform[0].rect.y)
-    #   # Test if bottomright of spider is touching the platform
-    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.bottomright):
-    #     print("bottomright is touching: " + str(self.rect.bottomright))
-    #   # Test if bottom left of spider is touching
-    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.bottomleft):
-    #     print("bottomleft is touching: " + str(self.rect.bottomleft))
-    #   # Test if topright of Spider is touching the platform
-    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.topright):
-    #     print("topright is touching")
-    #   # Test if topleft of spider is touching the platform
-    #   if pg.Rect.collidepoint(cur_platform[0].rect, self.rect.topleft):
-    #     print("topleft is touching")
-    # else:
-    #   # Fall 
-    #   self.rect.y += 1
-    
-    # Move the spider
-    if self.isHanging():
-      if self.dir == LEFT:
-        self.rect.x -= 1
-      elif self.dir == RIGHT:
-        self.rect.x += 1
-      # print("hanging")
-
-    elif self.isGripping_right():
-      if self.dir == UP:
-        self.rect.y -= 1
-      if self.dir == DOWN:
-        self.rect.y += 1
-      # print("gripping right")
-      
-    elif self.isStanding():
-      if self.dir == LEFT:
-        self.rect.x -= 1
-      elif self.dir == RIGHT:
-        self.rect.x += 1
-      # print("walking")
-
-    elif self.isGripping_left():
-      if self.dir == UP:
-        self.rect.y -= 1
-      if self.dir == DOWN:
-        self.rect.y += 1
-      # print("gripping left")
-
-    else:
-      # print("changing direction")
-      if self.dir == LEFT:
-        # print("rotating UP to 90")
-        self.dir = UP
-        self.orient = 90
-        self.rect.y -= 1
-
-      elif self.dir == UP:
-        # print("rotating RIGHT to 0")
-        self.dir = RIGHT
-        self.orient = 0
-        self.rect.x += 1
-
-      elif self.dir == RIGHT:
-        # print("rotating DOWN to 270")
-        self.dir = DOWN
-        self.orient = 270
-        self.rect.y += 1
-
-      elif self.dir == DOWN:
-        # print("rotating RIGHT to 180")
-        self.dir = LEFT
-        self.orient = 180
-        self.rect.x -= 1
-  
-  def isStanding(self):
-      self.rect.bottom -= 1
-      hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-      self.rect.bottom += 1
-      if hits:
-        # print("isStanding")
-        return True
-      else:  
-        return False
-
-  def isHanging(self):
-    self.rect.top += 1
-    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-    self.rect.top -= 1
-    if hits:
-      # print("hangin")
-      # print(hits[0])
-      # test_point = self.rect.bottomright
-      # print(pg.Rect.collidepoint(hits[0].rect, test_point))
-      return True
-    else:  
-      return False
-
-  def isGripping_right(self):
-    self.rect.x += 1
-    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-    self.rect.x -= 1
-    if hits:
-      return True
-    else:  
-      return False
-    
-  def isGripping_left(self):
-    self.rect.x -= 1
-    hits = pg.sprite.spritecollide (self, self.game.platforms, False)
-    self.rect.x += 1
-    if hits:
-      return True
-    else:  
-      return False
+  def isGripping_left(self, points):
+    return points["TL"] and points["BL"] and (points["TR"] == False and points["BR"] == False)
 
 class Acid(pg.sprite.Sprite):
   def __init__(self, game, x, y):
@@ -353,21 +423,20 @@ class Platform(pg.sprite.Sprite):
 class Ground_Platform(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
-    self.image.set_colorkey(BLACK)
+    self.image = pg.image.load("imgs/groundfloor.png").convert_alpha()
+    self.image = pg.transform.scale(self.image, (w, h))
     self.rect = self.image.get_rect()
     self.rect.x = x
     self.rect.y = y
-
     
 class Platform_Boss(pg.sprite.Sprite):
-  def __init__(self, game, x, y):
+  def __init__(self, spritesheet, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/groundfloor.png").convert(),0,1)
+    self.image = spritesheet.get_image(0,96,380,94)
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.x = x
-    self.rect.y = y       
+    self.rect.y = y   
 
 class Spritesheet():
   def __init__(self, filename):
@@ -426,20 +495,9 @@ class Boss(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
-    
     self.health = BOSS_HEALTH
     self.max_health = BOSS_HEALTH
-
     self.deadboss = False
-
-  def update(self):
-    if self.rect.x <= WIDTH/2:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
-    if self.rect.x >= WIDTH/2:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
@@ -456,10 +514,7 @@ class Explosion(pg.sprite.Sprite):
     def __init__(self, x, y, game):
       pg.sprite.Sprite.__init__(self)
       self.game = game
-      self.spritesheet = self.game.explosion_spritesheet
-      self.size = self.spritesheet.image_sheet.get_size()
-      self.frames = self.spritesheet.strip_from_sheet(self.spritesheet.image_sheet , (0,0), (7,4), (self.size[0]/8,self.size[1]/8))
-      # print("num pics = " + str(len(self.frames)))
+      self.frames = game.explosion_images
       self.image = self.frames[0]
       self.rect = self.image.get_rect(topleft=(x,y))
       self.image_num = 0
@@ -481,11 +536,15 @@ class Bat(pg.sprite.Sprite):
 
     self.image_up = pg.image.load("imgs/bat-up.jpg")
     self.image_up = self.image_up.convert_alpha()
+    self.image_up.set_colorkey(BLACK)
     self.image_mid = pg.image.load("imgs/bat-mid.jpg")
     self.image_mid = self.image_mid.convert_alpha()
+    self.image_mid.set_colorkey(BLACK)
     self.image_down = pg.image.load("imgs/bat-down.jpg")
     self.image_down = self.image_down.convert_alpha()
+    self.image_down.set_colorkey(BLACK)
     self.image = self.image_up
+    
     self.rect = self.image.get_rect()
     # Randomly choose starting left or right
     self.rect.centerx = choice([-100, WIDTH + 100])
@@ -513,3 +572,26 @@ class Bat(pg.sprite.Sprite):
     self.rect.y += self.vel.y
     if self.rect.left > WIDTH + 100 or self.rect.right < -100:
       self.kill() 
+
+class Coin(pg.sprite.Sprite):
+  def __init__(self, spritesheet, x, y):
+    pg.sprite.Sprite.__init__(self)
+    self.image = spritesheet.get_image(244,1981,61,61)    
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+
+class Small_Boss(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/small_boss.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+    self.rect.y = randrange(HEIGHT)
+    self.rect.x = randrange(WIDTH)
