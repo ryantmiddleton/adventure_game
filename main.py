@@ -457,61 +457,68 @@ class Game:
       keys = pg.key.get_pressed()
       for event in pg.event.get():
         # check for closing window
-        
-        if self.playing == True:
+        if event.type == pg.KEYDOWN:
+          if self.playing == False:
+            # Start game if key pressed
+            self.playing = True
+            # self.player.level = 1
+            self.player.health = 25
+          
+          elif self.playing == True:
+            self.playing == True
 
-          if event.type == pg.KEYUP:
-            if event.key == pg.K_UP:
-              self.player.jump_cut()
+        if event.type == pg.KEYUP:
+          if event.key == pg.K_UP:
+            self.player.jump_cut()
 
-          if event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP:
-              self.player.jump()
-              self.player.boss_jump()
-              self.player.ground_jump()
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_UP:
+            self.player.jump()
+            self.player.boss_jump()
+            self.player.ground_jump()
 
-            if event.key == pg.K_SPACE:
-              if keys[K_d] and keys[K_w]:
+          if event.key == pg.K_SPACE:
+            if keys[K_d] and keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 3)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_a] and keys[K_w]:
+            elif keys[K_a] and keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -3)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_d] and keys[K_s]:
+            elif keys[K_d] and keys[K_s]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 4)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_a] and keys[K_s]:
+            elif keys[K_a] and keys[K_s]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -4)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_w]:
+            elif keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 2)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_s]:
+            elif keys[K_s]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -2)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()                    
-              elif keys[K_d]:
+            elif keys[K_d]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()                    
-              elif self.player.left or keys[K_a]:
+            elif self.player.left or keys[K_a]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()                  
-              else:
+            else:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
