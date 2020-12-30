@@ -133,42 +133,73 @@ class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y, facing):
     pg.sprite.Sprite.__init__(self)
     self.facing = facing
+    #Shoot Up
     if facing == 2:
-      self.image = pg.image.load("img/bullet-up.png").convert()
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 90).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-80
+    #Shoot Down
+    elif facing == -2:
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 270).convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y
+    #Shoot Left  
     elif facing == -1:
-      self.image = pg.image.load("img/bullet-left.png").convert()
+      self.image = pg.transform.flip(pg.image.load("img/bullet.png"), 180, 0).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-40
       self.rect.y = y-30
+    #Shoot Shoot Up Right
     elif facing == 3:
-      self.image = pg.image.load("img/bullet-diag-right.png").convert()
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 45).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-50
+    #Shoot Up Left
     elif facing == -3:
-      self.image = pg.image.load("img/bullet-diag-left.png").convert()
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 135).convert()
       self.rect = self.image.get_rect()
       self.rect.x = x-20
       self.rect.y = y-50
+    #Shoot Down Right
+    elif facing == 4:
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 315).convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x
+      self.rect.y = y-50
+    #Shoot Down left
+    elif facing == -4:
+      self.image = pg.transform.rotate(pg.image.load("img/bullet.png"), 225).convert()
+      self.rect = self.image.get_rect()
+      self.rect.x = x-20
+      self.rect.y = y-50
+    #Shoot Right
     else:
       self.image = pg.image.load("img/bullet.png").convert()
       self.rect = self.image.get_rect()
       self.rect.x = x
       self.rect.y = y-30
-    self.image.set_colorkey((WHITE), RLEACCEL)
+    self.image.set_colorkey((BLACK), RLEACCEL)
 
   def update(self):
     if self.facing == 3:
-      self.rect.y += -8
+      self.rect.y -= 8
       self.rect.x += 8
     elif self.facing == -3:
-      self.rect.y += -8
-      self.rect.x += -8
+      self.rect.y -= 8
+      self.rect.x -= 8
     elif self.facing == 2:
-      self.rect.y += -8
+      self.rect.y -= 8
+    elif self.facing == -2:
+      self.rect.y += 8
+    elif self.facing == 4:
+      self.rect.y += 8
+      self.rect.x += 8
+    elif self.facing == -4:
+      self.rect.y += 8
+      self.rect.x -= 8
     else:
       self.rect.x += (8*self.facing)
     if self.rect.left > WIDTH: 
@@ -464,20 +495,9 @@ class Boss(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
-    
     self.health = BOSS_HEALTH
     self.max_health = BOSS_HEALTH
-
     self.deadboss = False
-
-  def update(self):
-    if self.rect.x <= WIDTH/2:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(), 0, 1)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
-
-    if self.rect.x >= WIDTH/2:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(), 0, 1)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
@@ -562,3 +582,16 @@ class Coin(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
+
+class Small_Boss(pg.sprite.Sprite):
+  def __init__(self, game, x, y, w, h):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/small_boss.png").convert(),0,1)
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.rect.center = (WIDTH/2, HEIGHT/2)
+    self.rect.x = x
+    self.rect.y = y
+    self.rect.y = randrange(HEIGHT)
+    self.rect.x = randrange(WIDTH)

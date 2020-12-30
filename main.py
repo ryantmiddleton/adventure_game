@@ -93,10 +93,9 @@ class Game:
     self.heart = pg.sprite.Group()
     self.coin = pg.sprite.Group()
     self.bat_timer = 0
+    self.small_boss_timer = 0
     # Add player to sprite group
     self.all_sprites.add(self.player)
-    self.player.health = self.player.max_health
-    self.all_sprites.add(self.boss)
     # Load music to all levels
 
     pg.mixer.music.load(path.join(self.snd_dir, 'background_music.ogg'))
@@ -140,7 +139,7 @@ class Game:
           self.player.jumping = False
     
     # Load enemies - bats
-    if self.player.level == 2 or self.player.level == 4:
+    if self.player.level == 2:
     # Spawn bats
       now = pg.time.get_ticks()
       if now - self.bat_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
@@ -149,6 +148,7 @@ class Game:
         self.all_sprites.add(bat)
         self.enemies.add(bat)
 
+    
     # Set scrolling variables 
     if self.player.level == 3:
       # Vertical (y) scrolling
@@ -183,8 +183,10 @@ class Game:
         if len(self.platforms) ==0:
           self.playing= False
 
-    # Collision Detection
-    # Heart Collision Detetction
+    bullet_platform_hit = pg.sprite.groupcollide(self.bullets, self.platforms, True, False)  
+
+    # Player Collision Detection
+    # Heart Collision Detection
     heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
     if heart_hit:
       if self.player.health == 25:
@@ -256,18 +258,19 @@ class Game:
         # Load a new level
         self.load_level()
     
-    # Check for bullet collision detection with boss enemey (only level 4)
-    if self.player.level == 4:
-      self.boss.deadboss = False
-      shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, True)
+
+    shoot_boss = pg.sprite.groupcollide(self.bullets, self.boss, True, False)
+    for boss in self.boss:
       if shoot_boss:
-          self.boss.deadboss = True
-          self.score += 15
-          for boss in self.boss:
-            self.boss.kill()
-          self.player.level += 1   
-          self.load_level()
-          print("You Have Won!")
+        boss.health -= 1
+      if boss.health <= 0:
+        boss.deadboss = True
+        self.score += 15
+        for boss in self.boss:
+          boss.kill()
+        # self.player.level += 1   
+        # self.load_level()
+        # print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -295,6 +298,7 @@ class Game:
     if bullet_kill_list:
       for bullet, enemy in bullet_kill_list.items():
         # print(enemy[0].rect)
+        self.score += 5
         explosion = Explosion(enemy[0].rect.x, enemy[0].rect.y, self)
         self.all_sprites.add(explosion)
 
@@ -319,6 +323,18 @@ class Game:
         self.player.vel.x = -10
     if self.player.health <= 0:
       self.playing = False
+
+    if self.player.level == 4:    
+      now = pg.time.get_ticks()
+      if now - self.small_boss_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+        self.small_boss_timer = now
+        small_boss = Small_Boss(self, WIDTH, HEIGHT, 10, 10)
+        self.all_sprites.add(small_boss)
+        self.enemies.add(small_boss)
+      if self.score > 100:
+        self.player.level += 1
+        self.load_level()
+
 
   def load_level(self):
     print ("Player level is " + str(self.player.level))
@@ -366,7 +382,6 @@ class Game:
       coin = Coin(self.platform_spritesheet, 250, 20)
       self.all_sprites.add(coin)
       self.coin.add(coin)
-
 
     # LEVEL 2
     if self.player.level == 2:
@@ -416,21 +431,24 @@ class Game:
 
     # LEVEL 4
     if self.player.level == 4:
+      temp = self.score
+      print(temp)
+      self.score = 0
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
        p = Platform_Boss(self.platform_spritesheet, *plat)
        self.all_sprites.add(p)
        self.platform_boss.add(p)
-      boss = Boss(self, 800, 200, 20, 40)
-      self.all_sprites.add(boss)
-      self.boss.add(boss)
       h= Heart(self, -400, HEIGHT * .75 - 50, 10, 10)
       self.all_sprites.add(h)
       self.heart.add(h)
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
-
+      boss = Boss(self, 1000, 200, 10, 10)
+      self.all_sprites.add(boss)
+      self.boss.add(boss)
+      
     if self.player.level == 5:
       g.win_screen()
 
@@ -439,71 +457,71 @@ class Game:
       keys = pg.key.get_pressed()
       for event in pg.event.get():
         # check for closing window
+        
+        if self.playing == True:
+
+          if event.type == pg.KEYUP:
+            if event.key == pg.K_UP:
+              self.player.jump_cut()
+
+          if event.type == pg.KEYDOWN:
+            if event.key == pg.K_UP:
+              self.player.jump()
+              self.player.boss_jump()
+              self.player.ground_jump()
+
+            if event.key == pg.K_SPACE:
+              if keys[K_d] and keys[K_w]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 3)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_a] and keys[K_w]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -3)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_d] and keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 4)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_a] and keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -4)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_w]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 2)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+              elif keys[K_s]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -2)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                    
+              elif keys[K_d]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                    
+              elif self.player.left or keys[K_a]:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, -1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()                  
+              else:
+                  b = Bullet(self.player.pos.x, self.player.pos.y, 1)
+                  self.all_sprites.add(b)
+                  self.bullets.add(b)
+                  self.shoot_sound.play()
+
         if event.type == QUIT:
           if self.playing:
             self.playing = False
           self.running = False
 
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-              self.player.jump()
-            
-        if event.type == pg.KEYUP:
-          if event.key == pg.K_UP:
-            self.player.jump_cut()
-
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.boss_jump()
-
-        if event.type == pg.KEYDOWN:
-          if event.key == pg.K_UP:
-            self.player.ground_jump()
-
-          if event.key == pg.K_SPACE:
-            if keys[K_d] and keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 3)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()
-            elif keys[K_a] and keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, -3)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()
-            elif keys[K_w]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 2)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()                
-            elif keys[K_d]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()                    
-            elif self.player.left or keys[K_a]:
-                b = Bullet(self.player.pos.x, self.player.pos.y, -1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()    
-            elif self.playing == True:
-                b = Bullet(self.player.pos.x, self.player.pos.y, 1)
-                self.all_sprites.add(b)
-                self.bullets.add(b)
-                self.shoot_sound.play()   
-
-        if event.type == pg.KEYDOWN:
-          if self.playing == False:
-                # Start game if key pressed
-            self.playing = True
-            # DO NOT SET THESE HERE
-            # THEY ARE INITIALIZED UPON PLAYER CREATION W/IN THE GAME CLASS
-            # self.player.level = 1
-            # self.player.health = 25
-
-          if event.type == pg.KEYUP:
-            if event.key == pg.K_UP:
-                self.player.jump_cut()
 
   def draw(self):
     #Game Loop - draw 
@@ -534,8 +552,10 @@ class Game:
       pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
       pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
       self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
-      # pg.draw.rect(self.screen, RED, (20, 20, (self.boss.max_health*20), 15))
-      # pg.draw.rect(self.screen, GREEN, (20, 20, (self.boss.health*20), 15))
+      for boss in self.boss:
+        pg.draw.rect(self.screen, RED, (20, 20, (boss.max_health*10), 5))
+        pg.draw.rect(self.screen, GREEN, (20, 20, (boss.health*10), 5))
+        self.draw_text("Boss Health: " + str(boss.health) + "/5", 22, WHITE, 100, 75) 
       self.screen.blit(self.player.image, self.player.rect)
       # self.screen.blit(self.boss.image, self.boss.rect)
       self.back_rect.move_ip(-2, 0)
