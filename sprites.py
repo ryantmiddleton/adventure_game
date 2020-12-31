@@ -45,7 +45,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 1
+    self.level = 5
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -544,20 +544,6 @@ class Key(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
 
-class Boss(pg.sprite.Sprite):
-  def __init__(self, game, x, y, w, h):
-    pg.sprite.Sprite.__init__(self)
-    self.game = game
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(),0,1)
-    self.image.set_colorkey((255, 255, 255), RLEACCEL)
-    self.rect = self.image.get_rect()
-    self.rect.center = (WIDTH/2, HEIGHT/2)
-    self.rect.x = x
-    self.rect.y = y
-    self.health = BOSS_HEALTH
-    self.max_health = BOSS_HEALTH
-    self.deadboss = False
-
 class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
@@ -568,6 +554,7 @@ class Heart(pg.sprite.Sprite):
     self.rect.center = (WIDTH/2, HEIGHT/2)
     self.rect.x = x
     self.rect.y = y
+    
 
 class Explosion(pg.sprite.Sprite):
     def __init__(self, x, y, game):
@@ -586,6 +573,59 @@ class Explosion(pg.sprite.Sprite):
         self.image = self.frames[self.image_num]
       else:
         self.kill()
+
+class Boss(pg.sprite.Sprite):
+  def __init__(self, game):
+    pg.sprite.Sprite.__init__(self)
+    self.game = game
+    self.vel = vec(0, 0)
+    self.left_image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(),0,1)
+    self.right_image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(),0,1)
+    self.image = self.left_image
+    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.rect = self.image.get_rect()
+    self.health = BOSS_HEALTH
+    self.max_health = BOSS_HEALTH
+    self.deadboss = False
+    self.rect.centerx = choice([-100, WIDTH + 100])
+    self.vel.x = randrange(3, 4)
+    if self.rect.centerx > WIDTH:
+      self.vel.x *= -1
+    self.rect.y = randrange(HEIGHT - 200)
+    self.vel.y = 0
+    self.dy = 0.5
+
+  def update(self):
+    self.rect.x += self.vel.x
+    self.vel.y += self.dy
+    if self.vel.y > 3 or self.vel.y <-3:
+      self.dy *= -1
+    center = self.rect.center
+    if self.dy < 0:
+      if self.vel.x < 0:
+        self.image = self.right_image
+      else:
+        self.image = self.left_image
+    else:
+      if self.vel.x < 0:
+        self.image = self.right_image
+      else:
+        self.image = self.left_image
+    self.rect = self.image.get_rect()
+    self.rect.center = center
+    self.rect.y += self.vel.y
+    if self.rect.left > WIDTH + 100 or self.rect.right < -100:
+      # Randomly choose starting left or right
+      self.rect.centerx = choice([-100, WIDTH + 100])
+      # Randomly choose speed
+      self.vel.x = randrange(3, 4)
+      if self.rect.centerx > WIDTH:
+        self.vel.x *= -1
+      # Randomly spawn in top half of screen
+      self.rect.y = randrange(HEIGHT / 2)
+      self.vel.y = 0
+      self.dy = 0.5
+      
 
 class Bat(pg.sprite.Sprite):
   def __init__(self, game):

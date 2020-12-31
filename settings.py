@@ -21,7 +21,7 @@ SPIDER_SPRITESHEET = "spiders.png"
 EXPLOSION_SPRITESHEET = "explosion_sheet.png"
 BOSS_ACC = 0.5
 BOSS_GRAV = 0
-BOSS_HEALTH = 5
+BOSS_HEALTH = 10
 
 # Globals for tracking directions
 LEFT = 0
@@ -118,6 +118,23 @@ MAP4_PLATFORM_LIST = [
   (-200, HEIGHT -350),
   (-100, HEIGHT -500),
   (0, HEIGHT - 700),
+]
+
+MAP5_PLATFORM_LIST = [
+  (1200, HEIGHT - 40),
+  (1050, HEIGHT - 40),
+  (900, HEIGHT - 40),
+  (750, HEIGHT - 40),
+  (600, HEIGHT - 40),
+  (450, HEIGHT - 40),
+  (300, HEIGHT - 40),  
+  (150, HEIGHT - 40),
+  (0, HEIGHT - 40),
+  (-150, HEIGHT - 40),
+  (0, HEIGHT * 3/4),
+  (300, HEIGHT /2),
+  (650, HEIGHT /2),
+  (950, HEIGHT * 3/4),
 ]
 
 # define colors
