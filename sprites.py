@@ -2,7 +2,8 @@
 import pygame as pg
 import math
 from settings import *
-from random import choice, randrange
+import settings
+from random import choice, randrange, randint
 from os import path
 
 vec = pg.math.Vector2
@@ -211,7 +212,16 @@ class Spider(pg.sprite.Sprite):
   def __init__(self, x, y, game):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.frames = game.spider_images
+
+    # Initilaize random start
+    rand_num = randint(1,10)
+    if rand_num <= 5:
+      self.frames = game.spider_left_images
+      self.dir = LEFT
+    else:
+      self.frames = game.spider_right_images
+      self.dir = RIGHT
+
     self.vel = 1
     self.image_num = 0
     self.anima_speed = 6
@@ -219,11 +229,7 @@ class Spider(pg.sprite.Sprite):
 
     #Initialize the spider position - self.rect.y = y, self.rect.x = x
     self.rect = self.image.get_rect(topleft=(x,y))
-    # self.rect.y = y, self.rect.x = x
-    # 0-right-facing/right, 90-up/legs right, 180-hanging/left, 270-down/leg left
     self.orient = 0
-    self.dir = RIGHT
-    self.falling = False
 
   def update(self):
     # Check if spider is holding onto any platforms
@@ -246,6 +252,13 @@ class Spider(pg.sprite.Sprite):
       # Loop through each platform the spider is touching
       # And see which points of the spider are touching
       for platform in collided_platforms:
+        # print("platform topright: " + str(platform.rect.topright))
+        # If Spider is falling and has collided with a platform
+        if self.vel > 1 and self.rect.bottom > platform.rect.top + 1:
+          self.rect.bottom = platform.rect.top + 1
+          self.image = pg.transform.rotate(self.frames[0], 0)
+          # print("spider bottom: " + str(self.rect.bottom))
+          self.vel = 1
         # Test if bottomright of spider is touching any platforms
         if pg.Rect.collidepoint(platform.rect, self.rect.bottomright):
           # print("bottomright is touching: " + str(self.rect.bottomright))
@@ -277,42 +290,48 @@ class Spider(pg.sprite.Sprite):
           # print("midright is touching")
           contact_points["MR"] = True
       
-
       # Advance the spider based on orientation
       if self.isHanging(contact_points):
         if self.dir == LEFT:
+          self.frames = self.game.spider_right_images
           self.rect.x -= 1
         elif self.dir == RIGHT:
+          self.frames = self.game.spider_left_images
           self.rect.x += 1
-        # print("hanging")
         # print("spider right border " + str(self.rect.right))
         # print("spider topmiddle coords: " + str(self.rect.midtop))
 
       elif self.isWalking(contact_points):
         if self.dir == LEFT:
+          self.frames = self.game.spider_left_images
           self.rect.x -= 1
         elif self.dir == RIGHT:
+          self.frames = self.game.spider_right_images
           self.rect.x += 1
-        # print("walking")
         # print("spider bottomright: " + str(self.rect.bottomright))
 
       elif self.isGripping_right(contact_points):
         if self.dir == UP:
+          self.frames = self.game.spider_right_images
           self.rect.y -= 1
         if self.dir == DOWN:
+          self.frames = self.game.spider_left_images
           self.rect.y += 1
         # print("gripping right")
 
       elif self.isGripping_left(contact_points):
         if self.dir == UP:
+          self.frames = self.game.spider_left_images
           self.rect.y -= 1
         if self.dir == DOWN:
+          self.frames = self.game.spider_right_images
           self.rect.y += 1
         # print("gripping left")
 
       else:
         if self.dir == LEFT:
           # print("spider topmiddle coords: " + str(self.rect.midtop))
+          # print("spider bottommiddle coords: " + str(self.rect.midbottom))
           if contact_points["MB"] or contact_points["MT"]:
             self.rect.x -= 1
           elif contact_points["TR"]:
@@ -321,10 +340,18 @@ class Spider(pg.sprite.Sprite):
             self.rect.right -= self.rect.w/2 - 2
             self.rect.top -= self.rect.h/2 - 1
             self.dir = UP
+            self.frames = self.game.spider_right_images
             # print("spider middleright coords: " + str(self.rect.midright))
-            # self.rect.y -= self.rect.w/2 
+          elif contact_points["BR"]:
+            # print("rotating DOWN to 90")
+            self.orient = 90
+            self.rect.right -= self.rect.w/2 - 2 
+            self.rect.bottom += self.rect.h/2 + 1
+            self.dir = DOWN
+            self.frames = self.game.spider_left_images
 
         elif self.dir == UP:
+          # print("spider middleleft coords: " + str(self.rect.midleft))
           # print("spider middleright coords: " + str(self.rect.midright))
           if contact_points["ML"] or contact_points["MR"]:
             self.rect.y -= 1
@@ -334,9 +361,19 @@ class Spider(pg.sprite.Sprite):
             self.rect.bottom -= self.rect.h/2 - 2
             self.rect.left += self.rect.w/2 + 1
             self.dir = RIGHT
+            self.frames = self.game.spider_right_images
+            # print("spider midbottom coords: " + str(self.rect.midbottom))
+          elif contact_points["BL"]:
+            # print("rotating LEFT to 0")
+            self.orient = 0
+            self.rect.bottom -= self.rect.h/2 - 2
+            self.rect.left -= self.rect.w/2 - 1
+            self.dir = LEFT
+            self.frames = self.game.spider_left_images
             # print("spider midbottom coords: " + str(self.rect.midbottom))
 
         elif self.dir == RIGHT:
+          # print("spider middletop coords: " + str(self.rect.midtop))
           # print("spider middlebottom coords: " + str(self.rect.midbottom))
           if contact_points["MB"] or contact_points["MT"]:
             self.rect.x += 1
@@ -347,11 +384,20 @@ class Spider(pg.sprite.Sprite):
             self.rect.left += self.rect.w/2 - 1
             self.rect.bottom += self.rect.h/2 + 1
             self.dir = DOWN
-            # print(self.rect)
+            self.frames = self.game.spider_right_images
+            # print("spider midleft coords: " + str(self.rect.midleft))
+          elif contact_points["TL"]:
+            # print("rotating UP to 270")
+            self.orient = 270
+            # adjust the position 
+            self.rect.left += self.rect.w/2 - 1
+            self.rect.top -= self.rect.h/2 + 1
+            self.dir = UP
+            self.frames = self.game.spider_left_images
             # print("spider midleft coords: " + str(self.rect.midleft))
 
         elif self.dir == DOWN:
-          # print("spider midleft coords: " + str(self.rect.midleft))
+          # print("spider midright coords: " + str(self.rect.midright))
           if contact_points["ML"] or contact_points["MR"]:
             self.rect.y += 1
           elif contact_points["TL"]:
@@ -361,18 +407,24 @@ class Spider(pg.sprite.Sprite):
             self.rect.top += self.rect.h/2 - 1
             self.rect.left -= self.rect.w/2 - 1
             self.dir = LEFT
+            self.frames = self.game.spider_right_images
             # print("spider midtop coords: " + str(self.rect.midtop))
-            
-
+          elif contact_points["TR"]:
+            # print("rotating LEFT to 180")
+            self.orient = 180
+            # adjust the x position of the spider to accomodate for the rest of the body
+            self.rect.top += self.rect.h/2 - 1
+            self.rect.left += self.rect.w/2 + 1
+            self.dir = RIGHT
+            self.frames = self.game.spider_left_images
+            # print("spider midtop coords: " + str(self.rect.midtop))
     else:
       # Fall 
       # print("Falling")
       # print("spider midbottom coords: " + str(self.rect.midbottom))
-      self.falling = True
       self.vel += self.vel/9.8
       self.rect.y += self.vel
-
-    
+      self.orient = 0
   
     # Animate the spider's legs by cycling through each image
     if self.image_num < len(self.frames) and self.anima_speed == 0:
@@ -389,16 +441,21 @@ class Spider(pg.sprite.Sprite):
       self.anima_speed -= 1
 
   def isWalking(self, points):
-    return points["BL"] and points["BR"] and (points["TL"] == False and points["TR"] == False)
+    return points["BL"] and points["BR"] and self.orient == 0 and (points["TL"] == False and points["TR"] == False)
 
   def isHanging(self, points):
-    return points["TL"] and points["TR"] and (points["BL"] == False and points["BR"] == False)
+    return points["TL"] and points["TR"] and self.orient == 180 and (points["BL"] == False and points["BR"] == False)
 
   def isGripping_right(self, points):
-    return points["TR"] and points["BR"] and (points["BL"] == False and points["TL"] == False)
+    return points["TR"] and points["BR"] and self.orient == 90 and (points["BL"] == False and points["TL"] == False)
     
   def isGripping_left(self, points):
-    return points["TL"] and points["BL"] and (points["TR"] == False and points["BR"] == False)
+    return points["TL"] and points["BL"] and self.orient == 270 and (points["TR"] == False and points["BR"] == False)
+
+  def flip_images(self):
+    for i in range (len(self.frames)):
+      self.frames[i] = pg.transform.flip(self.frames[i], True, False)
+    return self.frames
 
 class Acid(pg.sprite.Sprite):
   def __init__(self, game, x, y):
@@ -455,6 +512,8 @@ class Spritesheet():
     for y in range(start[1],end[1]+1):
         for x in range(start[0],end[0]+1):
             location = (size[0]*x, size[1]*y)
+            # sprite_img = pg.Surface.copy(sheet.subsurface(pg.Rect(location, size)))
+            # frames.append(sprite_img)
             frames.append(sheet.subsurface(pg.Rect(location, size)))
     return frames
 

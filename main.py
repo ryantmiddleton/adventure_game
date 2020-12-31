@@ -58,12 +58,15 @@ class Game:
     # Load Spider Images
     spider_spritesheet = Spritesheet(path.join(self.img_dir, SPIDER_SPRITESHEET))
     size = spider_spritesheet.image_sheet.get_size()
-    self.spider_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,6), (8,6), (size[0]/12,size[1]/8))
+    self.spider_right_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,6), (8,6), (size[0]/12,size[1]/8))
+    self.spider_left_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,5), (8,5), (size[0]/12,size[1]/8))
     # Crop each image from spritesheet
-    for i in range(len(self.spider_images)):
-      self.spider_images[i] = spider_spritesheet.crop(self.spider_images[i],(10,20),(65,45))
+    for i in range (len(self.spider_right_images)):
+      self.spider_right_images[i] = spider_spritesheet.crop(self.spider_right_images[i],(10,20),(65,45))
+      self.spider_left_images[i] = spider_spritesheet.crop(self.spider_left_images[i],(10,20),(65,45))
       # Iniitialize a rotation and scale
-      # self.spider_images[i] = pg.transform.rotozoom(self.spider_images[i], 0, 1)
+      # self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 1)
+      # self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 1)
 
     # Load Explosion Images
     explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
@@ -335,9 +338,8 @@ class Game:
         self.player.level += 1
         self.load_level()
 
-
   def load_level(self):
-    print ("Player level is " + str(self.player.level))
+    # print ("Player level is " + str(self.player.level))
     #LEVEL 1
     if self.player.level == 1:
       self.player.pos = vec(WIDTH/2, HEIGHT/2)
@@ -429,6 +431,7 @@ class Game:
 
     # LEVEL 3
     if self.player.level == 3:
+      num_spiders = 10
       # Add Platforms
       gp = Ground_Platform(0, HEIGHT - 40, WIDTH, 96)
       self.all_sprites.add(gp)
@@ -438,12 +441,19 @@ class Game:
         self.all_sprites.add(p)
         self.platforms.add(p)
         # Add enemies to each platform
-        spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1], self)
-        self.all_sprites.add(spider)
-        self.enemies.add(spider)
-      # spider = Spider(WIDTH/2, HEIGHT *3/4-10, self)
-      # self.all_sprites.add(spider)
-      # self.enemies.add(spider)
+        if num_spiders > 0:
+          rand_num = randint(1,10)
+          if rand_num <= 5:     
+            spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1] - 1, self)
+          else:
+            spider = Spider(p.rect.midtop[0]-25, p.rect.midtop[1] - 50, self)
+          self.all_sprites.add(spider)
+          self.enemies.add(spider)
+          num_spiders -= 1
+      # for spider_pos in MAP3_SPIDERS_LIST:
+      #   spider = Spider(*spider_pos, self)
+      #   self.all_sprites.add(spider)
+      #   self.enemies.add(spider)
       # Level 3 Door
       d = Door(300, -1445, 10, 20)
       self.all_sprites.add(d)
@@ -548,11 +558,13 @@ class Game:
                   self.bullets.add(b)
                   self.shoot_sound.play()
 
+        elif event.type == pg.KEYDOWN and self.playing == False:
+            self.playing = True
+
         if event.type == QUIT:
           if self.playing:
             self.playing = False
           self.running = False
-
 
   def draw(self):
     #Game Loop - draw 
