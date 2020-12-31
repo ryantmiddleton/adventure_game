@@ -52,10 +52,16 @@ MAP2_PLATFORM_LIST = [
   (400, 400),
 ]
 
+MAP3_SPIDERS_LIST = [
+  (WIDTH/2 - 200, HEIGHT *3/4-200),
+  (WIDTH/2 - 250, 500),
+  (WIDTH/2 + 150, 400),
+]
+
 MAP3_PLATFORM_LIST = [
     (WIDTH/2 - 50, 400),
     
-    (WIDTH/2 - 250, 600),
+    (WIDTH/2 - 250, 500),
     (WIDTH/2 + 150, 400),
     
     (WIDTH/2 - 50, 300),
