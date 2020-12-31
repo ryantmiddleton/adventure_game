@@ -45,7 +45,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 3
+    self.level = 1
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -593,16 +593,14 @@ class Bat(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.game = game
 
-    self.image_up = pg.image.load("imgs/bat-up.jpg")
-    self.image_up = self.image_up.convert_alpha()
-    self.image_up.set_colorkey(BLACK)
-    self.image_mid = pg.image.load("imgs/bat-mid.jpg")
-    self.image_mid = self.image_mid.convert_alpha()
-    self.image_mid.set_colorkey(BLACK)
-    self.image_down = pg.image.load("imgs/bat-down.jpg")
-    self.image_down = self.image_down.convert_alpha()
-    self.image_down.set_colorkey(BLACK)
-    self.image = self.image_up
+    self.image_up_left = pg.image.load("imgs/bat-up.png")
+    self.image_up_left = self.image_up_left.convert_alpha()
+    self.image_down_left = pg.image.load("imgs/bat-down.png")
+    self.image_down_left = self.image_down_left.convert_alpha()
+
+    self.image_up_right = pg.transform.flip(self.image_up_left, True, False)
+    self.image_down_right = pg.transform.flip(self.image_down_left, True, False)
+    self.image = self.image_up_right
     
     self.rect = self.image.get_rect()
     # Randomly choose starting left or right
@@ -623,9 +621,15 @@ class Bat(pg.sprite.Sprite):
       self.dy *= -1
     center = self.rect.center
     if self.dy < 0:
-      self.image = self.image_up
+      if self.vel.x < 0:
+        self.image = self.image_up_right
+      else:
+        self.image = self.image_up_left
     else:
-      self.image = self.image_down
+      if self.vel.x < 0:
+        self.image = self.image_down_right
+      else:
+        self.image = self.image_down_left
     self.rect = self.image.get_rect()
     self.rect.center = center
     self.rect.y += self.vel.y

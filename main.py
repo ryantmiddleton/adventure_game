@@ -396,14 +396,38 @@ class Game:
         self.all_sprites.add(p)
         self.platforms.add(p)
       # Level 2 Door
-      d = Door(-200, HEIGHT - 135, 10, 20)
+      d = Door(WIDTH, HEIGHT - 135, 10, 20)
       self.all_sprites.add(d)
       self.doors.add(d)
       # Level 2 Key
-      k = Key(775, 75, 10, 10)
+      k = Key(-200, 75, 10, 10)
       self.all_sprites.add(k)
       self.keys.add(k)
-
+      h = Heart(self, 775, 60, 10, 10)
+      self.all_sprites.add(h)
+      self.heart.add(h)
+      # Level 2 Acid
+      acid = Acid(self, 0, HEIGHT - 60)
+      acid1 = Acid(self, 75, HEIGHT - 60)
+      acid2 = Acid(self, 150, HEIGHT - 60)
+      acid3 = Acid(self, 225, HEIGHT - 60)
+      acid4 = Acid(self, 300, HEIGHT - 60)
+      acid5 = Acid(self, 375, HEIGHT - 60)
+      acid6 = Acid(self, 450, HEIGHT - 60)
+      self.all_sprites.add(acid)
+      self.acid_pools.add(acid)
+      self.all_sprites.add(acid1)
+      self.acid_pools.add(acid1)
+      self.all_sprites.add(acid2)
+      self.acid_pools.add(acid2)
+      self.all_sprites.add(acid3)
+      self.acid_pools.add(acid3)
+      self.all_sprites.add(acid4)
+      self.acid_pools.add(acid4)
+      self.all_sprites.add(acid5)
+      self.acid_pools.add(acid5)
+      self.all_sprites.add(acid6)
+      self.acid_pools.add(acid6)
 
     # LEVEL 3
     if self.player.level == 3:
@@ -467,61 +491,68 @@ class Game:
       keys = pg.key.get_pressed()
       for event in pg.event.get():
         # check for closing window
-        
-        if self.playing == True:
+        if event.type == pg.KEYDOWN:
+          if self.playing == False:
+            # Start game if key pressed
+            self.playing = True
+            # self.player.level = 1
+            self.player.health = 25
+          
+          elif self.playing == True:
+            self.playing == True
 
-          if event.type == pg.KEYUP:
-            if event.key == pg.K_UP:
-              self.player.jump_cut()
+        if event.type == pg.KEYUP:
+          if event.key == pg.K_UP:
+            self.player.jump_cut()
 
-          if event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP:
-              self.player.jump()
-              self.player.boss_jump()
-              self.player.ground_jump()
+        if event.type == pg.KEYDOWN:
+          if event.key == pg.K_UP:
+            self.player.jump()
+            self.player.boss_jump()
+            self.player.ground_jump()
 
-            if event.key == pg.K_SPACE:
-              if keys[K_d] and keys[K_w]:
+          if event.key == pg.K_SPACE:
+            if keys[K_d] and keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 3)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_a] and keys[K_w]:
+            elif keys[K_a] and keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -3)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_d] and keys[K_s]:
+            elif keys[K_d] and keys[K_s]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 4)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_a] and keys[K_s]:
+            elif keys[K_a] and keys[K_s]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -4)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_w]:
+            elif keys[K_w]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 2)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()
-              elif keys[K_s]:
+            elif keys[K_s]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -2)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()                    
-              elif keys[K_d]:
+            elif keys[K_d]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()                    
-              elif self.player.left or keys[K_a]:
+            elif self.player.left or keys[K_a]:
                   b = Bullet(self.player.pos.x, self.player.pos.y, -1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
                   self.shoot_sound.play()                  
-              else:
+            else:
                   b = Bullet(self.player.pos.x, self.player.pos.y, 1)
                   self.all_sprites.add(b)
                   self.bullets.add(b)
