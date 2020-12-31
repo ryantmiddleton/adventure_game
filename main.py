@@ -266,6 +266,10 @@ class Game:
     for boss in self.boss:
       if shoot_boss:
         boss.health -= 1
+        if boss.vel.x < 0:
+          boss.vel.x -= 2
+        if boss.vel.x > 0:
+          boss.vel.x += 2
       if boss.health <= 0:
         boss.deadboss = True
         self.score += 15
