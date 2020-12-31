@@ -65,8 +65,8 @@ class Game:
       self.spider_right_images[i] = spider_spritesheet.crop(self.spider_right_images[i],(10,20),(65,45))
       self.spider_left_images[i] = spider_spritesheet.crop(self.spider_left_images[i],(10,20),(65,45))
       # Iniitialize a rotation and scale
-      # self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 1)
-      # self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 1)
+      # self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 0.75)
+      # self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 0.75)
 
     # Load Explosion Images
     explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
@@ -431,7 +431,7 @@ class Game:
 
     # LEVEL 3
     if self.player.level == 3:
-      num_spiders = 10
+      num_spiders = 20
       # Add Platforms
       gp = Ground_Platform(0, HEIGHT - 40, WIDTH, 96)
       self.all_sprites.add(gp)
@@ -442,7 +442,7 @@ class Game:
         self.platforms.add(p)
         # Add enemies to each platform
         if num_spiders > 0:
-          rand_num = randint(1,10)
+          rand_num = randint(1,5)
           if rand_num <= 5:     
             spider = Spider(p.rect.midbottom[0]-25, p.rect.midbottom[1] - 1, self)
           else:
