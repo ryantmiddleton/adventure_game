@@ -65,8 +65,8 @@ class Game:
       self.spider_right_images[i] = spider_spritesheet.crop(self.spider_right_images[i],(10,20),(65,45))
       self.spider_left_images[i] = spider_spritesheet.crop(self.spider_left_images[i],(10,20),(65,45))
       # Iniitialize a rotation and scale
-      self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 0.75)
-      self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 0.75)
+      self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 1)
+      self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 1)
 
     # Load Explosion Images
     explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
