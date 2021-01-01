@@ -659,7 +659,7 @@ class Boss(pg.sprite.Sprite):
       # Randomly choose starting left or right
       self.rect.centerx = choice([-100, WIDTH + 100])
       # Randomly choose speed
-      self.vel.x = randrange(3, 4)
+      self.vel.x = randrange(5, 6)
       if self.rect.centerx > WIDTH:
         self.vel.x *= -1
       # Randomly spawn in top half of screen
