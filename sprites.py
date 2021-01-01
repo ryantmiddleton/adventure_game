@@ -45,7 +45,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 3
+    self.level = 1
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -314,7 +314,7 @@ class Spider(pg.sprite.Sprite):
               self.dir = RIGHT
           else:
             # Drop off the platform
-            rand_num = randint(1,1000)
+            rand_num = randint(1,5000)
             if rand_num <= 5:
               # print(rand_num)
               self.rect.top += 1
@@ -597,7 +597,6 @@ class Heart(pg.sprite.Sprite):
     self.rect.x = x
     self.rect.y = y
     
-
 class Explosion(pg.sprite.Sprite):
     def __init__(self, x, y, game):
       pg.sprite.Sprite.__init__(self)
@@ -668,7 +667,6 @@ class Boss(pg.sprite.Sprite):
       self.vel.y = 0
       self.dy = 0.5
       
-
 class Bat(pg.sprite.Sprite):
   def __init__(self, game):
     pg.sprite.Sprite.__init__(self)
