@@ -266,14 +266,18 @@ class Game:
     for boss in self.boss:
       if shoot_boss:
         boss.health -= 1
+        if boss.vel.x < 0:
+          boss.vel.x -= 2
+        if boss.vel.x > 0:
+          boss.vel.x += 2
       if boss.health <= 0:
         boss.deadboss = True
         self.score += 15
         for boss in self.boss:
           boss.kill()
-        # self.player.level += 1   
-        # self.load_level()
-        # print("You Have Won!")
+        self.player.level += 1   
+        self.load_level()
+        print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -428,6 +432,10 @@ class Game:
       self.acid_pools.add(acid5)
       self.all_sprites.add(acid6)
       self.acid_pools.add(acid6)
+      # Level 2 Coins
+      coin = Coin(self.platform_spritesheet, -200, HEIGHT - 70)
+      self.all_sprites.add(coin)
+      self.coin.add(coin)
 
     # LEVEL 3
     if self.player.level == 3:
@@ -479,11 +487,20 @@ class Game:
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
-      boss = Boss(self, 1000, 200, 10, 10)
+      
+
+    if self.player.level == 5:
+      for boss_plat in self.platform_boss:
+          boss_plat.kill()
+      for plat in MAP5_PLATFORM_LIST:
+       p = Platform_Boss(self.platform_spritesheet, *plat)
+       self.all_sprites.add(p)
+       self.platform_boss.add(p)
+      boss = Boss(self)
       self.all_sprites.add(boss)
       self.boss.add(boss)
       
-    if self.player.level == 5:
+    if self.player.level == 6:
       g.win_screen()
 
   def events(self):
@@ -588,10 +605,25 @@ class Game:
       pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
       pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
       self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
+      self.screen.blit(self.player.image, self.player.rect)
+      if self.back_rect.right == 0:
+        self.back_rect.x =0
+      self.draw_text("Level " + str(self.player.level), 22, WHITE, WIDTH / 2, 15) 
+    if self.player.level == 5:
+      self.back_image = pg.image.load('bg/boss_level.jpg')
+      self.back_image = pg.transform.scale(self.back_image, (1400, 720))
+      self.back_rect = self.back_image.get_rect()
+      self.screen.fill(BLACK)
+      self.screen.blit(self.back_image, self.back_rect.move(0,0))
+      self.all_sprites.draw(self.screen)
+      # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, 35) 
+      pg.draw.rect(self.screen, RED, (20, 20, (self.player.max_health*10), 5))
+      pg.draw.rect(self.screen, GREEN, (20, 20, (self.player.health*10), 5))
+      self.draw_text("Player Health: " + str(self.player.health) + "/25", 22, WHITE, 100, 35) 
       for boss in self.boss:
-        pg.draw.rect(self.screen, RED, (20, 20, (boss.max_health*10), 5))
-        pg.draw.rect(self.screen, GREEN, (20, 20, (boss.health*10), 5))
-        self.draw_text("Boss Health: " + str(boss.health) + "/5", 22, WHITE, 100, 75) 
+        pg.draw.rect(self.screen, RED, (20, 60, (boss.max_health*10), 5))
+        pg.draw.rect(self.screen, GREEN, (20, 60, (boss.health*10), 5))
+        self.draw_text("Boss Health: " + str(boss.health) + "/10", 22, WHITE, 95, 75) 
       self.screen.blit(self.player.image, self.player.rect)
       # self.screen.blit(self.boss.image, self.boss.rect)
       self.back_rect.move_ip(-2, 0)
@@ -623,16 +655,16 @@ class Game:
     pg.mixer.music.load(path.join(self.snd_dir, 'win.ogg'))
     pg.mixer.music.play(loops = -1)
     self.screen.fill(BLACK)
-    self.draw_text("Congrats! You have won!!!", 48, BLUE, WIDTH /2, HEIGHT / 4)
-    self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
+    self.draw_text("Congrats! You have won!!!", 75, BLUE, WIDTH /2, HEIGHT / 2)
+    # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
     
-    if self.score > self.highscore:
-      self.highscore = self.score
-      self.draw_text("New High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
-      with open(path.join(self.dir, HS_FILE), 'w') as f:
-        f.write(str(self.score))
-    else: 
-      self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
+    # if self.score > self.highscore:
+    #   self.highscore = self.score
+    #   self.draw_text("New High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
+    #   with open(path.join(self.dir, HS_FILE), 'w') as f:
+    #     f.write(str(self.score))
+    # else: 
+    #   self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH /2, HEIGHT/2 + 40)
     pg.display.flip()
     # Wait for player to hit a key to restart game
     while self.playing == True and self.running == True:
