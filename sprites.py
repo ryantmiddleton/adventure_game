@@ -253,6 +253,7 @@ class Spider(pg.sprite.Sprite):
       # And see which points of the spider are touching
       for platform in collided_platforms:
         # print("platform topright: " + str(platform.rect.topright))
+        # print("platform topleft: " + str(platform.rect.topleft))
         # If Spider is falling and has collided with a platform
         if self.vel > 1 and self.rect.bottom > platform.rect.top + 1:
           self.rect.bottom = platform.rect.top + 1
@@ -292,149 +293,171 @@ class Spider(pg.sprite.Sprite):
           # print("midright is touching: " + str(self.rect.midright))
           contact_points["MR"] = True
 
-      # Advance the spider based on orientation
-      if self.isHanging(contact_points):
-        self.orient = 180
-        if self.dir == LEFT:
-          self.frames = self.game.spider_right_images
-          self.rect.x -= 1
-          # print("hanging left")
-        elif self.dir == RIGHT:
-          self.frames = self.game.spider_left_images
-          self.rect.x += 1
-          # print("hangin right")
-        # print("spider right border " + str(self.rect.right))
-        # print("spider topmiddle coords: " + str(self.rect.midtop))
-
-      elif self.isWalking(contact_points):
-        self.orient = 0
-        if self.dir == LEFT:
-          self.frames = self.game.spider_left_images
-          self.rect.x -= 1
-          # print("walking left")
-        elif self.dir == RIGHT:
-          self.frames = self.game.spider_right_images
-          self.rect.x += 1
-          # print("walking right")
-
-      elif self.isGripping_right(contact_points):
-        self.orient = 90
-        if self.dir == UP:
-          self.frames = self.game.spider_right_images
-          self.rect.y -= 1
-          # print("gripping right UP")
-        if self.dir == DOWN:
-          self.frames = self.game.spider_left_images
-          self.rect.y += 1
-          # print("gripping right DOWN")
-
-      elif self.isGripping_left(contact_points):
-        self.orient = 270
-        if self.dir == UP:
-          self.frames = self.game.spider_left_images
-          self.rect.y -= 1
-          # print("gripping left UP")
-        if self.dir == DOWN:
-          self.frames = self.game.spider_right_images
-          self.rect.y += 1
-          # print("gripping left DOWN")
-
-      else:
-        if self.dir == LEFT:
-          # print("spider topmiddle coords: " + str(self.rect.midtop))
-          # print("spider bottommiddle coords: " + str(self.rect.midbottom))
-          if contact_points["MB"] or contact_points["MT"]:
+        # Advance the spider based on orientation
+        if self.isHanging(contact_points):
+          self.orient = 180
+          if self.dir == LEFT:
+            self.frames = self.game.spider_right_images
             self.rect.x -= 1
-          elif contact_points["TR"]:
-            # print("rotating UP to 90")
-            self.orient = 90
-            self.rect.right -= self.rect.w/2 - 2
-            self.rect.top -= self.rect.h/2 - 1
-            self.dir = UP
-            self.frames = self.game.spider_right_images
-            # print("spider middleright coords: " + str(self.rect.midright))
-          elif contact_points["BR"]:
-            # print("rotating DOWN to 90")
-            self.orient = 90
-            self.rect.right -= self.rect.w/2 - 2 
-            self.rect.bottom += self.rect.h/2 + 1
-            self.dir = DOWN
+            # print("hanging left")
+          elif self.dir == RIGHT:
             self.frames = self.game.spider_left_images
+            self.rect.x += 1
+            # print("hangin right")
+          # If Spider has reached the edge of the platform decide if it wants to switch direction
+          if self.rect.topright[0] == platform.rect.bottomright[0] or self.rect.topleft[0] == platform.rect.bottomleft[0]:
+            if randint(1,15) <= 5:
+              self.frames = self.game.spider_left_images
+              self.dir = LEFT
+            else:
+              self.frames = self.game.spider_right_images
+              self.dir = RIGHT
           else:
+            # Drop off the platform
+            rand_num = randint(1,1000)
+            if rand_num <= 5:
+              # print(rand_num)
+              self.rect.top += 1
+              self.orient = 0
+
+        elif self.isWalking(contact_points):
+          self.orient = 0
+          if self.dir == LEFT:
+            self.frames = self.game.spider_left_images
             self.rect.x -= 1
-
-        elif self.dir == UP:
-          # print("spider middleleft coords: " + str(self.rect.midleft))
-          # print("spider middleright coords: " + str(self.rect.midright))
-          if contact_points["ML"] or contact_points["MR"]:
-            self.rect.y -= 1
-          elif contact_points["BR"]:
-            # print("rotating RIGHT to 0")
-            self.orient = 0
-            self.rect.bottom -= self.rect.h/2 - 2
-            self.rect.left += self.rect.w/2 + 1
-            self.dir = RIGHT
+            # print("walking left")
+          elif self.dir == RIGHT:
             self.frames = self.game.spider_right_images
-            # print("spider midbottom coords: " + str(self.rect.midbottom))
-          elif contact_points["BL"]:
-            # print("rotating LEFT to 0")
-            self.orient = 0
-            self.rect.bottom -= self.rect.h/2 - 2
-            self.rect.left -= self.rect.w/2 - 1
-            self.dir = LEFT
-            self.frames = self.game.spider_left_images
-            # print("spider midbottom coords: " + str(self.rect.midbottom))
-          else:
-            self.rect.y -= 1
-
-        elif self.dir == RIGHT:
-          if contact_points["MB"] or contact_points["MT"]:
             self.rect.x += 1
-          elif contact_points["BL"]:
-            # print("rotating DOWN to 270")
-            self.orient = 270
-            # adjust the position 
-            self.rect.left += self.rect.w/2 - 1
-            self.rect.bottom += self.rect.h/2 + 1
-            self.dir = DOWN
+            # print("walking right")
+          # If Spider has reached the edge of the platform decide if it wants to switch direction
+          if self.rect.bottomright[0] == platform.rect.topright[0] or self.rect.bottomleft[0] == platform.rect.topleft[0]:
+            if randint(1,10) <= 5:
+              self.frames = self.game.spider_left_images
+              self.dir = LEFT
+            else:
+              self.frames = self.game.spider_right_images
+              self.dir = RIGHT
+
+        elif self.isGripping_right(contact_points):
+          self.orient = 90
+          if self.dir == UP:
             self.frames = self.game.spider_right_images
-            # print("spider midleft coords: " + str(self.rect.midleft))
-          elif contact_points["TL"]:
-            # print("rotating UP to 270")
-            self.orient = 270
-            # adjust the position 
-            self.rect.left += self.rect.w/2 - 1
-            self.rect.top -= self.rect.h/2 + 1
-            self.dir = UP
+            self.rect.y -= 1
+            # print("gripping right UP")
+          if self.dir == DOWN:
             self.frames = self.game.spider_left_images
-            # print("spider midleft coords: " + str(self.rect.midleft))
-          else:
-            self.rect.x += 1
-
-        elif self.dir == DOWN:
-          # print("spider midright coords: " + str(self.rect.midright))
-          if contact_points["ML"] or contact_points["MR"]:
             self.rect.y += 1
-          elif contact_points["TL"]:
-            # print("rotating RIGHT to 180")
-            self.orient = 180
-            # adjust the x position of the spider to accomodate for the rest of the body
-            self.rect.top += self.rect.h/2 - 1
-            self.rect.left -= self.rect.w/2 - 1
-            self.dir = LEFT
-            self.frames = self.game.spider_right_images
-            # print("spider midtop coords: " + str(self.rect.midtop))
-          elif contact_points["TR"]:
-            # print("rotating LEFT to 180")
-            self.orient = 180
-            # adjust the x position of the spider to accomodate for the rest of the body
-            self.rect.top += self.rect.h/2 - 1
-            self.rect.left += self.rect.w/2 + 1
-            self.dir = RIGHT
+            # print("gripping right DOWN")
+
+        elif self.isGripping_left(contact_points):
+          self.orient = 270
+          if self.dir == UP:
             self.frames = self.game.spider_left_images
-            # print("spider midtop coords: " + str(self.rect.midtop))
-          else:
-            self.rect.y += 1   
+            self.rect.y -= 1
+            # print("gripping left UP")
+          if self.dir == DOWN:
+            self.frames = self.game.spider_right_images
+            self.rect.y += 1
+            # print("gripping left DOWN")
+
+        else:
+          if self.dir == LEFT:
+            # print("spider topmiddle coords: " + str(self.rect.midtop))
+            # print("spider bottommiddle coords: " + str(self.rect.midbottom))
+            if contact_points["MB"] or contact_points["MT"]:
+              self.rect.x -= 1
+            elif contact_points["TR"]:
+              # print("rotating UP to 90")
+              self.orient = 90
+              self.rect.midright = platform.rect.bottomleft
+              self.rect.right += 1
+              self.dir = UP
+              self.frames = self.game.spider_right_images
+              # print("spider middleright coords: " + str(self.rect.midright))
+            elif contact_points["BR"]:
+              # print("rotating DOWN to 90")
+              self.orient = 90
+              self.rect.midright = platform.rect.topleft
+              self.rect.right += 1
+              self.dir = DOWN
+              self.frames = self.game.spider_left_images
+            else:
+              self.rect.x -= 1
+
+          elif self.dir == UP:
+            # print("spider middleleft coords: " + str(self.rect.midleft))
+            # print("spider middleright coords: " + str(self.rect.midright))
+            if contact_points["ML"] or contact_points["MR"]:
+              self.rect.y -= 1
+            elif contact_points["BR"]:
+              # print("rotating RIGHT to 0")
+              self.orient = 0
+              self.rect.midbottom = platform.rect.topleft
+              self.rect.bottom += 1
+              self.dir = RIGHT
+              self.frames = self.game.spider_right_images
+              # print("spider midbottom coords: " + str(self.rect.midbottom))
+            elif contact_points["BL"]:
+              # print("rotating LEFT to 0")
+              self.orient = 0
+              self.rect.midbottom = platform.rect.topright
+              self.rect.bottom += 1
+              self.dir = LEFT
+              self.frames = self.game.spider_left_images
+              # print("spider midbottom coords: " + str(self.rect.midbottom))
+            else:
+              self.rect.y -= 1
+
+          elif self.dir == RIGHT:
+            if contact_points["MB"] or contact_points["MT"]:
+              self.rect.x += 1
+            elif contact_points["BL"]:
+              # print("rotating DOWN to 270")
+              self.orient = 270
+              # adjust the position 
+              self.rect.midleft = platform.rect.topright
+              self.rect.left -= 1
+              self.dir = DOWN
+              self.frames = self.game.spider_right_images
+              # print("spider midleft coords: " + str(self.rect.midleft))
+            elif contact_points["TL"]:
+              # print("rotating UP to 270")
+              self.orient = 270
+              # adjust the position 
+              self.rect.midleft = platform.rect.bottomright
+              self.rect.left -= 1
+              self.dir = UP
+              self.frames = self.game.spider_left_images
+              # print("spider midleft coords: " + str(self.rect.midleft))
+            else:
+              self.rect.x += 1
+
+          elif self.dir == DOWN:
+            # print("spider midright coords: " + str(self.rect.midright))
+            if contact_points["ML"] or contact_points["MR"]:
+              self.rect.y += 1
+            elif contact_points["TL"]:
+              # print("rotating RIGHT to 180")
+              self.orient = 180
+              # adjust the x position of the spider to accomodate for the rest of the body
+              self.rect.midtop = platform.rect.bottomright
+              self.rect.top -= 1
+              self.dir = LEFT
+              self.frames = self.game.spider_right_images
+              # print("spider midtop coords: " + str(self.rect.midtop))
+            elif contact_points["TR"]:
+              # print("rotating LEFT to 180")
+              self.orient = 180
+              # adjust the x position of the spider to accomodate for the rest of the body
+              self.rect.midtop = platform.rect.bottomleft
+              self.rect.top -= 1
+              self.dir = RIGHT
+              self.frames = self.game.spider_left_images
+              # print("spider midtop coords: " + str(self.rect.midtop))
+            else:
+              self.rect.y += 1   
+            
     else:
       # Fall 
       # print("Falling")
@@ -456,10 +479,6 @@ class Spider(pg.sprite.Sprite):
         self.image_num = 0
       self.anima_speed = 6
       self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
-      self.image = self.image.convert_alpha()
-      # print("spider right border " + str(self.rect.right))
-      # print("spider midright coords: " + str(self.rect.midright))
-      # print(self.orient)
     else:
       self.anima_speed -= 1
 
