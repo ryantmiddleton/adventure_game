@@ -60,6 +60,7 @@ class Game:
     size = spider_spritesheet.image_sheet.get_size()
     self.spider_right_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,6), (8,6), (size[0]/12,size[1]/8))
     self.spider_left_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,5), (8,5), (size[0]/12,size[1]/8))
+    self.spider_drop_images = spider_spritesheet.strip_from_sheet(spider_spritesheet.image_sheet, (6,4), (8,4), (size[0]/12,size[1]/8))
     # Crop each image from spritesheet
     for i in range (len(self.spider_right_images)):
       self.spider_right_images[i] = spider_spritesheet.crop(self.spider_right_images[i],(10,20),(65,45))
