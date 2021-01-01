@@ -45,7 +45,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 3
+    self.level = 1
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -675,9 +675,15 @@ class Bat(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.game = game
 
+    scale_size = 2.5
+    # Load and Scale the up_left image
     self.image_up_left = pg.image.load("imgs/bat-up.png")
+    self.image_up_left = pg.transform.scale(self.image_up_left, (int(self.image_up_left.get_width() * scale_size), int(self.image_up_left.get_height() * scale_size)))
     self.image_up_left = self.image_up_left.convert_alpha()
+
+    # Scale the down_left image
     self.image_down_left = pg.image.load("imgs/bat-down.png")
+    self.image_down_left = pg.transform.scale(self.image_down_left, (int(self.image_down_left.get_width() * scale_size), int(self.image_down_left.get_height() * scale_size)))
     self.image_down_left = self.image_down_left.convert_alpha()
 
     self.image_up_right = pg.transform.flip(self.image_up_left, True, False)

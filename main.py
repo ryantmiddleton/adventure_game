@@ -66,8 +66,8 @@ class Game:
       self.spider_right_images[i] = spider_spritesheet.crop(self.spider_right_images[i],(10,20),(65,45))
       self.spider_left_images[i] = spider_spritesheet.crop(self.spider_left_images[i],(10,20),(65,45))
       # Iniitialize a rotation and scale
-      self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 1)
-      self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 1)
+      # self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 1)
+      # self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 1)
 
     # Load Explosion Images
     explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
@@ -77,6 +77,7 @@ class Game:
     # Initialize Sounds
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
+    self.explosion_sound = pg.mixer.Sound(path.join(self.snd_dir, 'explosion.wav'))
 
   def new(self):
     # start a new game
@@ -314,6 +315,7 @@ class Game:
         self.score += 5
         explosion = Explosion(enemy[0].rect.x, enemy[0].rect.y, self)
         self.all_sprites.add(explosion)
+        self.explosion_sound.play()
 
     # Check for player collision with boss enemey (only level 4)
     if self.player.level == 5:
