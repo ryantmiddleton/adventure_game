@@ -45,7 +45,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 5
+    self.level = 3
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -252,7 +252,7 @@ class Spider(pg.sprite.Sprite):
       # Loop through each platform the spider is touching
       # And see which points of the spider are touching
       for platform in collided_platforms:
-        # print("platform topright: " + str(platform.rect.topright))
+        # print("platform bottomright: " + str(platform.rect.bottomright))
         # print("platform topleft: " + str(platform.rect.topleft))
         # If Spider is falling and has collided with a platform
         if self.vel > 1 and self.rect.bottom > platform.rect.top + 1:
@@ -296,6 +296,15 @@ class Spider(pg.sprite.Sprite):
         # Advance the spider based on orientation
         if self.isHanging(contact_points):
           self.orient = 180
+          # If Spider is above player check if spider wants to drop
+          if self.game.player.pos.y > self.rect.y:
+            # Drop off the platform
+            rand_num = randint(1,1000)
+            if rand_num <= 5:
+              # print(rand_num)
+              self.rect.top += 1
+              self.orient = 0
+          # Move the Spider based on current direction
           if self.dir == LEFT:
             self.frames = self.game.spider_right_images
             self.rect.x -= 1
@@ -307,18 +316,15 @@ class Spider(pg.sprite.Sprite):
           # If Spider has reached the edge of the platform decide if it wants to switch direction
           if self.rect.topright[0] == platform.rect.bottomright[0] or self.rect.topleft[0] == platform.rect.bottomleft[0]:
             if randint(1,15) <= 5:
-              self.frames = self.game.spider_left_images
-              self.dir = LEFT
+              if self.dir == RIGHT:
+                self.frames = self.game.spider_left_images
+                # print("switching left")
+                self.dir = LEFT
             else:
-              self.frames = self.game.spider_right_images
-              self.dir = RIGHT
-          else:
-            # Drop off the platform
-            rand_num = randint(1,5000)
-            if rand_num <= 5:
-              # print(rand_num)
-              self.rect.top += 1
-              self.orient = 0
+              if self.dir == LEFT:
+                self.frames = self.game.spider_right_images
+                # print ("switching right")
+                self.dir = RIGHT
 
         elif self.isWalking(contact_points):
           self.orient = 0
@@ -465,12 +471,13 @@ class Spider(pg.sprite.Sprite):
       self.rect.y += self.vel
       self.orient = 0
       rand_num = randint(1,10)
-      if rand_num <= 5:
-        self.frames = self.game.spider_left_images
-        self.dir = LEFT
-      else:
-        self.frames = self.game.spider_right_images
-        self.dir = RIGHT
+      self.frames = self.game.spider_drop_images
+      # if rand_num <= 5:
+      #   self.frames = self.game.spider_left_images
+      #   self.dir = LEFT
+      # else:
+      #   self.frames = self.game.spider_right_images
+      #   self.dir = RIGHT
   
     # Animate the spider's legs by cycling through each image
     if self.image_num < len(self.frames) and self.anima_speed == 0:
@@ -493,11 +500,6 @@ class Spider(pg.sprite.Sprite):
     
   def isGripping_left(self, points):
     return points["TL"] and points["BL"]  and (points["TR"] == False and points["BR"] == False)
-
-  def flip_images(self):
-    for i in range (len(self.frames)):
-      self.frames[i] = pg.transform.flip(self.frames[i], True, False)
-    return self.frames
 
 class Acid(pg.sprite.Sprite):
   def __init__(self, game, x, y):
