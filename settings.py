@@ -133,7 +133,8 @@ MAP5_PLATFORM_LIST = [
   (-150, HEIGHT - 40),
   (0, HEIGHT * 3/4),
   (300, HEIGHT /2),
-  (650, HEIGHT /2),
+  (450, HEIGHT /2),
+  (600, HEIGHT /2),
   (950, HEIGHT * 3/4),
 ]
 

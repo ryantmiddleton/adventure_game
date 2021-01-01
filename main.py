@@ -186,7 +186,8 @@ class Game:
         if len(self.platforms) ==0:
           self.playing= False
 
-    bullet_platform_hit = pg.sprite.groupcollide(self.bullets, self.platforms, True, False)  
+    bullet_platform_hit = pg.sprite.groupcollide(self.bullets, self.platforms, True, False) 
+    bullet_bossplatform_hit = pg.sprite.groupcollide(self.bullets, self.platform_boss, True, False) 
 
     # Player Collision Detection
     # Heart Collision Detection
@@ -267,9 +268,9 @@ class Game:
       if shoot_boss:
         boss.health -= 1
         if boss.vel.x < 0:
-          boss.vel.x -= 2
+          boss.vel.x -= 5
         if boss.vel.x > 0:
-          boss.vel.x += 2
+          boss.vel.x += 5
       if boss.health <= 0:
         boss.deadboss = True
         self.score += 15
@@ -310,7 +311,7 @@ class Game:
         self.all_sprites.add(explosion)
 
     # Check for player collision with boss enemey (only level 4)
-    if self.player.level == 4:
+    if self.player.level == 5:
       boss_hit = pg.sprite.spritecollide(self.player, self.boss, False)
       if boss_hit:
         self.player.health -= 1
@@ -656,7 +657,7 @@ class Game:
     pg.mixer.music.play(loops = -1)
     self.screen.fill(BLACK)
     self.draw_text("Congrats! You have won!!!", 75, BLUE, WIDTH /2, HEIGHT / 2)
-    # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2)
+    # self.draw_text("Score: " + str(temp) + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT /2 + 150)
     
     # if self.score > self.highscore:
     #   self.highscore = self.score
