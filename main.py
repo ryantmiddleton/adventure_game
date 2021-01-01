@@ -432,6 +432,10 @@ class Game:
       self.acid_pools.add(acid5)
       self.all_sprites.add(acid6)
       self.acid_pools.add(acid6)
+      # Level 2 Coins
+      coin = Coin(self.platform_spritesheet, -200, HEIGHT - 70)
+      self.all_sprites.add(coin)
+      self.coin.add(coin)
 
     # LEVEL 3
     if self.player.level == 3:
