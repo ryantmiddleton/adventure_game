@@ -267,10 +267,14 @@ class Game:
     for boss in self.boss:
       if shoot_boss:
         boss.health -= 1
+        if boss.rect.y > HEIGHT/2:
+          boss.rect.y -= 250
+        if boss.rect.y < HEIGHT/2:
+          boss.rect.y += 250
         if boss.vel.x < 0:
-          boss.vel.x -= 5
+          boss.vel.x -= 8
         if boss.vel.x > 0:
-          boss.vel.x += 5
+          boss.vel.x += 8
       if boss.health <= 0:
         boss.deadboss = True
         self.score += 15
@@ -316,6 +320,7 @@ class Game:
       if boss_hit:
         self.player.health -= 1
         self.score -= .5
+        self.player.vel.y = -5
       if self.player.health <= 0:
         self.playing = False
 
