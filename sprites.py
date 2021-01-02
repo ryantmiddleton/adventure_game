@@ -45,7 +45,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 1
+    self.level = 3
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
@@ -257,6 +257,10 @@ class Spider(pg.sprite.Sprite):
         # If Spider is falling and has collided with a platform
         if self.vel > 1 and self.rect.bottom > platform.rect.top + 1:
           self.rect.bottom = platform.rect.top + 1
+          if self.dir == LEFT:
+            self.frames = self.game.spider_left_images
+          else:
+            self.frames = self.game.spider_right_images
           self.image = pg.transform.rotate(self.frames[0], 0)
           # print("spider bottom: " + str(self.rect.bottom))
           self.vel = 1
@@ -297,9 +301,9 @@ class Spider(pg.sprite.Sprite):
         if self.isHanging(contact_points):
           self.orient = 180
           # If Spider is above player check if spider wants to drop
-          if self.game.player.pos.y > self.rect.y:
+          if self.game.player.rect.y > self.rect.y:
             # Drop off the platform
-            rand_num = randint(1,1000)
+            rand_num = randint(1,5000)
             if rand_num <= 5:
               # print(rand_num)
               self.rect.top += 1
@@ -315,7 +319,7 @@ class Spider(pg.sprite.Sprite):
             # print("hangin right")
           # If Spider has reached the edge of the platform decide if it wants to switch direction
           if self.rect.topright[0] == platform.rect.bottomright[0] or self.rect.topleft[0] == platform.rect.bottomleft[0]:
-            if randint(1,15) <= 5:
+            if randint(1,10) <= 5:
               if self.dir == RIGHT:
                 self.frames = self.game.spider_left_images
                 # print("switching left")
@@ -571,7 +575,7 @@ class Spritesheet():
 class Door(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/door.png").convert(),0,1)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/door.png").convert_alpha(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
@@ -581,7 +585,7 @@ class Door(pg.sprite.Sprite):
 class Key(pg.sprite.Sprite):
   def __init__(self, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/keyYellow.png").convert(),0,1)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/keyYellow.png").convert_alpha(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
@@ -675,15 +679,15 @@ class Bat(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.game = game
 
-    scale_size = 2.5
+    scale_size = 2
     # Load and Scale the up_left image
     self.image_up_left = pg.image.load("imgs/bat-up.png")
-    self.image_up_left = pg.transform.scale(self.image_up_left, (int(self.image_up_left.get_width() * scale_size), int(self.image_up_left.get_height() * scale_size)))
+    self.image_up_left = pg.transform.rotozoom(self.image_up_left, 0, scale_size)
     self.image_up_left = self.image_up_left.convert_alpha()
 
     # Scale the down_left image
     self.image_down_left = pg.image.load("imgs/bat-down.png")
-    self.image_down_left = pg.transform.scale(self.image_down_left, (int(self.image_down_left.get_width() * scale_size), int(self.image_down_left.get_height() * scale_size)))
+    self.image_down_left = pg.transform.rotozoom(self.image_down_left, 0, scale_size)
     self.image_down_left = self.image_down_left.convert_alpha()
 
     self.image_up_right = pg.transform.flip(self.image_up_left, True, False)

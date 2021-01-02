@@ -78,6 +78,9 @@ class Game:
     self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'jump_snd.wav'))
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
     self.explosion_sound = pg.mixer.Sound(path.join(self.snd_dir, 'explosion.wav'))
+    self.heart_sound = pg.mixer.Sound(path.join(self.snd_dir, 'heart2.wav'))
+    self.coin_sound = pg.mixer.Sound(path.join(self.snd_dir, 'coin2.wav'))
+    self.key_sound = pg.mixer.Sound(path.join(self.snd_dir, 'key.wav'))
 
   def new(self):
     # start a new game
@@ -95,8 +98,8 @@ class Game:
     self.doors = pg.sprite.Group()
     self.keys = pg.sprite.Group()
     self.boss = pg.sprite.Group()
-    self.heart = pg.sprite.Group()
-    self.coin = pg.sprite.Group()
+    self.hearts = pg.sprite.Group()
+    self.coins = pg.sprite.Group()
     self.bat_timer = 0
     self.small_boss_timer = 0
     # Add player to sprite group
@@ -144,7 +147,7 @@ class Game:
           self.player.jumping = False
     
     # Load enemies - bats
-    if self.player.level == 2:
+    if self.player.level == 2 or self.player.level == 3:
     # Spawn bats
       now = pg.time.get_ticks()
       if now - self.bat_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
@@ -152,7 +155,6 @@ class Game:
         bat = Bat(self)
         self.all_sprites.add(bat)
         self.enemies.add(bat)
-
     
     # Set scrolling variables 
     if self.player.level == 3:
@@ -193,8 +195,9 @@ class Game:
 
     # Player Collision Detection
     # Heart Collision Detection
-    heart_hit = pg.sprite.spritecollideany(self.player, self.heart)
+    heart_hit = pg.sprite.spritecollideany(self.player, self.hearts)
     if heart_hit:
+      self.heart_sound.play()
       if self.player.health == 25:
         heart_hit.kill()
         print("Player Health Does Not Increase")
@@ -227,6 +230,7 @@ class Game:
     key_hit = pg.sprite.spritecollideany(self.player, self.keys)
     # If a player collides with a key, the key sprite is returned (not None)
     if key_hit != None:
+      self.key_sound.play()
       # remove the key from the screen
       key_hit.kill()
       self.score += 5
@@ -255,11 +259,11 @@ class Game:
           door.kill()
         for acid in self.acid_pools:
           acid.kill()
-        for heart in self.heart:
+        for heart in self.hearts:
           heart.kill()
         for spider in self.enemies:
           spider.kill()
-        for coin in self.coin:
+        for coin in self.coins:
           coin.kill()
         # Load a new level
         self.load_level()
@@ -300,11 +304,11 @@ class Game:
         self.playing = False
 
     # Coin Collision Detection
-    coin_hit = pg.sprite.spritecollide(self.player, self.coin, False)
+    coin_hit = pg.sprite.spritecollide(self.player, self.coins, False)
     if coin_hit:
       self.score += 1
-      for coin in self.coin:
-        coin.kill()
+      self.coin_sound.play()
+      coin_hit[0].kill()
 
     #Bullet Collision Detection
     # If any bullets hit any enemies kill those bullets and enemies
@@ -371,7 +375,7 @@ class Game:
       self.doors.add(d)
       h = Heart(self, 250, 60, 10, 10)
       self.all_sprites.add(h)
-      self.heart.add(h)
+      self.hearts.add(h)
       # Add Level 1 Key
       k = Key(500, 175, 10, 10)
       self.all_sprites.add(k)
@@ -396,7 +400,7 @@ class Game:
 
       coin = Coin(self.platform_spritesheet, 250, 20)
       self.all_sprites.add(coin)
-      self.coin.add(coin)
+      self.coins.add(coin)
 
     # LEVEL 2
     if self.player.level == 2:
@@ -418,7 +422,7 @@ class Game:
       self.keys.add(k)
       h = Heart(self, 775, 60, 10, 10)
       self.all_sprites.add(h)
-      self.heart.add(h)
+      self.hearts.add(h)
       # Level 2 Acid
       acid = Acid(self, 0, HEIGHT - 60)
       acid1 = Acid(self, 75, HEIGHT - 60)
@@ -444,20 +448,38 @@ class Game:
       # Level 2 Coins
       coin = Coin(self.platform_spritesheet, -200, HEIGHT - 70)
       self.all_sprites.add(coin)
-      self.coin.add(coin)
+      self.coins.add(coin)
 
     # LEVEL 3
     if self.player.level == 3:
+      # Initialize sprite counts
       num_spiders = 20
+      num_coins = 10
+      num_spikes = 10
+
+      # Level 3 Door
+      d = Door(900, 150, 10, 10)
+      self.all_sprites.add(d)
+      self.doors.add(d)
+      # Level 3 Key
+      k = Key(300, -1375, 10, 20)
+      self.all_sprites.add(k)
+      self.keys.add(k)
+      # Level 3 Heart
+      h = Heart(self, 50, 640, 10, 10)
+      self.all_sprites.add(h)
+      self.hearts.add(h)
+
       # Add Platforms
       gp = Ground_Platform(0, HEIGHT - 40, WIDTH, 96)
       self.all_sprites.add(gp)
-      self.platforms.add(gp)
+      self.platforms.add(gp) 
       for plat in MAP3_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
         self.platforms.add(p)
-        # Add enemies to each platform
+
+        # Add spiders to each platform
         if num_spiders > 0:
           rand_num = randint(1,5)
           if rand_num <= 5:     
@@ -467,18 +489,60 @@ class Game:
           self.all_sprites.add(spider)
           self.enemies.add(spider)
           num_spiders -= 1
-      # for spider_pos in MAP3_SPIDERS_LIST:
-      #   spider = Spider(*spider_pos, self)
-      #   self.all_sprites.add(spider)
-      #   self.enemies.add(spider)
-      # Level 3 Door
-      d = Door(300, -1445, 10, 20)
-      self.all_sprites.add(d)
-      self.doors.add(d)
-      # Level 3 Key
-      k = Key(950, 200, 10, 10)
-      self.all_sprites.add(k)
-      self.keys.add(k)
+
+        # Add Coins
+        if num_coins > 0:
+          rand_num = randint(1,1000)
+          # Set Coin at left edage of platform
+          if rand_num <= 100:
+            coin = Coin(self.platform_spritesheet, p.rect.topleft[0], p.rect.topleft[1] - 30)
+            self.all_sprites.add(coin)
+            self.coins.add(coin)
+            num_coins -= 1
+          # Set Coin in center of platform
+          elif rand_num >= 250 and rand_num <= 350:
+            coin = Coin(self.platform_spritesheet, p.rect.midtop[0]-25, p.rect.midtop[1] - 30)
+            self.all_sprites.add(coin)
+            self.coins.add(coin)
+            num_coins -= 1
+          # Set Coin at right edge of platform
+          elif rand_num >= 800 and rand_num <= 900:
+            coin = Coin(self.platform_spritesheet,  p.rect.topright[0]-25, p.rect.topright[1] - 30)
+            self.all_sprites.add(coin)
+            self.coins.add(coin)
+            num_coins -= 1
+  
+        # Add Spikes
+        if num_spikes > 0:
+          spike = None
+          rand_num = randint(1,1000)
+          # Set spikes at left edge of platform
+          if rand_num <= 100:
+            spike = Acid(self, p.rect.topleft[0], p.rect.topleft[1] - 25)
+            self.all_sprites.add(spike)
+            self.acid_pools.add(spike)
+            num_spikes -= 1
+          # Set spikes at center of platform
+          elif rand_num >= 250 and rand_num <= 350:
+            spike = Acid(self, p.rect.midtop[0]-25, p.rect.midtop[1] - 25)
+            self.all_sprites.add(spike)
+            self.acid_pools.add(spike)
+            num_spikes -= 1
+          # Set spikes at right edge of platform
+          elif rand_num >= 800 and rand_num <= 900:
+            spike = Acid(self, p.rect.topright[0] - 50, p.rect.topright[1] - 25)
+            self.all_sprites.add(spike)
+            self.acid_pools.add(spike)
+            num_spikes -= 1
+          # Do not put spikes where items are
+          if spike != None:
+            door_conflicts = pg.sprite.spritecollideany(p, self.doors)
+            heart_conflicts = pg.sprite.spritecollideany(p, self.hearts)
+            key_conflicts = pg.sprite.spritecollideany(p, self.keys)
+            coin_conflicts = pg.sprite.spritecollideany(p, self.coins)
+            if door_conflicts or heart_conflicts or key_conflicts or coin_conflicts:
+              spike.kill()
+              num_spikes += 1
 
     # LEVEL 4
     if self.player.level == 4:
@@ -492,7 +556,7 @@ class Game:
        self.platform_boss.add(p)
       h= Heart(self, -400, HEIGHT * .75 - 50, 10, 10)
       self.all_sprites.add(h)
-      self.heart.add(h)
+      self.hearts.add(h)
       acid5= Acid(self, -200, 350)
       self.all_sprites.add(acid5)
       self.acid_pools.add(acid5)
