@@ -60,7 +60,6 @@ MAP3_SPIDERS_LIST = [
 ]
 
 MAP3_PLATFORM_LIST = [
-    (WIDTH/2 - 50, 400),
     
     (WIDTH/2 - 250, 500),
     (WIDTH/2 + 150, 400),
