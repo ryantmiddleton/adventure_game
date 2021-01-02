@@ -147,7 +147,7 @@ class Game:
           self.player.jumping = False
     
     # Load enemies - bats
-    if self.player.level == 2 or self.player.level == 3:
+    if self.player.level == 1 or self.player.level == 2 or self.player.level == 3:
     # Spawn bats
       now = pg.time.get_ticks()
       if now - self.bat_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
@@ -155,6 +155,12 @@ class Game:
         bat = Bat(self)
         self.all_sprites.add(bat)
         self.enemies.add(bat)
+      #Spawn spiders
+      rand_num = randint(1,5000)
+      if rand_num <= 10:
+        spider_spawn = Spider(int(WIDTH - rand_num * 108), 0, self)
+        self.all_sprites.add(spider_spawn)
+        self.enemies.add(spider_spawn)
     
     # Set scrolling variables 
     if self.player.level == 3:
@@ -364,6 +370,7 @@ class Game:
       gp = Ground_Platform(0, HEIGHT - 40, 2000, 96)
       self.all_sprites.add(gp)
       self.groundplatform.add(gp)
+      self.platforms.add(gp)
       for plat in MAP1_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p) 
@@ -408,6 +415,7 @@ class Game:
       gp = Ground_Platform(-500, HEIGHT - 40, 2000, 96)
       self.all_sprites.add(gp)
       self.groundplatform.add(gp)
+      self.platforms.add(gp)
       for plat in MAP2_PLATFORM_LIST:
         p = Platform(self.platform_spritesheet, *plat)
         self.all_sprites.add(p)
@@ -462,9 +470,11 @@ class Game:
       self.all_sprites.add(d)
       self.doors.add(d)
       # Level 3 Key
-      k = Key(300, -1375, 10, 20)
-      self.all_sprites.add(k)
-      self.keys.add(k)
+      # Check if player got the key but then died
+      if self.player.hasKey == False:
+        k = Key(300, -1375, 10, 20)
+        self.all_sprites.add(k)
+        self.keys.add(k)
       # Level 3 Heart
       h = Heart(self, 50, 640, 10, 10)
       self.all_sprites.add(h)
@@ -492,6 +502,7 @@ class Game:
 
         # Add Coins
         if num_coins > 0:
+          coin = None
           rand_num = randint(1,1000)
           # Set Coin at left edage of platform
           if rand_num <= 100:
@@ -511,7 +522,20 @@ class Game:
             self.all_sprites.add(coin)
             self.coins.add(coin)
             num_coins -= 1
-  
+          # Make sure there are no conflicts with existing items
+          if coin != None:
+            door_conflicts = pg.sprite.spritecollideany(coin, self.doors)
+            heart_conflicts = pg.sprite.spritecollideany(coin, self.hearts)
+            key_conflicts = pg.sprite.spritecollideany(coin, self.keys)
+            spike_conflicts = pg.sprite.spritecollideany(coin, self.acid_pools)
+            # Make sure the new coin isn't on top of another one (besides itself)
+            coin_conflicts = pg.sprite.spritecollideany(coin, self.coins)
+            if coin.rect == coin_conflicts.rect:
+              coin_conflicts = None
+            if door_conflicts or heart_conflicts or key_conflicts or spike_conflicts or coin_conflicts:
+              coin.kill()
+              num_coins += 1
+
         # Add Spikes
         if num_spikes > 0:
           spike = None
@@ -534,13 +558,17 @@ class Game:
             self.all_sprites.add(spike)
             self.acid_pools.add(spike)
             num_spikes -= 1
-          # Do not put spikes where items are
+          # Do not put spikes where items already exist 
           if spike != None:
-            door_conflicts = pg.sprite.spritecollideany(p, self.doors)
-            heart_conflicts = pg.sprite.spritecollideany(p, self.hearts)
-            key_conflicts = pg.sprite.spritecollideany(p, self.keys)
-            coin_conflicts = pg.sprite.spritecollideany(p, self.coins)
-            if door_conflicts or heart_conflicts or key_conflicts or coin_conflicts:
+            door_conflicts = pg.sprite.spritecollideany(spike, self.doors)
+            heart_conflicts = pg.sprite.spritecollideany(spike, self.hearts)
+            key_conflicts = pg.sprite.spritecollideany(spike, self.keys)
+            coin_conflicts = pg.sprite.spritecollideany(spike, self.coins)
+            # Make sure the new spike isn't on top of another one (besides itself)
+            spike_conflicts = pg.sprite.spritecollideany(spike, self.acid_pools)
+            if spike.rect == spike_conflicts.rect:
+              spike_conflicts = None
+            if door_conflicts or heart_conflicts or key_conflicts or coin_conflicts or spike_conflicts:
               spike.kill()
               num_spikes += 1
 
