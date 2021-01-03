@@ -79,8 +79,9 @@ class Game:
     self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, 'shoot.wav'))
     self.explosion_sound = pg.mixer.Sound(path.join(self.snd_dir, 'explosion.wav'))
     self.heart_sound = pg.mixer.Sound(path.join(self.snd_dir, 'heart2.wav'))
-    self.coin_sound = pg.mixer.Sound(path.join(self.snd_dir, 'coin2.wav'))
+    self.coin_sound = pg.mixer.Sound(path.join(self.snd_dir, 'coin4.wav'))
     self.key_sound = pg.mixer.Sound(path.join(self.snd_dir, 'key.wav'))
+    self.door_sound = pg.mixer.Sound(path.join(self.snd_dir, 'door4.wav'))
 
   def new(self):
     # start a new game
@@ -247,6 +248,7 @@ class Game:
     door_hit = pg.sprite.spritecollideany(self.player, self.doors)
     # If a player collides with a door and has already gotten the key, the door sprite is returned
     if door_hit != None and self.player.hasKey:
+        self.door_sound.play()
       # Go to the next level
         self.player.level += 1
         self.score += 10
@@ -560,6 +562,7 @@ class Game:
             num_spikes -= 1
           # Do not put spikes where items already exist 
           if spike != None:
+            print("spike created")
             door_conflicts = pg.sprite.spritecollideany(spike, self.doors)
             heart_conflicts = pg.sprite.spritecollideany(spike, self.hearts)
             key_conflicts = pg.sprite.spritecollideany(spike, self.keys)
@@ -569,6 +572,7 @@ class Game:
             if spike.rect == spike_conflicts.rect:
               spike_conflicts = None
             if door_conflicts or heart_conflicts or key_conflicts or coin_conflicts or spike_conflicts:
+              print("spikes aborted")
               spike.kill()
               num_spikes += 1
 
