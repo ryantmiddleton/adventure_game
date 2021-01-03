@@ -562,7 +562,6 @@ class Game:
             num_spikes -= 1
           # Do not put spikes where items already exist 
           if spike != None:
-            print("spike created")
             door_conflicts = pg.sprite.spritecollideany(spike, self.doors)
             heart_conflicts = pg.sprite.spritecollideany(spike, self.hearts)
             key_conflicts = pg.sprite.spritecollideany(spike, self.keys)
@@ -572,7 +571,6 @@ class Game:
             if spike.rect == spike_conflicts.rect:
               spike_conflicts = None
             if door_conflicts or heart_conflicts or key_conflicts or coin_conflicts or spike_conflicts:
-              print("spikes aborted")
               spike.kill()
               num_spikes += 1
 
