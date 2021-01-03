@@ -207,31 +207,31 @@ class Game:
       self.heart_sound.play()
       if self.player.health == 25:
         heart_hit.kill()
-        print("Player Health Does Not Increase")
+        # print("Player Health Does Not Increase")
       if self.player.health == 24:
         heart_hit.kill()
         self.player.health += 1
-        print("Player Health increases by 1")
+        # print("Player Health increases by 1")
       if self.player.health == 23:
         heart_hit.kill()
         self.player.health += 2
-        print("Player Health increases by 2")
+        # print("Player Health increases by 2")
       if self.player.health == 22:
         heart_hit.kill()
         self.player.health += 3
-        print("Player Health increases by 3")
+        # print("Player Health increases by 3")
       if self.player.health == 21:
         heart_hit.kill()
         self.player.health += 4
-        print("Player Health increases by 4")
+        # print("Player Health increases by 4")
       if self.player.health == 20:
         heart_hit.kill()
         self.player.health += 5
-        print("Player Health increases by 5")
+        # print("Player Health increases by 5")
       if self.player.health <= 19:
         heart_hit.kill()
         self.player.health += 5
-        print("Player Health increases by 5")
+        # print("Player Health increases by 5")
 
     # Key collision detection for any of the keys
     key_hit = pg.sprite.spritecollideany(self.player, self.keys)
@@ -296,7 +296,7 @@ class Game:
           boss.kill()
         self.player.level += 1   
         self.load_level()
-        print("You Have Won!")
+        # print("You Have Won!")
 
     # Acid collision detection
     acid_hit = pg.sprite.spritecollide(self.player, self.acid_pools, False)
@@ -577,7 +577,7 @@ class Game:
     # LEVEL 4
     if self.player.level == 4:
       temp = self.score
-      print(temp)
+      # print(temp)
       self.score = 0
       # Level 4 Platforms
       for plat in MAP4_PLATFORM_LIST:
