@@ -35,7 +35,7 @@ class Player(pg.sprite.Sprite):
 
 
     # Player Image and rectangle surface
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert(),0,2)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert_alpha(),0,2)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
@@ -58,21 +58,21 @@ class Player(pg.sprite.Sprite):
 
     # update to left running player image
     if keys[K_LEFT]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/left_run.png").convert(), 0, 2)
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/left_run.png").convert_alpha(), 0, 2)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = -PLAYER_ACC
       self.left = True
 
     #update to right running player image 
     if keys[K_RIGHT]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/run_right.png").convert(), 0, 2)
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/run_right.png").convert_alpha(), 0, 2)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
       self.left = False
 
     # update to jumping player image
     if keys[K_UP]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert(), 0, 2)
+      self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert_alpha(), 0, 2)
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
     # apply friction
@@ -596,7 +596,7 @@ class Heart(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/heart.png").convert(),0,1)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/heart.png").convert_alpha(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
@@ -626,8 +626,8 @@ class Boss(pg.sprite.Sprite):
     pg.sprite.Sprite.__init__(self)
     self.game = game
     self.vel = vec(0, 0)
-    self.left_image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert(),0,1)
-    self.right_image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert(),0,1)
+    self.left_image = pg.transform.rotozoom(pg.image.load("imgs/boss.png").convert_alpha(),0,1)
+    self.right_image = pg.transform.rotozoom(pg.image.load("imgs/boss_left.png").convert_alpha(),0,1)
     self.image = self.left_image
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
@@ -742,7 +742,7 @@ class Small_Boss(pg.sprite.Sprite):
   def __init__(self, game, x, y, w, h):
     pg.sprite.Sprite.__init__(self)
     self.game = game
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/small_boss.png").convert(),0,1)
+    self.image = pg.transform.rotozoom(pg.image.load("imgs/small_boss.png").convert_alpha(),0,1)
     self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
