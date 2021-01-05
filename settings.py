@@ -8,7 +8,7 @@ FONT_NAME = 'bloddy.ttf'
 HS_FILE = 'highscore.txt'
 
 # Player properties
-PLAYER_ACC = 0.5
+PLAYER_ACC = 1
 PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.5
 PLAYER_JUMP = 15

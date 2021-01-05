@@ -72,8 +72,12 @@ class Player(pg.sprite.Sprite):
 
     # update to jumping player image
     if keys[K_UP]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert_alpha(), 0, 2)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      if self.left == False:
+        self.image = pg.transform.rotozoom(pg.transform.flip(pg.image.load("imgs/jump outline.png"), True, False).convert_alpha(), 0, 2)
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      else:  
+        self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert_alpha(), 0, 2)
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
     # apply friction
     self.acc.x += self.vel.x * PLAYER_FRICTION
