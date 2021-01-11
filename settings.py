@@ -15,6 +15,8 @@ PLAYER_JUMP = 15
 PLAYER_HEALTH = 25
 
 HAS_KEY = False
+PLAYER_IDLE_SPRITESHEET = "Player_Idle_Spritesheet.png"
+PLAYER_RUN_SPRITESHEET = "Player_Run_Spritesheet.png"
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"
