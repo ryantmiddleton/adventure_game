@@ -1,3 +1,5 @@
+import pygame as pg
+
 # game options
 TITLE = "Metoidvania"
 WIDTH = 1080
@@ -16,7 +18,9 @@ PLAYER_HEALTH = 25
 
 HAS_KEY = False
 PLAYER_IDLE_SPRITESHEET = "Player_Idle_Spritesheet.png"
+PLAYER_IDLE_SPRITESHEET_LEFT = "Player_Idle_Spritesheet_Left.png"
 PLAYER_RUN_SPRITESHEET = "Player_Run_Spritesheet.png"
+PLAYER_RUN_SPRITESHEET_LEFT = "Player_Run_Spritesheet_Left.png"
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"

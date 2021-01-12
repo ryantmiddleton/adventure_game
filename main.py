@@ -75,6 +75,12 @@ class Game:
     self.idle_images = player_idle_spritesheet.strip_from_sheet(player_idle_spritesheet.image_sheet , (0,0), (11,0), (size[0]/12, size[1]))
     for i in range (len(self.idle_images)):
       self.idle_images[i] = pg.transform.rotozoom(self.idle_images[i], 0, 2)
+    
+    player_idle_spritesheet_left = Spritesheet(path.join(self.img_dir, PLAYER_IDLE_SPRITESHEET_LEFT))
+    size = player_idle_spritesheet_left.image_sheet.get_size()
+    self.idle_images_left = player_idle_spritesheet_left.strip_from_sheet(player_idle_spritesheet_left.image_sheet , (0,0), (11,0), (size[0]/12, size[1]))
+    for i in range (len(self.idle_images_left)):
+      self.idle_images_left[i] = pg.transform.rotozoom(self.idle_images_left[i], 0, 2)
 
     # Load Player Run Images
     player_run_spritesheet = Spritesheet(path.join(self.img_dir, PLAYER_RUN_SPRITESHEET))
@@ -82,6 +88,12 @@ class Game:
     self.run_images = player_run_spritesheet.strip_from_sheet(player_run_spritesheet.image_sheet, (0,0), (7,0), (size[0]/8, size[1]))
     for i in range (len(self.run_images)):
       self.run_images[i] = pg.transform.rotozoom(self.run_images[i], 0, 2)
+
+    player_run_spritesheet_left = Spritesheet(path.join(self.img_dir, PLAYER_RUN_SPRITESHEET_LEFT))
+    size = player_run_spritesheet_left.image_sheet.get_size()
+    self.run_images_left = player_run_spritesheet_left.strip_from_sheet(player_run_spritesheet_left.image_sheet, (0,0), (7,0), (size[0]/8, size[1]))
+    for i in range (len(self.run_images_left)):
+      self.run_images_left[i] = pg.transform.rotozoom(self.run_images_left[i], 0, 2)
 
 
     # Load Explosion Images

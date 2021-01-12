@@ -36,9 +36,10 @@ class Player(pg.sprite.Sprite):
 
     # Player Image and rectangle surface
     self.frames = game.idle_images
-    self.image = self.frames[0]
+    self.frames_left = game.idle_images_left    
     self.run_frames = game.run_images
-    self.run_image = self.run_frames[0]
+    self.run_frames_left = game.run_images_left
+    self.image = self.frames[0]
     # self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert_alpha(),0,2)
     # self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
@@ -72,6 +73,16 @@ class Player(pg.sprite.Sprite):
       self.acc.x = -PLAYER_ACC
       self.left = True
 
+    #Run left animation
+      if self.run_num < len(self.run_frames_left) and self.anima_speed == 0:
+        self.run_num += 1
+        if self.run_num == len(self.run_frames_left):
+          self.run_num = 0
+        self.anima_speed = 3
+        self.image = pg.transform.rotate(self.run_frames_left[self.run_num], self.orient)
+      else:
+        self.anima_speed -= 1
+
     #update to right running player image 
     if keys[K_RIGHT]:
       # self.image = pg.transform.rotozoom(pg.image.load("imgs/run_right.png").convert_alpha(), 0, 2)
@@ -79,8 +90,8 @@ class Player(pg.sprite.Sprite):
       self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
       self.left = False
-      #Run animation
-      
+
+      #Run right animation
       if self.run_num < len(self.run_frames) and self.anima_speed == 0:
         self.run_num += 1
         if self.run_num == len(self.run_frames):
@@ -114,16 +125,27 @@ class Player(pg.sprite.Sprite):
     self.rect.midbottom = self.pos
 
     #Idle animimation
-    if self.image_num < len(self.frames) and self.anima_speed == 0:
-      self.image_num += 1
-      if self.image_num == len(self.frames):
-        self.image_num = 0
-      self.anima_speed = 3
-      self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+    if self.left == True:
+      if self.vel.x <= 1:
+        if self.image_num < len(self.frames_left) and self.anima_speed == 0:
+          self.image_num += 1
+          if self.image_num == len(self.frames_left):
+            self.image_num = 0
+          self.anima_speed = 3
+          self.image = pg.transform.rotate(self.frames_left[self.image_num], self.orient)
+          self.image.set_colorkey(WHITE, RLEACCEL)
+        else:
+          self.anima_speed -= 1
     else:
-      self.anima_speed -= 1
-
-    
+      if self.vel.x <= 1:
+        if self.image_num < len(self.frames) and self.anima_speed == 0:
+          self.image_num += 1
+          if self.image_num == len(self.frames):
+            self.image_num = 0
+          self.anima_speed = 3
+          self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+        else:
+          self.anima_speed -= 1
   
     
   def jump_cut(self):
