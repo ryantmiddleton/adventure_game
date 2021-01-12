@@ -1,3 +1,5 @@
+import pygame as pg
+
 # game options
 TITLE = "Metoidvania"
 WIDTH = 1080
