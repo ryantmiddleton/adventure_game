@@ -188,7 +188,7 @@ class Game:
       #Spawn spiders
       rand_num = randint(1,5000)
       if rand_num <= 10:
-        spider_spawn = Spider(int(WIDTH - rand_num * 108), 0, self)
+        spider_spawn = Spider(int(WIDTH - (rand_num * 108)), 0, self)
         self.all_sprites.add(spider_spawn)
         self.enemies.add(spider_spawn)
     
