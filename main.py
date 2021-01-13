@@ -197,22 +197,25 @@ class Game:
       # Vertical (y) scrolling
       scroll_dir = 1
       scroll_dim = 3
+      scroll_tol = HEIGHT/2
       screen_dim = HEIGHT
     else:
       # Side (x) scrolling
       scroll_dir = 0
       scroll_dim = 2
+      scroll_tol = WIDTH/3
       screen_dim = WIDTH
 
     # If player reaches the top/right 25% of the screen
     # scroll all sprites down (increase x/y coord)
-    if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 3:
+    # if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 3:
+    if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= scroll_tol:
       for sprite in self.all_sprites:
         sprite.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
     # If player reaches the bottom/left 25% of the screen
     # scroll all sprites up/right (decrease x/y coord)
-    elif self.player.rect[scroll_dir] >= screen_dim * .66:
+    elif self.player.rect[scroll_dir] >= screen_dim - scroll_tol:
       for sprite in self.all_sprites:
             sprite.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
