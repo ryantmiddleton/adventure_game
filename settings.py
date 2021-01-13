@@ -1,3 +1,5 @@
+import pygame as pg
+
 # game options
 TITLE = "Metoidvania"
 WIDTH = 1080
@@ -8,13 +10,15 @@ FONT_NAME = 'bloddy.ttf'
 HS_FILE = 'highscore.txt'
 
 # Player properties
-PLAYER_ACC = 0.5
+PLAYER_ACC = 1
 PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.5
 PLAYER_JUMP = 15
 PLAYER_HEALTH = 25
 
 HAS_KEY = False
+PLAYER_IDLE_SPRITESHEET = "Player_Idle_Spritesheet.png"
+PLAYER_RUN_SPRITESHEET = "Player_Run_Spritesheet.png"
 
 # Enemy properties
 SPIDER_SPRITESHEET = "spiders.png"

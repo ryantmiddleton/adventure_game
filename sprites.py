@@ -35,8 +35,13 @@ class Player(pg.sprite.Sprite):
 
 
     # Player Image and rectangle surface
-    self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert_alpha(),0,2)
-    self.image.set_colorkey((255, 255, 255), RLEACCEL)
+    self.frames = game.idle_images
+    self.frames_left = game.idle_images_left    
+    self.run_frames = game.run_images
+    self.run_frames_left = game.run_images_left
+    self.image = self.frames[0]
+    # self.image = pg.transform.rotozoom(pg.image.load("imgs/idle outline.png").convert_alpha(),0,2)
+    # self.image.set_colorkey((255, 255, 255), RLEACCEL)
     self.rect = self.image.get_rect()
     self.rect.center = (WIDTH/2, HEIGHT/2)
 
@@ -50,6 +55,11 @@ class Player(pg.sprite.Sprite):
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
 
+    self.image_num = 0
+    self.run_num = 0
+    self.anima_speed = 3
+    self.image = self.frames[self.image_num]
+    self.orient = 0
  
 
   def update(self):
@@ -58,22 +68,48 @@ class Player(pg.sprite.Sprite):
 
     # update to left running player image
     if keys[K_LEFT]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/left_run.png").convert_alpha(), 0, 2)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      # self.image = pg.transform.rotozoom(pg.image.load("imgs/left_run.png").convert_alpha(), 0, 2)
+      # self.image = self.run_frames_left[self.run_num]
+      # self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = -PLAYER_ACC
       self.left = True
 
+    #Run left animation
+      if self.run_num < len(self.run_frames_left) and self.anima_speed == 0:
+        self.run_num += 1
+        if self.run_num == len(self.run_frames_left):
+          self.run_num = 0
+        self.anima_speed = 2
+        self.image = self.run_frames_left[self.run_num]
+      else:
+        self.anima_speed -= 1
+
     #update to right running player image 
     if keys[K_RIGHT]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/run_right.png").convert_alpha(), 0, 2)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      # self.image = pg.transform.rotozoom(pg.image.load("imgs/run_right.png").convert_alpha(), 0, 2)
+      # self.image = self.run_frames[self.run_num]
+      # self.image.set_colorkey((255, 255, 255), RLEACCEL)
       self.acc.x = PLAYER_ACC
       self.left = False
 
+      #Run right animation
+      if self.run_num < len(self.run_frames) and self.anima_speed == 0:
+        self.run_num += 1
+        if self.run_num == len(self.run_frames):
+          self.run_num = 0
+        self.anima_speed = 2
+        self.image = self.run_frames[self.run_num]
+      else:
+        self.anima_speed -= 1
+
     # update to jumping player image
     if keys[K_UP]:
-      self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert_alpha(), 0, 2)
-      self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      if self.left == False:
+        self.image = pg.transform.rotozoom(pg.transform.flip(pg.image.load("imgs/jump outline.png"), True, False).convert_alpha(), 0, 2)
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+      else:  
+        self.image = pg.transform.rotozoom(pg.image.load("imgs/jump outline.png").convert_alpha(), 0, 2)
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
 
     # apply friction
     self.acc.x += self.vel.x * PLAYER_FRICTION
@@ -88,7 +124,31 @@ class Player(pg.sprite.Sprite):
       self.pos.x = 0 + self.rect.width/2
 
     self.rect.midbottom = self.pos
+
+    #Idle animimation
+    if self.left == True:
+      if self.vel.x >= -4 and self.vel.y >= -1 and self.vel.y <=1:
+        if self.image_num < len(self.frames_left) and self.anima_speed == 0:
+          self.image_num += 1
+          if self.image_num == len(self.frames_left):
+            self.image_num = 0
+          self.anima_speed = 3
+          self.image = pg.transform.rotate(self.frames_left[self.image_num], self.orient)
+          self.image.set_colorkey(WHITE, RLEACCEL)
+        else:
+          self.anima_speed -= 1
+    else:
+      if self.vel.x <= 4 and self.vel.y >= -1 and self.vel.y <=1:
+        if self.image_num < len(self.frames) and self.anima_speed == 0:
+          self.image_num += 1
+          if self.image_num == len(self.frames):
+            self.image_num = 0
+          self.anima_speed = 3
+          self.image = pg.transform.rotate(self.frames[self.image_num], self.orient)
+        else:
+          self.anima_speed -= 1
   
+    
   def jump_cut(self):
     if self.jumping:
       if self.vel.y < -3:
@@ -186,23 +246,23 @@ class Bullet(pg.sprite.Sprite):
 
   def update(self):
     if self.facing == 3:
-      self.rect.y -= 8
-      self.rect.x += 8
+      self.rect.y -= 20
+      self.rect.x += 20
     elif self.facing == -3:
-      self.rect.y -= 8
-      self.rect.x -= 8
+      self.rect.y -= 20
+      self.rect.x -= 20
     elif self.facing == 2:
-      self.rect.y -= 8
+      self.rect.y -= 20
     elif self.facing == -2:
-      self.rect.y += 8
+      self.rect.y += 20
     elif self.facing == 4:
-      self.rect.y += 8
-      self.rect.x += 8
+      self.rect.y += 20
+      self.rect.x += 20
     elif self.facing == -4:
-      self.rect.y += 8
-      self.rect.x -= 8
+      self.rect.y += 20
+      self.rect.x -= 20
     else:
-      self.rect.x += (8*self.facing)
+      self.rect.x += (20*self.facing)
     if self.rect.left > WIDTH: 
       self.kill()
     elif self.rect.right < 0:

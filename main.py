@@ -69,6 +69,35 @@ class Game:
       # self.spider_right_images[i] = pg.transform.rotozoom(self.spider_right_images[i], 0, 1)
       # self.spider_left_images[i] = pg.transform.rotozoom(self.spider_left_images[i], 0, 1)
 
+
+    player_idle_spritesheet = Spritesheet(path.join(self.img_dir, PLAYER_IDLE_SPRITESHEET))
+    size = player_idle_spritesheet.image_sheet.get_size()
+    self.idle_images = player_idle_spritesheet.strip_from_sheet(player_idle_spritesheet.image_sheet , (0,0), (11,0), (size[0]/12, size[1]))
+    for i in range (len(self.idle_images)):
+      self.idle_images[i] = pg.transform.rotozoom(self.idle_images[i], 0, 2)
+    
+    player_idle_spritesheet_left = Spritesheet(path.join(self.img_dir, PLAYER_IDLE_SPRITESHEET))
+    size = player_idle_spritesheet_left.image_sheet.get_size()
+    self.idle_images_left = player_idle_spritesheet_left.strip_from_sheet(player_idle_spritesheet_left.image_sheet , (0,0), (11,0), (size[0]/12, size[1]))
+    for i in range (len(self.idle_images_left)):
+      self.idle_images_left[i] = pg.transform.rotozoom(self.idle_images_left[i], 0, 2)
+      self.idle_images_left[i] = pg.transform.flip(self.idle_images[i], True, False)
+
+    # Load Player Run Images
+    player_run_spritesheet = Spritesheet(path.join(self.img_dir, PLAYER_RUN_SPRITESHEET))
+    size = player_run_spritesheet.image_sheet.get_size()
+    self.run_images = player_run_spritesheet.strip_from_sheet(player_run_spritesheet.image_sheet, (0,0), (7,0), (size[0]/8, size[1]))
+    for i in range (len(self.run_images)):
+      self.run_images[i] = pg.transform.rotozoom(self.run_images[i], 0, 2)
+
+    player_run_spritesheet_left = Spritesheet(path.join(self.img_dir, PLAYER_RUN_SPRITESHEET))
+    size = player_run_spritesheet_left.image_sheet.get_size()
+    self.run_images_left = player_run_spritesheet_left.strip_from_sheet(player_run_spritesheet_left.image_sheet, (0,0), (7,0), (size[0]/8, size[1]))
+    for i in range (len(self.run_images_left)):
+      self.run_images_left[i] = pg.transform.rotozoom(self.run_images_left[i], 0, 2)
+      self.run_images_left[i] = pg.transform.flip(self.run_images_left[i], True, False)
+
+
     # Load Explosion Images
     explosion_spritesheet = Spritesheet(path.join(self.img_dir, EXPLOSION_SPRITESHEET))
     size = explosion_spritesheet.image_sheet.get_size()
@@ -177,13 +206,13 @@ class Game:
 
     # If player reaches the top/right 25% of the screen
     # scroll all sprites down (increase x/y coord)
-    if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 4:
+    if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 3:
       for sprite in self.all_sprites:
         sprite.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
     # If player reaches the bottom/left 25% of the screen
     # scroll all sprites up/right (decrease x/y coord)
-    elif self.player.rect[scroll_dir] >= screen_dim * .75:
+    elif self.player.rect[scroll_dir] >= screen_dim * .66:
       for sprite in self.all_sprites:
             sprite.rect[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
       self.player.pos[scroll_dir] -= abs(int(self.player.vel[scroll_dir]))
