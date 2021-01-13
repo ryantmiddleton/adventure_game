@@ -208,7 +208,6 @@ class Game:
 
     # If player reaches the top/right 25% of the screen
     # scroll all sprites down (increase x/y coord)
-    # if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= screen_dim / 3:
     if self.player.rect[scroll_dir] + self.player.rect[scroll_dim] <= scroll_tol:
       for sprite in self.all_sprites:
         sprite.rect[scroll_dir] += abs(int(self.player.vel[scroll_dir]))
