@@ -246,23 +246,23 @@ class Bullet(pg.sprite.Sprite):
 
   def update(self):
     if self.facing == 3:
-      self.rect.y -= 8
-      self.rect.x += 8
+      self.rect.y -= 20
+      self.rect.x += 20
     elif self.facing == -3:
-      self.rect.y -= 8
-      self.rect.x -= 8
+      self.rect.y -= 20
+      self.rect.x -= 20
     elif self.facing == 2:
-      self.rect.y -= 8
+      self.rect.y -= 20
     elif self.facing == -2:
-      self.rect.y += 8
+      self.rect.y += 20
     elif self.facing == 4:
-      self.rect.y += 8
-      self.rect.x += 8
+      self.rect.y += 20
+      self.rect.x += 20
     elif self.facing == -4:
-      self.rect.y += 8
-      self.rect.x -= 8
+      self.rect.y += 20
+      self.rect.x -= 20
     else:
-      self.rect.x += (8*self.facing)
+      self.rect.x += (20*self.facing)
     if self.rect.left > WIDTH: 
       self.kill()
     elif self.rect.right < 0:
