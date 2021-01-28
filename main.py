@@ -41,7 +41,7 @@ class Game:
     self.player = Player(self)
     
   def load_data(self):
-    # Initialize Path directories
+        # Initialize Path directories
     self.dir = path.dirname(__file__)
     self.img_dir = path.join(self.dir, 'imgs')
     self.snd_dir = path.join(self.dir, 'snd')
