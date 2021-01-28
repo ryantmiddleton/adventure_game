@@ -50,7 +50,7 @@ class Player(pg.sprite.Sprite):
     self.vel = vec(0, 0)
     self.acc = vec(0, 0)
     self.left = False
-    self.level = 3
+    self.level = 1
 
     self.health = PLAYER_HEALTH
     self.max_health = PLAYER_HEALTH
