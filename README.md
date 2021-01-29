@@ -2,6 +2,9 @@
 
 This is a side/vertical scrolling game that takes the player through 4 levels. On each level the player must find a key in order to open the door to the next level. The player gets points by killing/shooting enemies or picking up objects like coins. Hearts restore health.
 
+Gameplay
+[![Alt text for your video](Adventure_Game.mov)]
+
 The title screen
 ![](screenshot_title.jpg)
 
