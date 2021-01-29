@@ -22,6 +22,7 @@ from pygame.locals import (
   K_a,
   K_s,
   K_d,
+  K_p
 )
       
 class Game:
@@ -647,12 +648,16 @@ class Game:
             self.playing = True
             # self.player.level = 1
             self.player.health = 25
+            if event.key == pg.K_p:
+              pg.image.save(self.screen,"screenshot.jpg")
         else:
           if event.type == pg.KEYUP:
             if event.key == pg.K_UP:
               self.player.jump_cut()
 
           if event.type == pg.KEYDOWN:
+            if event.key == pg.K_p:
+              pg.image.save(self.screen,"screenshot.jpg")
             if event.key == pg.K_UP:
               self.player.jump()
               self.player.boss_jump()
